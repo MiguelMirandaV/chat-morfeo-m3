@@ -42,6 +42,18 @@ Estos avisos pertenecen a dependencias de las herramientas, incluyendo el árbol
 - Contrastes calculados sobre la superficie #08110b: texto principal 15.68:1, secundario 8.75:1, acento 14.86:1, error 11.29:1 y placeholder 7.27:1. No se aplica esta medición a elementos decorativos ni controles deshabilitados.
 - Se guardaron diez capturas reales: nueve combinaciones de vista/tamaño y un caso de 281 caracteres, enlazadas desde el README.
 
+## Paso 4 — History API y footer
+
+- Footer actualizado a `© 2026 Miguel Miranda`, con enlace al repositorio GitHub y atributos target=_blank y rel=noopener noreferrer. Se revisó a 320, 768 y 1024 px sin overflow horizontal; las capturas están en docs/capturas/home-copyright-*.jpg.
+- npm test: 17 tests pasando en dos archivos (cuatro de conteo y trece de routing). Los tests comprueban selección de vistas, raíz/barras finales, rutas desconocidas, exclusión de enlaces nativos/externos/recursos, pushState antes del render, destino repetido y destino externo rechazado.
+- En el navegador se comprobó Inicio → Chat → Acerca de → Atrás → Atrás → Adelante. URL, título, enlace activo y foco coincidieron con la vista esperada. El foco se movió a main-content. Las columnas de cascada fueron 28 en Inicio y 0 en Chat/Acerca de.
+- Un proxy temporal local de QA observó una descarga HTML al abrir Inicio y ninguna descarga HTML adicional durante la navegación SPA, Atrás/Adelante, enlaces repetidos o anclas. Con Cmd+click se abrió otra pestaña en Acerca de y el total pasó a dos documentos, lo esperado para una apertura nativa. El proxy y su pestaña se cerraron al terminar; no se añadió código de instrumentación a la aplicación.
+- Pulsar Chat cuando ya era la vista actual conservó el texto de prueba y no eliminó la posibilidad de usar Adelante. Activar Saltar al contenido y volver con Atrás conservó el texto del campo: el popstate de un cambio de ancla no desmonta la misma vista.
+- Se verificaron accesos directos a /, /chat, /chat/?tema=eleccion y /ruta-desconocida. La raíz terminó en /home; la barra final se normalizó conservando el query; la ruta desconocida mostró su vista propia. Recargar /chat mantuvo esa vista.
+- HTTP: /home, /chat, /about, /chat/ y rutas desconocidas/profundas devolvieron el HTML base con 200. app.js, styles.css y utils.js se sirvieron como recursos reales. /api/functions, /_vercel/ruta-inexistente, /inexistente.js, /.env, /.env.local, /.git/config y /package.json devolvieron 404, sin pasar al fallback.
+- La vista de ruta desconocida ofrece regreso a Inicio sin recargar. Su captura está en docs/capturas/ruta-desconocida-1024.jpg. La consola no mostró errores/advertencias durante la verificación.
+- El historial de conversación y la persistencia del borrador entre vistas diferentes todavía no están implementados: esta etapa solo conserva el campo cuando no corresponde remontar la misma vista. El paso 5 gestionará el estado del chat en memoria.
+
 ## Comprobaciones pendientes
 
-Siguen pendientes la navegación SPA sin recargas, la conversación en memoria, fetching, función serverless, Gemini y validación final de producción. Los cuatro tests actuales verifican el conteo; la suite se ampliará al incorporar las funciones restantes.
+Siguen pendientes la conversación en memoria, fetching, función serverless, Gemini y validación final de producción. Las pruebas actuales cubren conteo y routing; la suite se ampliará al incorporar las funciones restantes.

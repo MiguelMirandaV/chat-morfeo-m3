@@ -20,7 +20,15 @@ function header(activePage) {
 }
 
 function footer() {
-  return `<footer class="site-footer"><span>PROYECTO ACADÉMICO <span aria-hidden="true">/</span> HENRY M3</span><a href="/about">Acerca del proyecto ${arrow}</a></footer>`;
+  return `
+    <footer class="site-footer">
+      <span>© 2026 Miguel Miranda</span>
+      <span class="footer-context">PROYECTO ACADÉMICO / HENRY M3</span>
+      <div class="footer-links">
+        <a href="/about">Acerca del proyecto ${arrow}</a>
+        <a href="https://github.com/MiguelMirandaV/chat-morfeo-m3" target="_blank" rel="noopener noreferrer" aria-label="GitHub del proyecto (abre en otra pestaña)">GitHub ${arrow}</a>
+      </div>
+    </footer>`;
 }
 
 function renderHomeView() {
@@ -99,7 +107,7 @@ function renderNotFoundView() {
   return `<main id="main-content" class="not-found page-width" tabindex="-1"><p class="eyebrow">404 / RUTA NO ENCONTRADA</p><h1>Este camino<br>no existe<span class="text-accent">.</span></h1><p>Puedes regresar al inicio y elegir otra dirección.</p><a class="button button-primary" href="/home">Volver a Inicio <span aria-hidden="true">→</span></a></main>`;
 }
 
-/** El efecto pertenece a Home; su cleanup podrá reutilizarse con el router SPA. */
+/** El efecto pertenece a Home; el router llama a su cleanup antes de cambiar de vista. */
 function startMatrixRain(container, control) {
   const characters = Array.from('アイウエオカキクケコサシスセソタチツテトナニヌネノ012345789');
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -157,26 +165,120 @@ function setupComposerPreview() {
   return () => { input.removeEventListener('input', updateCounter); form.removeEventListener('submit', preventPreviewSubmit); };
 }
 
-// La maqueta usa enlaces nativos. La intercepción con History API llega en el paso 4.
 const views = {
-  '/': ['home', renderHomeView, 'Inicio'],
   '/home': ['home', renderHomeView, 'Inicio'],
   '/chat': ['chat', renderChatView, 'Chat'],
   '/about': ['about', renderAboutView, 'Acerca de'],
 };
 
-function mountPreview() {
-  const [page, render, title] = views[window.location.pathname] ?? ['not-found', renderNotFoundView, 'Ruta no encontrada'];
-  document.title = `${title} · Chat con Morfeo`;
-  document.body.dataset.page = page;
-  document.querySelector('#app').innerHTML = `${header(page)}${render()}${footer()}`;
-  let cleanup = () => {};
-  if (page === 'home') cleanup = startMatrixRain(document.querySelector('.matrix-rain'), document.querySelector('.motion-control'));
-  if (page === 'chat') cleanup = setupComposerPreview();
-  // El navegador puede conservar la página al usar Atrás: en ese caso preservamos el efecto.
-  window.addEventListener('pagehide', (event) => {
-    if (!event.persisted) cleanup();
-  });
+export function normalizePathname(pathname) {
+  const path = pathname.replace(/\/+$/, '');
+  return path || '/home';
 }
 
-mountPreview();
+export function resolveRoute(pathname) {
+  const path = normalizePathname(pathname);
+  const [page, render, title] = views[path] ?? ['not-found', renderNotFoundView, 'Ruta no encontrada'];
+  return { path, page, render, title: `${title} · Chat con Morfeo` };
+}
+
+/** Devuelve una URL interna solo cuando el click debe pertenecer a la SPA. */
+export function getSpaDestination({ href, target, download, button, modified, defaultPrevented }, currentHref) {
+  if (defaultPrevented || button !== 0 || modified || download || !href) return null;
+  if (target && target.toLowerCase() !== '_self') return null;
+  if (href.startsWith('#')) return null;
+
+  const current = new URL(currentHref);
+  const destination = new URL(href, current);
+  if (!['http:', 'https:'].includes(destination.protocol) || destination.origin !== current.origin) return null;
+
+  // La API y los archivos se solicitan al servidor; no representan vistas del cliente.
+  if (/^\/(api|_vercel)(\/|$)/.test(destination.pathname) || destination.pathname.includes('.')) return null;
+  if (destination.pathname === current.pathname && destination.search === current.search && destination.hash) return null;
+  return `${destination.pathname}${destination.search}${destination.hash}`;
+}
+
+let cleanupCurrentView = () => {};
+let renderedLocation = '';
+
+function renderRoute({ moveFocus = false } = {}) {
+  const route = resolveRoute(window.location.pathname);
+  if (route.path !== window.location.pathname) {
+    // Corrige / y las barras finales sin añadir una entrada al historial.
+    window.history.replaceState(null, '', `${route.path}${window.location.search}${window.location.hash}`);
+  }
+
+  cleanupCurrentView();
+  cleanupCurrentView = () => {};
+  document.title = route.title;
+  document.body.dataset.page = route.page;
+  renderedLocation = `${route.path}${window.location.search}`;
+  document.querySelector('#app').innerHTML = `${header(route.page)}${route.render()}${footer()}`;
+  if (route.page === 'home') {
+    cleanupCurrentView = startMatrixRain(document.querySelector('.matrix-rain'), document.querySelector('.motion-control'));
+  } else if (route.page === 'chat') {
+    cleanupCurrentView = setupComposerPreview();
+  }
+
+  if (moveFocus) {
+    document.querySelector('main').focus({ preventScroll: true });
+    window.scrollTo(0, 0);
+    if (window.location.hash) {
+      // getElementById no interpreta el fragmento como un selector CSS.
+      let fragment;
+      try { fragment = decodeURIComponent(window.location.hash.slice(1)); }
+      catch { fragment = window.location.hash.slice(1); }
+      document.getElementById(fragment)?.scrollIntoView();
+    }
+  }
+}
+
+export function navigateTo(destination, browserWindow = window, render = renderRoute) {
+  const current = new URL(browserWindow.location.href);
+  const next = new URL(destination, current);
+  if (next.origin !== current.origin || !['http:', 'https:'].includes(next.protocol)) {
+    throw new Error('La navegación SPA requiere una ruta del mismo origen.');
+  }
+  next.pathname = normalizePathname(next.pathname);
+  const currentPath = `${current.pathname}${current.search}${current.hash}`;
+  const nextPath = `${next.pathname}${next.search}${next.hash}`;
+  if (nextPath === currentPath) return;
+
+  browserWindow.history.pushState(null, '', nextPath);
+  // pushState no dispara popstate: la navegación programática debe renderizar aquí.
+  render({ moveFocus: true });
+}
+
+function handleNavigation(event) {
+  if (!(event.target instanceof Element)) return;
+  const link = event.target.closest('a[href]');
+  if (!link) return;
+  const destination = getSpaDestination({
+    href: link.getAttribute('href'),
+    target: link.getAttribute('target'),
+    download: link.hasAttribute('download'),
+    button: event.button,
+    modified: event.metaKey || event.ctrlKey || event.shiftKey || event.altKey,
+    defaultPrevented: event.defaultPrevented,
+  }, window.location.href);
+  if (destination === null) return;
+  event.preventDefault();
+  navigateTo(destination);
+}
+
+function initializeApp() {
+  document.addEventListener('click', handleNavigation);
+  // Un solo listener; renderRoute nunca añade entradas al retroceder o avanzar.
+  window.addEventListener('popstate', () => {
+    // Los cambios de ancla nativos no deben desmontar una vista que sigue siendo la misma.
+    if (`${window.location.pathname}${window.location.search}` === renderedLocation) return;
+    renderRoute({ moveFocus: true });
+  });
+  window.addEventListener('pagehide', (event) => {
+    if (!event.persisted) cleanupCurrentView();
+  });
+  renderRoute();
+}
+
+// Permite probar las funciones del router en Node sin montar una página ni simular el DOM.
+if (typeof document !== 'undefined' && document.querySelector('#app')) initializeApp();

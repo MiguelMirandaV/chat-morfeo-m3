@@ -1,6 +1,6 @@
 # Paso 1 — Definición de Chat con Morfeo
 
-Estado: definición del producto completada y pasos 2–3 ejecutados: entorno e interfaz visual. El routing SPA, la conversación y Gemini siguen en sus etapas previstas. Esta ficha conserva los criterios de aceptación del producto; los resultados realmente obtenidos se registran en `pruebas.md`.
+Estado: definición del producto completada y pasos 2–4 ejecutados: entorno, interfaz visual y routing SPA. La conversación y Gemini siguen en sus etapas previstas. Esta ficha conserva los criterios de aceptación del producto; los resultados realmente obtenidos se registran en `pruebas.md`.
 
 ## Decisiones de Miguel
 
@@ -10,6 +10,7 @@ Estado: definición del producto completada y pasos 2–3 ejecutados: entorno e 
 - Avances previos: ninguno.
 - Alcance: el mínimo del integrador, sin extra credit, usando la estructura simple.
 - Ampliación visual solicitada posteriormente: cascada animada de caracteres verdes tipo Matrix solo en /home.
+- Ajuste posterior: footer con © 2026 Miguel Miranda y enlace al repositorio público en GitHub.
 
 Nombre de trabajo: **Chat con Morfeo**. Nombre de carpeta/repositorio propuesto para el paso 2: `chat-morfeo-m3`.
 
@@ -154,7 +155,7 @@ Estas son pruebas previstas para los pasos 7, 8 y 10. No se han ejecutado todav�
 
 ## Próximo paso y registro
 
-La carpeta única y el repositorio ya están preparados. La ficha se incorporó al primer commit y la interfaz visual se comprobó en el paso 3. El próximo paso es implementar History API y la navegación sin recargas.
+La carpeta y el repositorio están preparados; interfaz y routing SPA se comprobaron en los pasos 3 y 4. El próximo paso es implementar el chat con estado en memoria y respuestas simuladas, sin llamar todavía a Gemini.
 
 No se necesita conectar PostgreSQL. Vercel está vinculado y el servidor local funciona; Google AI Studio se configurará en la etapa de Gemini. La fecha de entrega sigue pendiente.
 

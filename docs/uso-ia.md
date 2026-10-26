@@ -33,3 +33,15 @@
 **Verificación:** Codex revisó las nueve combinaciones de vista y ancho, capturó las pantallas, comprobó pausa/reanudación, retorno con Atrás y el contador en el navegador. Detectó que la limpieza de pagehide debía respetar la caché de navegación y lo corrigió. Los resultados y las limitaciones están en pruebas.md; no se atribuyen estas comprobaciones a Miguel.
 
 **Referencias técnicas consultadas:** [Intl.Segmenter en MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Segmenter) y [prefers-reduced-motion en MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@media/prefers-reduced-motion).
+
+## 4. Footer y routing SPA
+
+**Solicitud de Miguel:** “Solo corrige el footer agregando mi copyright y link a github. Avanza con el siguiente paso del plan”.
+
+**Trabajo de Codex:** copyright con nombre/año, enlace al repositorio, navegación con History API, funciones pequeñas exportables para tests, listener único de popstate, limpieza de vistas y fallback de Vercel con exclusiones de recursos/API. Se escribieron trece tests del router, dejando la suite en 17 casos pasando.
+
+**Decisiones y correcciones:** evitar duplicar la ruta actual; mantener anclas, clicks modificados y enlaces externos a cargo del navegador; usar replaceState al normalizar; limpiar la cascada antes de desmontar Home. Se añadió una guardia al popstate para no destruir el campo de escritura al cambiar solo el fragmento de la URL.
+
+**Verificación:** Codex comprobó navegación, Atrás/Adelante, foco, acceso directo, recarga y rutas desconocidas en el navegador. Para comprobar descargas de documentos utilizó un proxy temporal de observación HTTP, porque la herramienta del navegador no exponía la medición de rendimiento intentada inicialmente. El proxy no modifica la app, no registra cabeceras ni cuerpos y se cerró al terminar. Se observaron cero descargas HTML adicionales durante los cambios SPA. El footer se revisó y capturó en tres anchos.
+
+**Referencia técnica consultada:** [Configuración y negative lookahead en Vercel](https://vercel.com/docs/project-configuration/vercel-json#negative-lookahead).

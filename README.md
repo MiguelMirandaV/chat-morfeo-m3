@@ -4,9 +4,9 @@ Proyecto Integrador del Módulo 3 de Full Stack de Henry. Aplicación en desarro
 
 ## Estado del proyecto
 
-Los pasos 1–3 están completos: definición, entorno e interfaz responsive. Inicio, Chat y Acerca de tienen su maqueta visual; Home incluye una cascada de caracteres verdes con pausa. El contador de 280 caracteres está funcionando y tiene cuatro tests unitarios. El proyecto está vinculado a GitHub y al espacio Hobby de Vercel de Miguel.
+Los pasos 1–4 están completos: definición, entorno, interfaz responsive y routing SPA con History API. Inicio, Chat y Acerca de se renderizan sin recargar, con Atrás/Adelante, carga directa, normalización de rutas y vista interna de no encontrado. Home incluye una cascada de caracteres verdes con pausa. El contador de 280 caracteres está funcionando. Pasan 17 tests unitarios entre conteo y routing. El proyecto está vinculado a GitHub y al espacio Hobby de Vercel de Miguel.
 
-La navegación todavía usa enlaces normales con recarga; la History API se implementará en el paso 4. El chat permite revisar el campo de escritura y su contador, pero el envío está deshabilitado hasta desarrollar la conversación. Gemini no está integrado todavía. La URL de entrega se documentará después de validar la aplicación completa.
+El chat permite revisar el campo de escritura y su contador, pero el envío está deshabilitado hasta desarrollar la conversación en memoria en el paso 5. Gemini no está integrado todavía. La URL de entrega se documentará después de validar la aplicación completa.
 
 ## Alcance acordado
 
@@ -72,7 +72,7 @@ Luego ejecuta:
 npm start
 ```
 
-Abre la URL que muestre la terminal: el comando está configurado para escuchar únicamente en `http://127.0.0.1:3000`. Se utiliza el nombre `chat-morfeo-m3`, la raíz `.` y el preset Other. La configuración está versionada en `vercel.json`: contenido estático desde `src/`, sin compilación ni proceso de desarrollo adicional. El script se llama `start` porque Vercel rechaza que un script llamado `dev` invoque de nuevo `vercel dev`. Hay reglas para abrir directamente `/home`, `/chat` y `/about` al revisar la maqueta; la navegación SPA y el fallback completo se incorporarán en el paso 4. Detén el servidor con Ctrl+C.
+Abre la URL que muestre la terminal: el comando está configurado para escuchar únicamente en `http://127.0.0.1:3000`. Se utiliza el nombre `chat-morfeo-m3`, la raíz `.` y el preset Other. La configuración está versionada en `vercel.json`: contenido estático desde `src/`, sin compilación ni proceso de desarrollo adicional. El script se llama `start` porque Vercel rechaza que un script llamado `dev` invoque de nuevo `vercel dev`. El fallback entrega index.html para las rutas de vistas, excluyendo /api, /_vercel y rutas con puntos para mantener los archivos y endpoints a cargo del servidor. Detén el servidor con Ctrl+C.
 
 ## Tests
 
@@ -83,7 +83,22 @@ npm test
 npm run test:watch
 ```
 
-Actualmente pasan cuatro tests de `countCharacters`: bordes 279/280/281, espacios/saltos de línea, tildes compuestas/descompuestas y emojis simples/compuestos. Se añadirán pruebas de la lógica del chat, transformación de respuestas y errores con fetch mockeado al implementar esas funciones. Las pruebas actuales no verifican una integración Gemini que aún no existe.
+Actualmente pasan 17 tests en dos archivos:
+
+- `utils.test.js`: cuatro casos de conteo, incluyendo bordes 279/280/281, espacios/saltos de línea, tildes equivalentes y emojis compuestos.
+- `app.test.js`: trece casos de rutas, normalización, selección de enlaces, orden pushState/render, destinos repetidos y bloqueo de destinos externos en navigateTo.
+
+Los tests del router importan funciones sin montar un DOM y utilizan mocks para verificar History API y el orden de las llamadas. Se añadirán pruebas de la lógica del chat, transformación de respuestas y errores con fetch mockeado al implementar esas funciones. Las pruebas actuales no verifican una integración Gemini que aún no existe.
+
+## Navegación SPA
+
+`navigateTo` actualiza la URL con pushState y llama al render de inmediato; un único listener popstate refleja Atrás/Adelante sin crear entradas nuevas. La raíz `/` se normaliza a `/home` y las barras finales se corrigen con replaceState. Se mantienen los parámetros y fragmentos.
+
+El router respeta Cmd/Ctrl-click, enlaces externos, target, descargas, protocolos especiales y anclas de la misma página. Al cambiar de vista mueve el foco al contenido y ejecuta la limpieza de la vista anterior. Así, la cascada y sus listeners solo existen en Inicio.
+
+Se comprobó la navegación real mediante un proxy temporal de QA: la carga inicial produjo una descarga de documento HTML; los cambios de vista y Atrás/Adelante no añadieron otra. Cmd+click abrió una nueva pestaña y produjo la segunda descarga esperada. El proxy fue retirado al terminar la comprobación y no forma parte de la aplicación.
+
+Una ruta desconocida muestra la vista de no encontrado con enlace de regreso. Su documento base se entrega con HTTP 200 por ser el fallback de la SPA; el contenido representa la ruta inexistente. Los recursos estáticos inexistentes y /api/functions, que aún no está implementado, siguen devolviendo 404 del servidor.
 
 ## Interfaz y comprobaciones responsive
 
@@ -91,7 +106,9 @@ El CSS parte de 320 px, agrega una distribución de tablet a 768 px y dos column
 
 La conversación del panel de Inicio es un ejemplo ilustrativo escrito para la maqueta; no procede de una llamada a Gemini.
 
-![Inicio en escritorio](docs/capturas/home-1024.jpg)
+El footer incluye `© 2026 Miguel Miranda` y un enlace al repositorio en GitHub.
+
+![Inicio en escritorio con copyright](docs/capturas/home-copyright-1024.jpg)
 
 | Vista | Móvil | Tablet | Escritorio |
 | --- | --- | --- | --- |
@@ -100,6 +117,8 @@ La conversación del panel de Inicio es un ejemplo ilustrativo escrito para la m
 | Acerca de | [320 px](docs/capturas/about-320.jpg) | [768 px](docs/capturas/about-768.jpg) | [1024 px](docs/capturas/about-1024.jpg) |
 
 El estado de exceso de caracteres también está [documentado con una captura real](docs/capturas/chat-limite-281.jpg).
+
+El footer actualizado está capturado a [320 px](docs/capturas/home-copyright-320.jpg), [768 px](docs/capturas/home-copyright-768.jpg) y [1024 px](docs/capturas/home-copyright-1024.jpg). La [vista de ruta desconocida](docs/capturas/ruta-desconocida-1024.jpg) también está documentada.
 
 ## Organización
 
