@@ -8,7 +8,7 @@
     "node": "24.x"
   },
   "scripts": {
-    "dev": "vercel dev",
+    "start": "vercel dev --listen 127.0.0.1:3000",
     "test": "vitest run",
     "test:watch": "vitest",
     "vercel:login": "vercel login",

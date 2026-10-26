@@ -8,11 +8,20 @@
 - El repositorio `MiguelMirandaV/chat-morfeo-m3` no existía al iniciar la preparación.
 
 - Se instalaron las herramientas locales: Vitest 5.0.5 y Vercel CLI 65.3.1, compatibles con Node 24. Las versiones ejecutaron sus comandos de identificación correctamente.
-- Se comprobó la validez de package.json y vercel.json; los módulos son ES y el directorio estático es src. El comando interno de desarrollo de Vercel se deja vacío para que no vuelva a llamar recursivamente a npm run dev.
+- Se comprobó la validez de package.json y vercel.json; los módulos son ES y el directorio estático es src. El comando interno de desarrollo de Vercel se deja vacío para servir el contenido estático directamente.
 - Git ignora .env, variantes locales/producción, node_modules y .vercel. .env.example sí es versionable y sus valores están vacíos.
 - Los enlaces locales de README y documentación apuntan a archivos existentes. No se encontraron patrones de claves de Gemini o tokens de GitHub en la documentación revisada.
 - Se inicializó main y se creó el primer commit de alcance, 0e5b666.
-- Vercel CLI informó que no existe sesión. Miguel confirmó que aún no tiene cuenta de Vercel; registro, autenticación y prueba con vercel dev quedan pendientes de su acceso.
+- Miguel creó su cuenta y confirmó el acceso en VS Code. Vercel CLI comprobó la sesión como `miguelmirandav`, en el espacio `miguel-miranda-v`, plan Hobby.
+- Se creó/vinculó el proyecto `chat-morfeo-m3` en ese espacio y Vercel conectó el repositorio público existente de GitHub.
+- La vinculación generó `.vercel/` y `.env.local` con datos privados de la CLI. Se conservan ignorados, sin registrar sus valores en la documentación.
+- El primer arranque produjo `DEV_RECURSIVE_INVOCATION`: Vercel no permite que el script `dev` llame a `vercel dev`, incluso con devCommand vacío. Se corrigió a `npm start`, que ejecuta Vercel Dev enlazado solo a 127.0.0.1:3000. El README refleja el comando real.
+- Se simplificó .gitignore tras los cambios automáticos de Vercel: `.env*` queda seguido por `!.env.example`, preservando el ejemplo versionable y las variables reales excluidas.
+- Segundo arranque con `npm start`: Vercel Dev quedó listo en `http://127.0.0.1:3000`.
+- Comprobación HTTP local: `/`, `/styles.css` y `/app.js` respondieron 200 con sus tipos correctos; el HTML incluyó el texto de preparación esperado.
+- `/.env`, `/.env.local`, `/.git/config` y `/package.json` respondieron 404. No se registraron contenidos de archivos privados.
+- Se comprobaron las exclusiones con `git check-ignore --no-index`, para no depender de que el archivo ya estuviera versionado: variables y datos privados ignorados, .env.example permitido.
+- Resultado: paso 2 completado. Esta verificación valida el entorno inicial; las funcionalidades del chat aún no existen y no se presenta como una prueba de la integración Gemini o del router.
 
 ### Revisión de dependencias
 

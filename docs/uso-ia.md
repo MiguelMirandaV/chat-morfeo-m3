@@ -19,3 +19,5 @@
 **Trabajo de Codex:** revisión de herramientas instaladas y compatibilidad de paquetes; creación de carpeta, configuración npm/Vercel/Git, documentación inicial y página mínima para comprobar el entorno. La actividad real de GitHub y las comprobaciones se registran en `pruebas.md`.
 
 **Criterio aplicado:** herramientas locales del proyecto, versiones registradas y secretos ignorados antes del primer commit. Los módulos iniciales no simulan una aplicación terminada. Los tests funcionales se escribirán junto con la lógica a verificar.
+
+**Iteración después del acceso a Vercel:** Miguel creó la cuenta e inició sesión desde VS Code. Codex verificó la sesión, vinculó el proyecto y probó el arranque real. La CLI rechazó el script `dev` que llamaba a `vercel dev`; se sustituyó por `npm start` y se actualizó la documentación. También se corrigió el orden de las reglas de .gitignore que Vercel había modificado, para mantener .env.example como excepción. Se documenta el fallo y su corrección en lugar de presentar la configuración inicial como comprobada.

@@ -4,7 +4,7 @@ Proyecto Integrador del Módulo 3 de Full Stack de Henry. Aplicación en desarro
 
 ## Estado del proyecto
 
-El alcance y el personaje están definidos. Esta versión prepara el entorno y una página inicial de comprobación. El routing, la interfaz final, la cascada de Home, el chat, Gemini y los tests funcionales se implementarán en los próximos pasos. Aún no hay URL productiva.
+El alcance y el personaje están definidos. El entorno quedó preparado y se verificó la página inicial con Vercel Dev. El proyecto está vinculado al repositorio de GitHub en el espacio Hobby de Miguel. El routing, la interfaz final, la cascada de Home, el chat, Gemini y los tests funcionales se implementarán en los próximos pasos. La URL de entrega se documentará después de validar la aplicación completa.
 
 ## Alcance acordado
 
@@ -66,10 +66,10 @@ npm run vercel:login
 Luego ejecuta:
 
 ```bash
-npm run dev
+npm start
 ```
 
-Abre la URL que muestre la terminal. En el primer uso, Vercel puede pedir vincular la carpeta con un proyecto; se usará el nombre `chat-morfeo-m3`, la raíz `.` y el preset Other. La configuración está versionada en `vercel.json`: contenido estático desde `src/`, sin compilación ni proceso de desarrollo adicional. Las reglas SPA se incorporarán al implementar el router. Detén el servidor con Ctrl+C.
+Abre la URL que muestre la terminal: el comando está configurado para escuchar únicamente en `http://127.0.0.1:3000`. Se utiliza el nombre `chat-morfeo-m3`, la raíz `.` y el preset Other. La configuración está versionada en `vercel.json`: contenido estático desde `src/`, sin compilación ni proceso de desarrollo adicional. El script se llama `start` porque Vercel rechaza que un script llamado `dev` invoque de nuevo `vercel dev`. Las reglas SPA se incorporarán al implementar el router. Detén el servidor con Ctrl+C.
 
 ## Tests
 
