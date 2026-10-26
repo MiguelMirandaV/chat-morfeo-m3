@@ -1,0 +1,21 @@
+{
+  "name": "chat-morfeo-m3",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Proyecto Integrador M3 de Henry: SPA para conversar con Morfeo de Matrix.",
+  "type": "module",
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "dev": "vercel dev",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "vercel:login": "vercel login",
+    "vercel:whoami": "vercel whoami"
+  },
+  "devDependencies": {
+    "vercel": "65.3.1",
+    "vitest": "5.0.5"
+  }
+}

@@ -1,6 +1,6 @@
 # Paso 1 — Definición de Chat con Morfeo
 
-Estado: completado como definición del producto. El plan general está aprobado. No hay código de aplicación, repositorio ni despliegue creados todavía. Las pruebas siguientes son criterios pendientes de ejecución, no resultados obtenidos.
+Estado: definición del producto completada. Esta ficha se escribió antes de preparar el entorno y ya forma parte del repositorio local. La página inicial de comprobación no implementa aún las funcionalidades descritas aquí. Las pruebas siguientes son criterios pendientes de ejecución, no resultados obtenidos. El avance de la preparación se registra en `pruebas.md`.
 
 ## Decisiones de Miguel
 

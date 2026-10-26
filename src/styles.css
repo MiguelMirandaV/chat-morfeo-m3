@@ -1,0 +1,17 @@
+/* Base temporal para comprobar el entorno. El diseño mobile-first llega en el paso 3. */
+:root {
+  color-scheme: dark;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: #b8f7c8;
+  background: #030705;
+}
+
+body {
+  margin: 0;
+  padding: 1.5rem;
+}
+
+main {
+  max-width: 50rem;
+  margin-inline: auto;
+}
