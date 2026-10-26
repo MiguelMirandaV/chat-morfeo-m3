@@ -29,6 +29,19 @@ La instalación inicial de las herramientas produjo 34 avisos de npm audit. Se e
 
 Estos avisos pertenecen a dependencias de las herramientas, incluyendo el árbol de Vercel CLI. No se consideran resueltos ni se ocultan con overrides de versiones principales. La auditoría con --omit=dev devolvió cero vulnerabilidades; en esta etapa aún no hay dependencias de aplicación de producción. Este último resultado no equivale a una auditoría limpia de todas las herramientas. Se revisará de nuevo al incorporar dependencias o preparar la publicación.
 
+## Paso 3 — Interfaz y cascada de Inicio
+
+- Se construyeron las vistas visuales de Inicio, Chat y Acerca de. Las URLs conocidas se sirven con rewrites de Vercel; en esta etapa sus enlaces todavía recargan la página.
+- Navegador utilizado: navegador integrado de Codex. Se revisaron y capturaron las tres vistas a 320×800, 768×1024 y 1024×900. En las nueve combinaciones, documentElement.scrollWidth coincidió con innerWidth: sin overflow horizontal.
+- En cada tamaño, Home tuvo exactamente un contenedor de cascada; Chat y Acerca de no tuvieron ninguno. La cascada usa 28 columnas, con duración y desfase diferentes.
+- Se verificó el control real: estado running al comenzar, paused y aria-pressed=true al pausar, y running al reanudar. Después de Inicio → Chat → Atrás hubo 28 columnas activas. Se conservan los recursos al regresar desde la caché de navegación y se dispone de cleanup para el router futuro.
+- Se implementó una media query para movimiento reducido y su ajuste de control. La preferencia real del navegador durante esta comprobación era no-preference; no se modificó el ajuste del sistema ni se presenta como una prueba de emulación de reduce.
+- Se verificó en el campo real: 279/280, 280/280 y 281/280; solo 281 activó aria-invalid y el mensaje de exceso. Con 280 emojis compuestos el contador mostró 280/280. El botón Enviar permanece deshabilitado porque la lógica de conversación no se implementó aún.
+- npm test: un archivo y cuatro tests pasando. Cubren los bordes del límite, espacios y saltos de línea, tildes equivalentes y emojis compuestos. No consumen red.
+- Se comprobó la sintaxis de app.js y el formato del diff. La consola del navegador no mostró errores ni advertencias durante las interacciones revisadas.
+- Contrastes calculados sobre la superficie #08110b: texto principal 15.68:1, secundario 8.75:1, acento 14.86:1, error 11.29:1 y placeholder 7.27:1. No se aplica esta medición a elementos decorativos ni controles deshabilitados.
+- Se guardaron diez capturas reales: nueve combinaciones de vista/tamaño y un caso de 281 caracteres, enlazadas desde el README.
+
 ## Comprobaciones pendientes
 
-No se han ejecutado pruebas de chat, routing SPA, Gemini, responsive, cascada o producción. Todavía no se han implementado esas funcionalidades. Los tests unitarios se agregarán con la lógica central.
+Siguen pendientes la navegación SPA sin recargas, la conversación en memoria, fetching, función serverless, Gemini y validación final de producción. Los cuatro tests actuales verifican el conteo; la suite se ampliará al incorporar las funciones restantes.

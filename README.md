@@ -4,7 +4,9 @@ Proyecto Integrador del Módulo 3 de Full Stack de Henry. Aplicación en desarro
 
 ## Estado del proyecto
 
-El alcance y el personaje están definidos. El entorno quedó preparado y se verificó la página inicial con Vercel Dev. El proyecto está vinculado al repositorio de GitHub en el espacio Hobby de Miguel. El routing, la interfaz final, la cascada de Home, el chat, Gemini y los tests funcionales se implementarán en los próximos pasos. La URL de entrega se documentará después de validar la aplicación completa.
+Los pasos 1–3 están completos: definición, entorno e interfaz responsive. Inicio, Chat y Acerca de tienen su maqueta visual; Home incluye una cascada de caracteres verdes con pausa. El contador de 280 caracteres está funcionando y tiene cuatro tests unitarios. El proyecto está vinculado a GitHub y al espacio Hobby de Vercel de Miguel.
+
+La navegación todavía usa enlaces normales con recarga; la History API se implementará en el paso 4. El chat permite revisar el campo de escritura y su contador, pero el envío está deshabilitado hasta desarrollar la conversación. Gemini no está integrado todavía. La URL de entrega se documentará después de validar la aplicación completa.
 
 ## Alcance acordado
 
@@ -26,6 +28,7 @@ No se incorporan persistencia, varios personajes, timestamps, envío con Enter, 
 - Git para control de versiones.
 - Cuenta de Vercel para utilizar su CLI y las funciones locales.
 - Cuenta de Google AI Studio y una clave de Gemini en la etapa de integración.
+- Navegador reciente con soporte para Intl.Segmenter, utilizado para contar caracteres visibles, incluidas tildes y emojis compuestos.
 
 Vitest y Vercel CLI son dependencias de desarrollo del proyecto. Los scripts de npm ejecutan sus versiones locales; no hace falta instalarlas globalmente.
 
@@ -69,7 +72,7 @@ Luego ejecuta:
 npm start
 ```
 
-Abre la URL que muestre la terminal: el comando está configurado para escuchar únicamente en `http://127.0.0.1:3000`. Se utiliza el nombre `chat-morfeo-m3`, la raíz `.` y el preset Other. La configuración está versionada en `vercel.json`: contenido estático desde `src/`, sin compilación ni proceso de desarrollo adicional. El script se llama `start` porque Vercel rechaza que un script llamado `dev` invoque de nuevo `vercel dev`. Las reglas SPA se incorporarán al implementar el router. Detén el servidor con Ctrl+C.
+Abre la URL que muestre la terminal: el comando está configurado para escuchar únicamente en `http://127.0.0.1:3000`. Se utiliza el nombre `chat-morfeo-m3`, la raíz `.` y el preset Other. La configuración está versionada en `vercel.json`: contenido estático desde `src/`, sin compilación ni proceso de desarrollo adicional. El script se llama `start` porque Vercel rechaza que un script llamado `dev` invoque de nuevo `vercel dev`. Hay reglas para abrir directamente `/home`, `/chat` y `/about` al revisar la maqueta; la navegación SPA y el fallback completo se incorporarán en el paso 4. Detén el servidor con Ctrl+C.
 
 ## Tests
 
@@ -80,7 +83,23 @@ npm test
 npm run test:watch
 ```
 
-En esta etapa todavía no existen tests de funcionalidad: Vitest informará que no encontró archivos de prueba. Los tests se incorporarán con las validaciones, transformaciones y lógica del proyecto. La entrega deberá incluir al menos cuatro tests significativos con todos los casos pasando.
+Actualmente pasan cuatro tests de `countCharacters`: bordes 279/280/281, espacios/saltos de línea, tildes compuestas/descompuestas y emojis simples/compuestos. Se añadirán pruebas de la lógica del chat, transformación de respuestas y errores con fetch mockeado al implementar esas funciones. Las pruebas actuales no verifican una integración Gemini que aún no existe.
+
+## Interfaz y comprobaciones responsive
+
+El CSS parte de 320 px, agrega una distribución de tablet a 768 px y dos columnas de Inicio a 1024 px. Se comprobaron las tres vistas en esos tres anchos, sin desbordamiento horizontal. El fondo de Home tiene un control para pausar/reanudar, se detiene al ocultar la pestaña y respeta `prefers-reduced-motion`. Chat y Acerca de no crean la cascada.
+
+La conversación del panel de Inicio es un ejemplo ilustrativo escrito para la maqueta; no procede de una llamada a Gemini.
+
+![Inicio en escritorio](docs/capturas/home-1024.jpg)
+
+| Vista | Móvil | Tablet | Escritorio |
+| --- | --- | --- | --- |
+| Inicio | [320 px](docs/capturas/home-320.jpg) | [768 px](docs/capturas/home-768.jpg) | [1024 px](docs/capturas/home-1024.jpg) |
+| Chat | [320 px](docs/capturas/chat-320.jpg) | [768 px](docs/capturas/chat-768.jpg) | [1024 px](docs/capturas/chat-1024.jpg) |
+| Acerca de | [320 px](docs/capturas/about-320.jpg) | [768 px](docs/capturas/about-768.jpg) | [1024 px](docs/capturas/about-1024.jpg) |
+
+El estado de exceso de caracteres también está [documentado con una captura real](docs/capturas/chat-limite-281.jpg).
 
 ## Organización
 
@@ -91,7 +110,7 @@ src/styles.css    Estilos
 src/app.js        Entrada, vistas y routing
 src/chat.js       Estado y lógica del chat
 src/utils.js      Validaciones y transformaciones
-tests/            Tests unitarios pendientes de implementación
+tests/            Tests unitarios del conteo; se ampliarán con las siguientes funciones
 docs/             Alcance, registro de IA, pruebas y capturas
 ```
 
@@ -105,6 +124,6 @@ Se conectará este repositorio a Vercel en la etapa de publicación. Se configur
 
 - [Registro de uso de IA](docs/uso-ia.md)
 - [Registro de comprobaciones](docs/pruebas.md)
-- Las capturas reales se agregarán a `docs/capturas/` cuando exista la interfaz.
+- Las capturas reales de esta etapa están en `docs/capturas/`.
 
 Miguel definió el personaje, la dirección visual, el máximo de caracteres y aprobó el plan. Codex apoya la planificación, el desarrollo y las verificaciones. Los registros distinguen acciones realizadas de funcionalidades pendientes.

@@ -3,5 +3,10 @@
   "framework": null,
   "outputDirectory": "src",
   "buildCommand": "",
-  "devCommand": ""
+  "devCommand": "",
+  "rewrites": [
+    { "source": "/home", "destination": "/index.html" },
+    { "source": "/chat", "destination": "/index.html" },
+    { "source": "/about", "destination": "/index.html" }
+  ]
 }

@@ -1,6 +1,6 @@
 # Paso 1 — Definición de Chat con Morfeo
 
-Estado: definición del producto completada. Esta ficha se escribió antes de preparar el entorno y ya forma parte del repositorio local. La página inicial de comprobación no implementa aún las funcionalidades descritas aquí. Las pruebas siguientes son criterios pendientes de ejecución, no resultados obtenidos. El avance de la preparación se registra en `pruebas.md`.
+Estado: definición del producto completada y pasos 2–3 ejecutados: entorno e interfaz visual. El routing SPA, la conversación y Gemini siguen en sus etapas previstas. Esta ficha conserva los criterios de aceptación del producto; los resultados realmente obtenidos se registran en `pruebas.md`.
 
 ## Decisiones de Miguel
 
@@ -154,8 +154,8 @@ Estas son pruebas previstas para los pasos 7, 8 y 10. No se han ejecutado todav�
 
 ## Próximo paso y registro
 
-El paso 2 creará una carpeta única de proyecto y comprobará Node, npm, Git, VS Code y las sesiones necesarias. Esta ficha se incorporará al repositorio y al primer commit cuando se inicialice Git; todavía no hay un commit que subir.
+La carpeta única y el repositorio ya están preparados. La ficha se incorporó al primer commit y la interfaz visual se comprobó en el paso 3. El próximo paso es implementar History API y la navegación sin recargas.
 
-No se necesita conectar PostgreSQL. Google AI Studio y Vercel se configurarán en los pasos correspondientes. La fecha de entrega y el estado de cuentas siguen pendientes, pero no bloquean este paso.
+No se necesita conectar PostgreSQL. Vercel está vinculado y el servidor local funciona; Google AI Studio se configurará en la etapa de Gemini. La fecha de entrega sigue pendiente.
 
 Uso de IA en esta etapa: Miguel eligió Morfeo, la estética de terminal y el máximo de 280 caracteres. Codex elaboró la ficha, el borrador del prompt, los criterios verificables y el esquema visual. No se atribuyen a Miguel código, pruebas o acciones de sistemas que aún no ha realizado.
