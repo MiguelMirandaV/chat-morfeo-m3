@@ -1,0 +1,34 @@
+[
+  {
+    "method": "POST",
+    "path": "/api/functions",
+    "messageCount": 1,
+    "roles": [
+      "user"
+    ],
+    "status": 503,
+    "injectedByQA": true
+  },
+  {
+    "method": "POST",
+    "path": "/api/functions",
+    "messageCount": 1,
+    "roles": [
+      "user"
+    ],
+    "status": 200,
+    "injectedByQA": false
+  },
+  {
+    "method": "POST",
+    "path": "/api/functions",
+    "messageCount": 3,
+    "roles": [
+      "user",
+      "assistant",
+      "user"
+    ],
+    "status": 200,
+    "injectedByQA": false
+  }
+]

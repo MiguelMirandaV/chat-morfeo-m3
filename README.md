@@ -4,9 +4,9 @@ Proyecto Integrador del Módulo 3 de Full Stack de Henry. Aplicación en desarro
 
 ## Estado del proyecto
 
-Los pasos 1–5 están completos: definición, entorno, interfaz responsive, routing SPA y chat en memoria con respuestas simuladas. Inicio, Chat y Acerca de se renderizan sin recargar, con Atrás/Adelante, carga directa, normalización de rutas y vista interna de no encontrado. Home incluye una cascada de caracteres verdes con pausa. El chat valida el máximo de 280 caracteres, muestra la espera y conserva conversación y borrador entre vistas. Pasan 33 tests unitarios. El proyecto está vinculado a GitHub y al espacio Hobby de Vercel de Miguel.
+Los pasos 1–6 están completos: definición, entorno, interfaz responsive, routing SPA, chat en memoria y transporte HTTP con una función serverless simulada. Inicio, Chat y Acerca de se renderizan sin recargar, con Atrás/Adelante, carga directa, normalización de rutas y vista interna de no encontrado. Home incluye una cascada de caracteres verdes con pausa. El chat valida el máximo de 280 caracteres, muestra la espera y conserva conversación y borrador entre vistas. Pasan 76 tests unitarios. El proyecto está vinculado a GitHub y al espacio Hobby de Vercel de Miguel.
 
-El envío está habilitado en modo de prueba: las respuestas son textos predefinidos, con una espera simulada de 1,1 segundos. La simulación prioriza variantes menos usadas y evita repetir la respuesta inmediatamente anterior, incluso al agotar su banco finito de textos. Gemini y la función serverless se integrarán en las siguientes etapas. La URL de entrega se documentará después de validar la aplicación completa.
+El envío utiliza POST /api/functions y permanece en modo de prueba: el servidor devuelve textos predefinidos, con una espera simulada de 1,1 segundos. La simulación prioriza variantes menos usadas y evita repetir la respuesta inmediatamente anterior, incluso al agotar su banco finito de textos. Gemini se integrará en las siguientes etapas. La URL de entrega se documentará después de validar la aplicación completa.
 
 ## Alcance acordado
 
@@ -83,12 +83,12 @@ npm test
 npm run test:watch
 ```
 
-Actualmente pasan 33 tests en dos archivos:
+Actualmente pasan 76 tests en dos archivos:
 
 - `utils.test.js`: seis casos de conteo y validación, incluyendo bordes 279/280/281, espacios/saltos de línea, tildes equivalentes, emojis compuestos y tipos incorrectos.
-- `app.test.js`: trece casos de routing y catorce de sesión: historial completo, bloqueo de concurrencia, cambios de suscripción, recuperación de fallos, respuestas inválidas, aislamiento de datos y espera simulada con reloj falso.
+- `app.test.js`: 13 casos de routing, 14 de sesión/simulación, 14 de transporte HTTP y 29 del handler. Cubren historial completo, concurrencia, fallos, reintentos, timeout, validación de entradas y presupuesto de bytes.
 
-Los tests importan funciones sin montar un DOM y utilizan mocks para verificar History API, orden de llamadas y proveedores simulados. La recuperación de errores se comprueba con un proveedor que falla una vez y responde al reintentar, sin red. Las pruebas de fetch y del contrato serverless se añadirán al implementar esas funciones. Las pruebas actuales no verifican una integración Gemini que aún no existe.
+Los tests importan funciones sin montar un DOM y utilizan mocks para History API, proveedores, fetch y respuesta de Vercel. Hay casos de éxito, HTTP 400/413/429/503, fallo de red, timeout, JSON inválido, roles/orden incorrectos y bordes de tamaño. La suite no usa la red ni consume Gemini. La integración local real se verifica por separado y está registrada en docs/pruebas.md.
 
 ## Chat en memoria
 
@@ -103,6 +103,44 @@ El render añade solo mensajes nuevos y utiliza `textContent`, de modo que etiqu
 
 Evidencias del paso 5: [móvil 320 px](docs/capturas/chat-memoria-320.jpg), [tablet 768 px](docs/capturas/chat-memoria-768.jpg) y [escritorio 1024 px](docs/capturas/chat-memoria-1024.jpg).
 
+## Función serverless y contrato HTTP
+
+El flujo actual es navegador → `requestReply` (fetch) → `POST /api/functions` → simulación en servidor → JSON → sesión/render. La función utiliza Node.js y los helpers req/res de Vercel, sin framework adicional. Referencia: [Node.js y request.body en Vercel](https://vercel.com/docs/functions/runtimes/node-js#request-body).
+
+Petición (`Content-Type: application/json`):
+
+```json
+{"messages":[{"role":"user","content":"Hola, Morfeo"}]}
+```
+
+Respuesta exitosa (HTTP 200):
+
+```json
+{"reply":"Bienvenido…"}
+```
+
+Error controlado:
+
+```json
+{"error":{"code":"INVALID_HISTORY","message":"Descripción del problema."}}
+```
+
+El historial comienza/termina en user y alterna user/assistant; cada mensaje contiene únicamente role/content. El servidor rechaza roles system, campos extra, blancos, tipos incorrectos y cualquier turno del usuario de más de 280 grafemas. Conserva espacios y saltos del contenido válido. El presupuesto de entrada es 64 KiB: se comprueba Content-Length cuando está disponible y el tamaño UTF-8 del JSON serializado. Si se supera, se rechaza toda la petición con 413, sin recortar el historial. La conversación anterior sigue en memoria y el aviso propone recargar para una sesión nueva.
+
+| Estado | Situación |
+| --- | --- |
+| 200 | Respuesta válida con reply. |
+| 400 | JSON, contrato o mensajes inválidos. |
+| 405 | Método distinto de POST; incluye Allow: POST. |
+| 413 | Se supera el presupuesto de entrada. |
+| 415 | Content-Type distinto de application/json. |
+| 502 | El proveedor devuelve texto vacío o inválido. |
+| 503 | Fallo interno/proveedor no disponible, sin detalles sensibles. |
+
+Todas las respuestas del handler llevan Cache-Control: no-store. El cliente revisa response.ok antes de interpretar el éxito; también controla 429, fallos de red, respuestas inválidas y un timeout de 20 segundos con AbortController. No hay reintentos automáticos. El texto vuelve al campo tras fallar y el botón permite reintentar; se mantiene el bloqueo de concurrencia. El handler simulado todavía no aplica un rate limit propio ni consume Gemini.
+
+La comprobación del flujo con historial, error 503 controlado y reintento está registrada en [pruebas.md](docs/pruebas.md). Capturas: [éxito en escritorio](docs/capturas/chat-api-1024.jpg), [móvil](docs/capturas/chat-api-320.jpg) y [error HTTP controlado](docs/capturas/chat-error-http-1024.jpg).
+
 ## Navegación SPA
 
 `navigateTo` actualiza la URL con pushState y llama al render de inmediato; un único listener popstate refleja Atrás/Adelante sin crear entradas nuevas. La raíz `/` se normaliza a `/home` y las barras finales se corrigen con replaceState. Se mantienen los parámetros y fragmentos.
@@ -111,7 +149,7 @@ El router respeta Cmd/Ctrl-click, enlaces externos, target, descargas, protocolo
 
 Se comprobó la navegación real mediante un proxy temporal de QA: la carga inicial produjo una descarga de documento HTML; los cambios de vista y Atrás/Adelante no añadieron otra. Cmd+click abrió una nueva pestaña y produjo la segunda descarga esperada. El proxy fue retirado al terminar la comprobación y no forma parte de la aplicación.
 
-Una ruta desconocida muestra la vista de no encontrado con enlace de regreso. Su documento base se entrega con HTTP 200 por ser el fallback de la SPA; el contenido representa la ruta inexistente. Los recursos estáticos inexistentes y /api/functions, que aún no está implementado, siguen devolviendo 404 del servidor.
+Una ruta desconocida muestra la vista de no encontrado con enlace de regreso. Su documento base se entrega con HTTP 200 por ser el fallback de la SPA; el contenido representa la ruta inexistente. Los recursos estáticos inexistentes y las rutas API desconocidas siguen devolviendo 404 del servidor. GET /api/functions devuelve 405 con Allow: POST; las peticiones válidas se envían mediante POST.
 
 ## Interfaz y comprobaciones responsive
 
@@ -136,13 +174,13 @@ El footer actualizado está capturado a [320 px](docs/capturas/home-copyright-32
 ## Organización
 
 ```text
-api/              Función de Vercel; se implementará en su etapa
+api/functions.js  Handler de Vercel y simulación temporal del proveedor
 src/index.html    Documento inicial
 src/styles.css    Estilos
 src/app.js        Entrada, vistas y routing
 src/chat.js       Estado y lógica del chat
 src/utils.js      Validaciones y transformaciones
-tests/            Tests unitarios del conteo; se ampliarán con las siguientes funciones
+tests/            Tests de conteo, validación, routing, sesión, fetch y handler
 docs/             Alcance, registro de IA, pruebas y capturas
 ```
 

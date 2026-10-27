@@ -1,0 +1,87 @@
+{
+  "results": [
+    {
+      "name": "GET no permitido",
+      "status": 405,
+      "code": "METHOD_NOT_ALLOWED"
+    },
+    {
+      "name": "JSON malformado",
+      "status": 400,
+      "code": "INVALID_JSON"
+    },
+    {
+      "name": "Content-Type incorrecto",
+      "status": 415,
+      "code": "UNSUPPORTED_MEDIA_TYPE"
+    },
+    {
+      "name": "Rol system rechazado",
+      "status": 400,
+      "code": "INVALID_HISTORY"
+    },
+    {
+      "name": "Usuario de 281 caracteres rechazado",
+      "status": 400,
+      "code": "INVALID_MESSAGE"
+    },
+    {
+      "name": "Texto en blanco rechazado",
+      "status": 400,
+      "code": "INVALID_HISTORY"
+    },
+    {
+      "name": "Más de 64 KiB rechazado",
+      "status": 413,
+      "code": "HISTORY_TOO_LARGE"
+    },
+    {
+      "name": "Primer turno válido",
+      "status": 200,
+      "code": null
+    },
+    {
+      "name": "Historial completo válido",
+      "status": 200,
+      "code": null
+    },
+    {
+      "name": "280 emojis compuestos aceptados",
+      "status": 200,
+      "code": null
+    },
+    {
+      "name": "/home",
+      "status": 200
+    },
+    {
+      "name": "/chat",
+      "status": 200
+    },
+    {
+      "name": "/about",
+      "status": 200
+    },
+    {
+      "name": "/.env.local",
+      "status": 404
+    },
+    {
+      "name": "/.git/config",
+      "status": 404
+    },
+    {
+      "name": "/api/desconocida",
+      "status": 404
+    },
+    {
+      "name": "/api/functions.js (alias ejecutable local, sin fuente)",
+      "status": 405
+    }
+  ],
+  "frontend": {
+    "usesApi": true,
+    "simulationOnServer": true,
+    "noGeminiKeyReference": true
+  }
+}

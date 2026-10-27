@@ -1,51 +1,58 @@
 import { countCharacters, getMessageError, MAX_MESSAGE_LENGTH } from './utils.js';
 
-/** Simulación temporal: no llama a un proveedor ni pretende razonar con IA. */
-export async function simulateReply(messages) {
-  await new Promise((resolve) => setTimeout(resolve, 1100));
-  const question = messages.at(-1).content.toLocaleLowerCase('es');
-  let replies;
-  if (/\b(hola|buenas|saludos)\b/.test(question)) {
-    replies = [
-      'Bienvenido. Antes de buscar una respuesta, detente en tu pregunta. ¿Qué te ha traído hasta aquí?',
-      'Aquí puedes empezar con una inquietud. ¿Hay algo que quieras mirar desde otra perspectiva?',
-      'Te escucho. No necesitas tener todo claro para comenzar. ¿Qué deseas preguntar?',
-    ];
-  } else if (/miedo|duda|difícil/.test(question)) {
-    replies = [
-      'La duda no cierra el camino. Te invita a mirar con atención. ¿Qué pequeño paso puedes dar, aun con ese miedo?',
-      'Equivocarte puede mostrarte un límite que todavía no comprendías. ¿Qué podrías intentar en un espacio donde el error sea parte del aprendizaje?',
-      'Observa ese temor: ¿nace de algo que ya ocurrió o de algo que imaginas? Distinguirlos puede ayudarte a elegir el siguiente paso.',
-    ];
-  } else if (/aprender|estudi|program|código/.test(question)) {
-    replies = [
-      'Aprender exige poner a prueba lo que crees comprender. Elige una idea, construye algo pequeño y observa qué ocurre. ¿Qué quieres explorar primero?',
-      'Intenta explicar una sola idea con tus palabras y después comprobarla con un ejemplo. ¿En qué parte de esa explicación aparece una duda?',
-      'Divide el problema hasta encontrar una acción que puedas probar. Un resultado pequeño te dará algo concreto que observar. ¿Cuál sería esa primera prueba?',
-    ];
-  } else if (/realidad|matrix|libertad|elegir/.test(question)) {
-    replies = [
-      'Lo familiar puede parecer la única posibilidad. Cuestionarlo es el comienzo de una elección. ¿Qué estás dando por cierto?',
-      'Una elección empieza por reconocer las posibilidades que tienes delante. ¿Qué opción has descartado sin examinarla?',
-      'Tus sentidos ofrecen una parte de lo que conoces. También interpretas y supones. ¿Qué evidencia te ayudaría a revisar esa interpretación?',
-    ];
-  } else {
-    replies = [
-      'Puedo acompañarte en la pregunta. Mira lo que sabes, lo que supones y lo que aún puedes comprobar. ¿Cuál de esas partes te inquieta?',
-      'Elige un aspecto concreto de esa inquietud. ¿Qué observación te permitiría comprenderlo mejor?',
-      'Considera qué cambiaría si revisaras una de tus suposiciones. ¿Qué pregunta podrías hacer para ponerla a prueba?',
-    ];
-  }
+const requestErrors = {
+  NETWORK_ERROR: 'No se pudo conectar. Revisa tu conexión e inténtalo de nuevo.',
+  TIMEOUT: 'La respuesta tardó demasiado. Inténtalo de nuevo.',
+  INVALID_HISTORY: 'El historial enviado no es válido. Recarga para iniciar una sesión nueva.',
+  HISTORY_TOO_LARGE: 'La conversación supera el límite de 64 KiB. Recarga para iniciar una sesión nueva.',
+  RATE_LIMITED: 'Demasiadas solicitudes. Espera un momento y vuelve a intentarlo.',
+  SERVICE_UNAVAILABLE: 'El servicio no está disponible. Inténtalo de nuevo.',
+  INVALID_RESPONSE: 'El servicio devolvió una respuesta inválida. Inténtalo de nuevo.',
+  REQUEST_REJECTED: 'El servidor no pudo aceptar el mensaje. Inténtalo de nuevo.',
+};
 
-  // Prioriza las variantes menos usadas y excluye la respuesta anterior, incluso al agotar el banco.
-  const previousReplies = messages.filter(({ role }) => role === 'assistant').map(({ content }) => content);
-  const candidates = replies.filter((reply) => reply !== previousReplies.at(-1));
-  const usage = (reply) => previousReplies.filter((previous) => previous === reply).length;
-  return candidates.reduce((selected, reply) => usage(reply) < usage(selected) ? reply : selected);
+export class ChatRequestError extends Error {
+  constructor(code) {
+    super(requestErrors[code] || requestErrors.REQUEST_REJECTED);
+    this.name = 'ChatRequestError';
+    this.code = code;
+  }
+}
+
+/** Transporte HTTP separado del estado y del render; los tests inyectan fetch. */
+export async function requestReply(messages, { fetchImpl = globalThis.fetch, timeoutMs = 20_000 } = {}) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetchImpl('/api/functions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages }),
+      signal: controller.signal,
+    });
+    if (!response.ok) {
+      const code = response.status === 413 ? 'HISTORY_TOO_LARGE'
+        : response.status === 429 ? 'RATE_LIMITED'
+        : response.status === 400 ? 'INVALID_HISTORY'
+        : response.status >= 500 ? 'SERVICE_UNAVAILABLE' : 'REQUEST_REJECTED';
+      throw new ChatRequestError(code);
+    }
+    let data;
+    try { data = await response.json(); }
+    catch { throw new ChatRequestError('INVALID_RESPONSE'); }
+    if (!data || typeof data.reply !== 'string' || !data.reply.trim()) throw new ChatRequestError('INVALID_RESPONSE');
+    return data.reply.trim();
+  } catch (error) {
+    if (controller.signal.aborted) throw new ChatRequestError('TIMEOUT');
+    if (error instanceof ChatRequestError) throw error;
+    throw new ChatRequestError('NETWORK_ERROR');
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 /** La sesión no depende del DOM: puede terminar un turno mientras otra vista está abierta. */
-export function createChatSession({ respond = simulateReply } = {}) {
+export function createChatSession({ respond = requestReply } = {}) {
   let messages = [];
   let draft = '';
   let pending = false;
@@ -76,11 +83,12 @@ export function createChatSession({ respond = simulateReply } = {}) {
       if (typeof reply !== 'string' || !reply.trim()) throw new Error('Respuesta vacía');
       messages.push({ role: 'assistant', content: reply.trim() });
       return true;
-    } catch {
+    } catch (cause) {
       // Revierte solo el turno fallido: reenviar no duplica el mensaje ni pierde el texto.
       messages.pop();
       draft = submitted;
-      error = 'No se pudo obtener la respuesta. Tu mensaje sigue en el campo; vuelve a enviarlo.';
+      const detail = cause instanceof ChatRequestError ? cause.message : 'No se pudo obtener la respuesta.';
+      error = `${detail} Tu mensaje sigue en el campo.`;
       return false;
     } finally {
       pending = false;

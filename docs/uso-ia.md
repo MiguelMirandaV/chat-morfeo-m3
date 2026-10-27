@@ -59,3 +59,15 @@
 **Verificación:** Codex comprobó la conversación, estados, navegación durante la espera, borrador, recarga, doble click, texto literal y tres tamaños en el navegador. Los fallos y reintentos se probaron con un proveedor inyectado en Vitest. Las respuestas de esta etapa no fueron generadas por Gemini y no demuestran comprensión contextual del personaje.
 
 **Corrección solicitada por Miguel:** señaló respuestas idénticas en dos interacciones. Codex identificó un único texto por categoría y añadió variantes seleccionadas mediante el historial, sin repetir la respuesta previa. Se añadieron dos tests de regresión y se comprobó en navegador. Miguel comprendió el motivo de la simulación y pidió continuar al paso 6.
+
+## 6. Función serverless y transporte HTTP
+
+**Solicitud de Miguel:** comprendió el motivo de las respuestas predefinidas y pidió continuar al siguiente paso.
+
+**Trabajo de Codex:** handler de Vercel con contrato POST/JSON, validación de historial, respuestas estructuradas y límite de bytes; requestReply con fetch, response.ok, timeout y errores seguros. Se trasladó la simulación al servidor y se mantuvo el historial de sesión independiente del DOM.
+
+**Decisiones:** reutilizar la validación por grafemas en el servidor, exigir roles alternados y campos explícitos, enviar el historial completo y rechazar el exceso sin truncarlo. El cliente muestra mensajes controlados según el estado HTTP, sin mostrar excepciones originales ni reintentar automáticamente. No se añadieron dependencias.
+
+**Verificación e iteración:** 76 tests sin red; 17 comprobaciones HTTP reales; un error 503 provocado mediante proxy local temporal, seguido de reintento y navegación durante la petición. Se corrigió la expectativa del script sobre /api/functions.js al comprobar que Vercel Dev ejecuta ese alias en vez de servir su fuente. El proxy se retiró al terminar. Las acciones de desarrollo y QA son de Codex; no se atribuyen a Miguel.
+
+**Referencia consultada:** [Runtime Node.js y helpers de Vercel](https://vercel.com/docs/functions/runtimes/node-js), comprobado junto con las definiciones de la CLI local. El SDK y el prompt de Gemini se evaluarán en las etapas siguientes.
