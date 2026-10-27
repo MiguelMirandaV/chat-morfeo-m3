@@ -14,13 +14,13 @@ sequenceDiagram
     participant Gemini
     Usuario->>Vista: Escribe y pulsa Enviar
     Vista->>Sesion: Valida y bloquea otro envío
-    Sesion->>API: Historial completo role/content + cookie
-    API->>API: Valida origen, acceso, JSON y límites
+    Sesion->>API: character + historial role/content + cookie
+    API->>API: Valida origen, acceso, personaje, JSON y límites
     API->>Redis: Reserva atómica
     alt Hay cuota
-        API->>Gemini: systemInstruction + contents
+        API->>Gemini: systemInstruction del personaje + contents
         Gemini-->>API: Candidato y partes de texto
-        API-->>Sesion: reply + quota
+        API-->>Sesion: character + reply + quota
         Sesion-->>Vista: Añade respuesta y libera el campo
     else Se alcanzó el límite
         API-->>Sesion: 429 + quota + Retry-After
@@ -37,7 +37,8 @@ El desbloqueo se hace antes de este recorrido: `{action:"unlock",cohort:"79"}` o
 | `src/app.js` | Vistas, `resolveRoute`, decisiones de navegación, `pushState`/`popstate`, foco y portal; limpia los recursos de la vista anterior. |
 | `src/matrix-scene.js` | Geometría procedural, atlas de caracteres, lluvia WebGL, fallback 2D, apertura y cámara; libera recursos al desmontar. |
 | `scripts/prepare-assets.js` | Copia los módulos Three.js fijados y su licencia a `src/vendor`, generado e ignorado en Git. |
-| `src/chat.js` | `createChatSession` conserva mensajes/borrador/estado; `postApi` gestiona fetch, JSON y errores; `mountChat`/`mountAccess` conectan estado y DOM. |
+| `src/chat.js` | `createCharacterSession` coordina tres `createChatSession`, con mensajes/borrador/error separados; `postApi` gestiona fetch, JSON y errores; `mountChat`/`mountAccess` conectan estado y DOM. |
+| `src/characters.js` | Identificadores permitidos y metadatos públicos, sin prompts. |
 | `src/utils.js` | `countCharacters` con Intl.Segmenter y `getMessageError`; la función backend reutiliza la validación. |
 | `api/functions.js` | `createHandler`, acceso firmado, validación del historial, reserva, adaptador Gemini y parseo. Usa dependencias inyectables para ensayar fallos sin red. |
 | `src/styles.css` | Base móvil y adaptaciones 768/1024, Flexbox/Grid, estados, foco y movimiento reducido. |
@@ -63,7 +64,7 @@ El desbloqueo se hace antes de este recorrido: `{action:"unlock",cohort:"79"}` o
 | Cookie de acceso | Navegador, HttpOnly | Token firmado con expiración de 8 horas; Secure en HTTPS, SameSite=Strict. Sin identidad individual. |
 | Cantidades y tiempos de solicitudes | Redis compartido, o archivo privado solo en desarrollo sin Redis | Ventana móvil y día del Pacífico, con expiraciones. No guarda mensajes. |
 | Claves y secreto de sesión | Entorno del servidor | `.env` local y variables de Vercel, excluidos del código público. |
-| Prompt | Constante del backend | Define el personaje; no contiene claves. No se envía como parte de los assets estáticos. |
+| Prompts | Constantes del backend | Define el personaje; no contiene claves. No se envía como parte de los assets estáticos. |
 
 La app no persiste conversaciones; eso no describe las políticas de tratamiento de datos del proveedor externo. El código 79 es conocido y compartido, por lo que no debe considerarse una cuenta personal ni protección general contra abuso.
 
@@ -75,3 +76,14 @@ La app no persiste conversaciones; eso no describe las políticas de tratamiento
 4. Sigue `validateHistory` → cuota → `generateGeminiReply` → `parseGeminiReply`.
 5. Regresa a `mountChat` para ver cómo se convierte el estado en interfaz.
 6. Termina con el router y su limpieza en `src/app.js`. Usa los tests como ejemplos de entradas/resultados, sin ejecutarlos contra servicios reales.
+
+
+## Selección y conversaciones de personajes
+
+El acceso autenticado muestra la elección inicial. El estado empieza con `character: null`; no admite envíos sin destinatario. Cada personaje tiene un almacén propio en un Map. Al enviar, la sesión captura su identificador y llama al transporte con una copia de su historial. Un envío pendiente bloquea otro envío y un cambio de selección. Los snapshots públicos copian los mensajes para impedir modificaciones externas.
+
+El contrato de generación es `{character, messages}`, con `character` limitado a `morpheus`, `oracle` o `trinity`. La función valida el acceso y el contrato antes de reservar cuota. El prompt correspondiente se obtiene de constantes del servidor; no se acepta una instrucción enviada por el navegador. La respuesta incluye `{character, reply, quota}` y el cliente rechaza una identidad que no coincida. Esta etiqueta comprueba coherencia del contrato; no es una firma criptográfica del contenido.
+
+La separación de historiales se implementa en el cliente; el servidor valida la estructura del historial recibido y no conserva conversaciones. Las cuotas Redis siguen siendo globales entre personajes. El estado aún es volátil: localStorage se incorpora en la etapa siguiente. La elección inicial permite revisar las voces; el cambio pedido dentro del chat tendrá su control y confirmación en la etapa de terminal.
+
+Los prompts tienen una base compartida de conversación, brevedad y límites de ficción. Morfeo acompaña la reflexión y el aprendizaje; el Oráculo explora elecciones con calidez sin predecir el futuro real; Trinity propone acciones concretas sin fingir haberlas ejecutado. La configuración de Gemini y los tiempos de espera se mantienen.

@@ -192,3 +192,12 @@ El alcance define los turnos, la acumulación entre personajes, el retorno a la 
 Codex implementó el rostro procedural de caracteres, lluvia volumétrica y transición de mandíbula/cámara usando Three.js 0.186.1. No generó ni utilizó una fotografía para la nueva Home. El chat conserva por ahora su retrato y comportamiento anteriores. La biblioteca y su licencia se copian localmente durante el build.
 
 Se corrigieron durante el desarrollo un error de sintaxis en la función gaussiana, la competencia entre contextos 2D/WebGL del mismo canvas y una primera lluvia demasiado tenue. La revisión de navegador comprobó WebGL real, tamaños 320/768/1024, pausa, transición completa, Escape y desmontaje. Los escenarios sin WebGL y con movimiento reducido se sirvieron con fixtures locales identificados, sin presentarlos como pruebas del proveedor real. Los códigos 78/79 se comprobaron contra la función local. Las 130 pruebas pasan; la auditoría de producción reporta cero avisos. No se generaron respuestas Gemini en esta etapa.
+
+
+## Iteración 2 — Personajes, contrato y conversaciones
+
+Codex implementó identificadores públicos permitidos, prompts de servidor distintos para Morfeo, el Oráculo y Trinity, y el contrato explícito de personaje. Refactorizó la sesión en tres conversaciones en memoria, con borradores/errores separados y bloqueo de cambio durante un envío. Incluyó una elección inicial mínima para revisar los tres personajes; el cambio solicitado dentro del chat sigue pendiente de su etapa.
+
+La suite suma 152 casos. Al actualizar el contrato se corrigieron expectativas y un fixture antiguo sin identidad en la respuesta; no se eliminó la prueba de recuperación que lo detectó. Se comprobaron tres respuestas reales mediante la interfaz local, una por personaje, con preguntas y nombres ficticios. Redis pasó de 30 a 33 reservas diarias. La consulta inicial de disponibilidad falló de forma transitoria; el reintento de desbloqueo y la lectura posterior funcionaron, sin sustituir las cuotas reales por contadores locales. La muestra confirma integración, no una evaluación exhaustiva de personalidad o seguridad.
+
+La revisión visual comprobó la selección tras autenticar, etiquetas de autor/canal, tamaños 320/1024 sin desbordamiento y conservación de personaje/borrador al navegar entre Chat y Acerca de. No se modificaron credenciales ni configuración de Redis, y no se presentó persistencia tras recarga como si ya existiera.

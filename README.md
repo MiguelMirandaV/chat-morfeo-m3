@@ -1,6 +1,6 @@
 # Chat con Morfeo
 
-Creé esta aplicación para conversar en español con una interpretación de Morfeo de *The Matrix (1999)*. Es mi Proyecto Integrador del Módulo 3 de Full Stack de Henry; lo desarrollé con asistencia de Codex.
+Creé esta aplicación para conversar en español con interpretaciones de Morfeo, el Oráculo y Trinity de *The Matrix (1999)*. Es mi Proyecto Integrador del Módulo 3 de Full Stack de Henry; lo desarrollé con asistencia de Codex.
 
 **[Abrir la versión entregada](https://chat-morfeo-m3.vercel.app/home)** · **[Ver el repositorio](https://github.com/MiguelMirandaV/chat-morfeo-m3)**
 
@@ -14,26 +14,27 @@ Uso este código como una puerta temática compartida. No representa una cuenta 
 
 ## Mi propuesta
 
-Elegí a Morfeo por su voz serena y reflexiva, sus preguntas sobre la libertad y su forma de acompañar el aprendizaje. Mi interpretación responde con frases breves, aprovecha el contexto de la conversación y distingue el universo ficticio de Matrix del mundo real.
+Elegí a Morfeo por su voz serena y reflexiva, sus preguntas sobre la libertad y su forma de acompañar el aprendizaje. Cada personaje tiene instrucciones propias de voz y conserva su conversación independiente. Las respuestas aprovechan el contexto y distinguen el universo ficticio de Matrix del mundo real.
 
 Diseñé la interfaz como una terminal de Zion. En esta rama construí una entrada de pantalla completa: lluvia volumétrica y un rostro procedural en 3D formado por caracteres, con una cámara que entra por su boca para abrir el chat. Incluí pausa, opción de omitir la transición, navegación con teclado, movimiento reducido y una alternativa en Canvas 2D cuando WebGL no está disponible. [Explico la escena y sus límites](docs/home-3d.md). La aplicación publicada conserva la versión entregada mientras reviso esta iteración en Preview.
 
 ## Qué puedes hacer
 
 - Navegar por **Inicio**, **Chat** y **Acerca de** sin recargar la página; usar Atrás y Adelante.
-- Conversar con Morfeo mediante Gemini, enviando el historial completo en cada petición.
+- Elegir a **Morfeo, el Oráculo o Trinity** después de desbloquear el canal.
+- Conversar mediante Gemini, enviando el historial completo del personaje elegido en cada petición. Los borradores y errores también se mantienen separados.
 - Escribir hasta **280 caracteres visibles**, incluidos espacios, saltos y emojis compuestos. El texto pegado que excede el límite se conserva para corregirlo.
 - Ver el estado de escritura y recuperar el borrador si una respuesta falla.
 - Consultar las solicitudes compartidas de la app: **15 en una ventana móvil de 60 segundos y 500 al día**.
 - Ver la intervención visual de Smith cuando el servidor rechaza una solicitud por cuota.
 
-En esta versión, uso el botón **Enviar**; Enter agrega una línea. Conservo la conversación en memoria al navegar y la borro al recargar. La ampliación que estoy desarrollando tiene sus reglas en [el alcance de la iteración](docs/iteracion-2.md).
+En esta rama, la elección inicial ya funciona. El cambio de personaje solicitado dentro del chat y la persistencia se incorporarán en sus etapas. Por ahora uso el botón **Enviar**; Enter agrega una línea. Conservo la conversación en memoria al navegar y la borro al recargar. La ampliación que estoy desarrollando tiene sus reglas en [el alcance de la iteración](docs/iteracion-2.md).
 
 ## Cómo usar la aplicación
 
 1. Abre la aplicación e introduce **79**.
 2. Entra al canal; puedes omitir la transición con el botón o Escape.
-3. Escribe una pregunta y pulsa **Enviar**.
+3. Elige a **Morfeo, el Oráculo o Trinity**, escribe una pregunta y pulsa **Enviar**.
 4. Espera la respuesta. Ante un fallo, revisa el mensaje de estado y reintenta con el borrador conservado.
 5. Puedes ir a Acerca de y volver sin perder la conversación. Recargar inicia una conversación vacía.
 
@@ -44,12 +45,13 @@ Envío las preguntas a Gemini a través de mi función de servidor. No escribas 
 Utilicé HTML, CSS y JavaScript con módulos ES para la SPA, una función Node en Vercel como backend, el SDK `@google/genai` para Gemini, Redis de Upstash para los contadores, Three.js para el rostro y la lluvia 3D, y Vitest para las pruebas.
 
 ```text
-api/functions.js       Acceso, cuotas, validación, prompt y adaptador Gemini
+api/functions.js       Acceso, cuotas, validación, tres prompts y adaptador Gemini
 src/index.html         Documento inicial
 src/app.js             Vistas, routing, foco y transición
 src/matrix-scene.js    Rostro procedural, lluvia 3D, fallback y limpieza
 scripts/prepare-assets.js Copia local de módulos Three.js y licencia
-src/chat.js            Estado, peticiones HTTP y render del chat
+src/chat.js            Conversaciones separadas, peticiones HTTP y render del chat
+src/characters.js      Identificadores y metadatos públicos de personajes
 src/utils.js           Conteo y validación de caracteres
 src/styles.css         Estilos responsive y estados visuales
 src/assets/            Retratos de la interfaz
@@ -114,13 +116,13 @@ npm test
 npm run test:watch
 ```
 
-Incluí **130 pruebas en tres archivos** para validar caracteres, navegación, historial, estados, errores, transporte, acceso, cuotas y respuestas de Gemini. Uso mocks para que la suite no consuma Gemini ni Redis reales y restauro el entorno entre pruebas.
+Incluí **152 pruebas en cuatro archivos** para validar caracteres, navegación, historiales separados, identidad, estados, errores, transporte, acceso, cuotas y contratos de Gemini. Uso mocks para que la suite no consuma Gemini ni Redis reales y restauro el entorno entre pruebas.
 
-[Detalle de las pruebas](docs/pruebas-unitarias.md) · [Comprobaciones y límites](docs/pruebas.md).
+[Personajes y contrato](docs/personajes.md) · [Detalle de las pruebas](docs/pruebas-unitarias.md) · [Comprobaciones y límites](docs/pruebas.md).
 
 ## Acceso, datos y cuotas
 
-Mantengo la API key y el prompt en el servidor. El navegador se comunica mediante `POST /api/functions`; envío códigos de error controlados y muestro mensajes con `textContent`.
+Mantengo la API key y los tres prompts en el servidor. El navegador se comunica mediante `POST /api/functions`; envío códigos de error controlados y muestro mensajes con `textContent`.
 
 Valido el acceso con una cookie firmada, HttpOnly y SameSite=Strict, con expiración de ocho horas y Secure bajo HTTPS. Aplico el límite de caracteres tanto en cliente como en servidor.
 
@@ -148,7 +150,7 @@ Configura en Production y Preview las cinco variables de servidor de la tabla, e
 
 ## Límites y mantenimiento
 
-- Gemini puede equivocarse, repetirse o tardar; mi prompt y las pruebas no garantizan todas las respuestas futuras.
+- Gemini puede equivocarse, repetirse o tardar; los prompts y las pruebas no garantizan todas las respuestas futuras.
 - El código 79 es compartido. No ofrece identidad individual ni sincronización entre dispositivos.
 - Uso un retrato CGI prerenderizado animado con CSS en la versión publicada.
 - Probé tamaños concretos y un navegador; no certifico todos los dispositivos ni lectores de pantalla.

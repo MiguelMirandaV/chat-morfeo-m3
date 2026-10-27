@@ -1,4 +1,12 @@
-# Paso 9 — Pruebas unitarias consolidadas
+# Pruebas unitarias
+
+## Iteración 2: personajes e historiales
+
+Resultado vigente: **152 casos en cuatro archivos**. La suite conserva las pruebas de regresión y adapta el contrato de generación a `{character, messages}` y `{character, reply, quota}`.
+
+Agregué `tests/characters.test.js` con 22 casos sobre identificadores permitidos, rechazo antes de reservar cuota, prompts por personaje, identidad de respuesta, cuota compartida, selección inicial, borradores/contextos separados, respuestas pendientes y recuperación de errores. Estos tests sustituyen al proveedor y no certifican el tono de sus generaciones reales.
+
+## Registro de la versión entregada — Paso 9
 
 Fecha: 27 de octubre de 2026. Resultado final: **130 casos aprobados en tres archivos de pruebas**.
 
