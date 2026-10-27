@@ -5,6 +5,9 @@
   "installCommand": "npm ci",
   "buildCommand": "",
   "devCommand": "",
+  "functions": {
+    "api/functions.js": { "maxDuration": 60 }
+  },
   "rewrites": [
     { "source": "/((?!api(?:/|$)|_vercel(?:/|$)|.*\\.).*)", "destination": "/index.html" }
   ]

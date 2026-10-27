@@ -90,9 +90,9 @@ export async function generateGeminiReply(messages, { environment = process.env,
   try { settings = getGeminiConfig(environment); }
   catch { throw new ApiError(503, 'CONFIGURATION_ERROR', 'El canal no está disponible temporalmente.'); }
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 16_000);
+  const timer = setTimeout(() => controller.abort(), 30_000);
   try {
-    const client = clientFactory({ apiKey: settings.apiKey, httpOptions: { timeout: 16_000, retryOptions: { attempts: 1 } } });
+    const client = clientFactory({ apiKey: settings.apiKey, httpOptions: { timeout: 30_000, retryOptions: { attempts: 1 } } });
     const response = await client.models.generateContent({
       model: settings.model,
       contents: toGeminiContents(messages),

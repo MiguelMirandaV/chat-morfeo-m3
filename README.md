@@ -155,7 +155,7 @@ Devuelve `{authenticated:true, quota}` y emite la cookie. Después, el navegador
 | 502 | Texto vacío, inválido o truncado. |
 | 503 / 504 | Configuración, cuota/proveedor no disponibles o timeout. |
 
-El SDK tiene un solo intento, timeout de 16 s y AbortController; el frontend espera hasta 20 s. No hay reenvíos automáticos. Un aborto local no garantiza cancelar el cómputo remoto, por lo que la reserva no se devuelve. Los mensajes usan `textContent`, no HTML del usuario. Los detalles internos y secretos no se devuelven al cliente.
+El SDK tiene un solo intento, timeout de 30 s y AbortController; el frontend espera hasta 40 s y la función tiene un máximo de 60 s. No hay reenvíos automáticos. Un aborto local no garantiza cancelar el cómputo remoto, por lo que la reserva no se devuelve. Los mensajes usan `textContent`, no HTML del usuario. Los detalles internos y secretos no se devuelven al cliente.
 
 ## Modelo y prompt
 

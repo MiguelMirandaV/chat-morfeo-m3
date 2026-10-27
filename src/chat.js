@@ -43,7 +43,7 @@ function updateQuota(quota, intercepted = false) {
 }
 
 /** Contrato JSON compartido por sesión, desbloqueo y conversación. No muestra errores internos. */
-export async function postApi(payload, { fetchImpl = globalThis.fetch, timeoutMs = 20_000 } = {}) {
+export async function postApi(payload, { fetchImpl = globalThis.fetch, timeoutMs = 40_000 } = {}) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {

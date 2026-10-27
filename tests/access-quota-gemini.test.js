@@ -188,12 +188,14 @@ describe('adaptador Gemini real con proveedor sustituido en tests', () => {
     const result = generateGeminiReply(messages, { environment, clientFactory: () => ({ models: { generateContent: async () => { throw Object.assign(new Error('private-key-content'), { status }); } } }) });
     const error = await result.catch((error) => error); expect(error.code).toBe(code); expect(error.message).not.toContain('private');
   });
-  it('aborta después de 16 segundos sin reintentar automáticamente', async () => {
+  it('aborta después de 30 segundos sin reintentar automáticamente', async () => {
     vi.useFakeTimers();
     const generateContent = vi.fn(({ config }) => new Promise((_, reject) => config.abortSignal.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')))));
     const result = generateGeminiReply(messages, { environment, clientFactory: () => ({ models: { generateContent } }) });
     const check = expect(result).rejects.toMatchObject({ code: 'TIMEOUT' });
-    await vi.advanceTimersByTimeAsync(16_000); await check; expect(generateContent).toHaveBeenCalledTimes(1); expect(vi.getTimerCount()).toBe(0);
+    await vi.advanceTimersByTimeAsync(16_000);
+    expect(generateContent.mock.calls[0][0].config.abortSignal.aborted).toBe(false);
+    await vi.advanceTimersByTimeAsync(14_000); await check; expect(generateContent).toHaveBeenCalledTimes(1); expect(vi.getTimerCount()).toBe(0);
   });
 });
 
