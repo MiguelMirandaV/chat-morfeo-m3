@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { getSpaDestination, navigateTo, normalizePathname, resolveRoute } from '../src/app.js';
 import { ChatRequestError, createChatSession, requestReply } from '../src/chat.js';
-import { createHandler, MAX_REQUEST_BYTES, simulateReply, validateHistory } from '../api/functions.js';
+import { createHandler, DEFAULT_GEMINI_MODEL, getGeminiConfig, MAX_REQUEST_BYTES, simulateReply, validateHistory } from '../api/functions.js';
 
 const origin = 'http://localhost:3000';
 const click = { href: '/chat', button: 0, modified: false, download: false, target: null, defaultPrevented: false };
@@ -246,6 +246,41 @@ describe('transporte HTTP del chat', () => {
     expect(chat.getState().messages).toHaveLength(2);
     expect(fetchImpl.mock.calls[0][1].body).toBe(fetchImpl.mock.calls[1][1].body);
     expect(vi.getTimerCount()).toBe(0);
+  });
+});
+
+describe('preparación de la configuración de Gemini', () => {
+  const environment = { GEMINI_API_KEY: 'clave-de-prueba-no-real', GEMINI_MODEL: DEFAULT_GEMINI_MODEL };
+
+  it.each([undefined, '', '   ', null])('rechaza una clave ausente o inválida sin intentar llamar al proveedor: %j', (apiKey) => {
+    expect(() => getGeminiConfig({ ...environment, GEMINI_API_KEY: apiKey })).toThrow('Falta configurar GEMINI_API_KEY');
+  });
+
+  it('requiere declarar el modelo y no cambia silenciosamente la selección', () => {
+    expect(() => getGeminiConfig({ GEMINI_API_KEY: environment.GEMINI_API_KEY })).toThrow('GEMINI_MODEL');
+    expect(() => getGeminiConfig({ ...environment, GEMINI_MODEL: 'otro-modelo' })).toThrow('compatibilidad');
+  });
+
+  it('normaliza espacios de configuración sin modificar el entorno recibido', () => {
+    const input = { GEMINI_API_KEY: ` ${environment.GEMINI_API_KEY} `, GEMINI_MODEL: ` ${DEFAULT_GEMINI_MODEL} ` };
+    const before = { ...input };
+    const config = getGeminiConfig(input);
+    expect(config.apiKey).toBe(environment.GEMINI_API_KEY);
+    expect(config.model).toBe(DEFAULT_GEMINI_MODEL);
+    expect(input).toEqual(before);
+  });
+
+  it('no comparte configuración mutable entre solicitudes ni incluye valores rechazados en los errores', () => {
+    const first = getGeminiConfig(environment);
+    const second = getGeminiConfig(environment);
+    first.generation.maxOutputTokens = 1;
+    expect(second.generation.maxOutputTokens).toBe(1024);
+    const sensitiveValue = 'valor-de-prueba-que-no-debe-aparecer';
+    let error;
+    try { getGeminiConfig({ ...environment, GEMINI_MODEL: sensitiveValue }); }
+    catch (cause) { error = cause; }
+    expect(error.message).not.toContain(sensitiveValue);
+    expect(error.message).not.toContain(environment.GEMINI_API_KEY);
   });
 });
 

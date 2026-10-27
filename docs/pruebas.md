@@ -95,3 +95,14 @@ Miguel observó dos respuestas exactamente iguales. Cada tema de la simulación 
 - No se configuró ni consumió Gemini en este paso. La simulación permite probar transporte y estados; la voz generada, el contexto de IA, las cuotas y el funcionamiento productivo siguen pendientes.
 
 Evidencias en docs/capturas: chat-api-1024.jpg, chat-api-320.jpg, chat-error-http-1024.jpg, red-api-paso-6.json y http-api-paso-6.json.
+
+## Paso 7 — Preparación de Gemini (evaluación real pendiente)
+
+- Se revisaron las fuentes oficiales actuales de modelos, claves, cuotas, precios, thinking, cambios de API y SDK. gemini-3.5-flash-lite se propone como modelo estable con nivel gratuito publicado; no se asume que la cuenta ya tenga acceso o una cuota concreta.
+- Se detectó que la guía específica de 3.5 Flash-Lite declara temperature/top_p/top_k obsoletos. Se retiró temperature de la preparación antes de integrarla, en lugar de conservar el parámetro de los ejemplos de lectures o inferir compatibilidad de una guía general.
+- Se añadió MORPHEUS_SYSTEM_PROMPT con identidad, voz, brevedad, uso de contexto, variación y límites de la ficción. La matriz evaluacion-prompt.md conserva todos los resultados reales como pendientes.
+- getGeminiConfig requiere GEMINI_API_KEY y GEMINI_MODEL en el entorno del servidor, valida la selección revisada y devuelve una configuración nueva. Valores iniciales: salida máxima 1024 tokens y thinking minimal, sujetos a evaluación real. El handler sigue usando la simulación.
+- Se creó .env solo si no existía, mediante escritura exclusiva y permisos 0600, con clave vacía. No se leyó ni editó .env.local. git check-ignore --no-index confirmó .env y .env.local ignorados; .env.example continúa versionable y su clave está vacía. El nombre de modelo público se incluye en el ejemplo.
+- npm test: 83 tests aprobados, siete nuevos de configuración. Comprueban clave ausente/inválida, modelo explícito y revisado, normalización sin alterar el entorno, independencia de configuración y errores sin valores sensibles. Estos tests no hacen peticiones ni validan la voz de Gemini.
+- Miguel confirmó que necesita crear la clave. Codex abrió AI Studio en una pestaña nueva; la bienvenida requiere confirmar edad/uso y aceptar términos. Esos pasos se dejaron a Miguel. Se proporcionaron instrucciones para crear la clave y pegarla directamente en el .env local.
+- Pendientes: confirmación de clave guardada, acceso real al modelo, cuota del proyecto y evaluación del prompt. No se afirma que Gemini esté integrado o que el paso 7 esté cerrado.

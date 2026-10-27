@@ -71,3 +71,15 @@
 **Verificación e iteración:** 76 tests sin red; 17 comprobaciones HTTP reales; un error 503 provocado mediante proxy local temporal, seguido de reintento y navegación durante la petición. Se corrigió la expectativa del script sobre /api/functions.js al comprobar que Vercel Dev ejecuta ese alias en vez de servir su fuente. El proxy se retiró al terminar. Las acciones de desarrollo y QA son de Codex; no se atribuyen a Miguel.
 
 **Referencia consultada:** [Runtime Node.js y helpers de Vercel](https://vercel.com/docs/functions/runtimes/node-js), comprobado junto con las definiciones de la CLI local. El SDK y el prompt de Gemini se evaluarán en las etapas siguientes.
+
+## 7. Prompt y configuración preparados; acceso pendiente
+
+**Solicitud de Miguel:** continuar. Al consultar el estado de AI Studio, indicó que necesita crear la clave.
+
+**Trabajo de Codex:** revisión de documentación oficial vigente, propuesta de modelo estable con nivel gratuito, prompt v1 bajo control del servidor, validación de configuración y matriz de evaluación. Se creó el archivo local ignorado con clave vacía y permisos privados. Se prepararon instrucciones de AI Studio y VS Code.
+
+**Criterio aplicado:** distinguir la ficha inicial y una configuración revisada de una evaluación real. No se presentan ejemplos ni tests de código como resultados de Gemini. Se eligió omitir los parámetros de muestreo obsoletos al encontrar la guía específica del modelo. El máximo de tokens se tratará como presupuesto técnico; la brevedad y el contexto requieren observar respuestas reales.
+
+**Intervención de Miguel:** la bienvenida observada de AI Studio solicita declaraciones personales y aceptación de términos; quedó a su cargo, junto con crear y guardar su clave directamente en el archivo local. Codex no recibió ni mostró una clave, no habilitó facturación y no cambió el chat del mock al proveedor real.
+
+**Verificación:** 83 tests aprobados, incluyendo siete de configuración; exclusión de .env y ejemplo público sin clave. La preparación es revisable; el acceso/cuota y la evaluación del prompt permanecen pendientes de la clave local. Referencias y criterios están en evaluacion-prompt.md.

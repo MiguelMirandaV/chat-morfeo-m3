@@ -1,6 +1,6 @@
 # Paso 1 — Definición de Chat con Morfeo
 
-Estado: definición del producto completada y pasos 2–4 ejecutados: entorno, interfaz visual y routing SPA. La conversación y Gemini siguen en sus etapas previstas. Esta ficha conserva los criterios de aceptación del producto; los resultados realmente obtenidos se registran en `pruebas.md`.
+Estado: definición del producto completada y pasos 2–6 ejecutados: entorno, interfaz, routing, chat y función con simulación. El paso 7 tiene preparados el prompt/configuración; la clave y evaluación real siguen pendientes. Esta ficha conserva los criterios de aceptación del producto; los resultados realmente obtenidos se registran en `pruebas.md`.
 
 ## Decisiones de Miguel
 
@@ -32,9 +32,9 @@ La interpretación se centrará en el Morfeo de la primera película, The Matrix
 
 Se crearán respuestas originales. Las frases conocidas de la película no sustituirán el diálogo ni se repetirán como respuesta a cualquier pregunta.
 
-## Borrador del system prompt
+## Borrador original del system prompt (paso 1)
 
-Este texto es una especificación inicial. Se probará e iterará con Gemini en el paso 7; todavía no es un prompt evaluado con el proveedor.
+Este texto conserva la especificación inicial. El prompt v1 preparado en el paso 7 está en MORPHEUS_SYSTEM_PROMPT, dentro de api/functions.js, y es la fuente que utilizará el servidor. Sus casos y estado de evaluación están en [evaluacion-prompt.md](evaluacion-prompt.md); sigue pendiente de probar con el proveedor.
 
 > Interpreta a Morfeo del universo ficticio de The Matrix (1999). Habla en español natural y trata al usuario de tú. Tu voz es serena, firme, paciente y filosófica. Ayuda a explorar ideas sobre elección, percepción, libertad y aprendizaje con claridad y alguna pregunta breve cuando sea útil.
 >
@@ -155,7 +155,7 @@ Estas son pruebas previstas para los pasos 7, 8 y 10. No se han ejecutado todav�
 
 ## Próximo paso y registro
 
-La carpeta y el repositorio están preparados; interfaz y routing SPA se comprobaron en los pasos 3 y 4. El próximo paso es implementar el chat con estado en memoria y respuestas simuladas, sin llamar todavía a Gemini.
+La carpeta, interfaz, routing, chat en memoria y transporte HTTP con simulación están implementados. Para cerrar el paso 7 falta que Miguel complete la bienvenida de AI Studio, cree/guarde su clave y se comprueben acceso/cuota y respuestas reales al prompt. El paso 8 conectará el proveedor al chat.
 
 No se necesita conectar PostgreSQL. Vercel está vinculado y el servidor local funciona; Google AI Studio se configurará en la etapa de Gemini. La fecha de entrega sigue pendiente.
 
