@@ -3,12 +3,17 @@
   "framework": null,
   "outputDirectory": "src",
   "installCommand": "npm ci",
-  "buildCommand": "",
+  "buildCommand": "npm run build",
   "devCommand": "",
   "functions": {
-    "api/functions.js": { "maxDuration": 60 }
+    "api/functions.js": {
+      "maxDuration": 60
+    }
   },
   "rewrites": [
-    { "source": "/((?!api(?:/|$)|_vercel(?:/|$)|.*\\.).*)", "destination": "/index.html" }
+    {
+      "source": "/((?!api(?:/|$)|_vercel(?:/|$)|.*\\.).*)",
+      "destination": "/index.html"
+    }
   ]
 }

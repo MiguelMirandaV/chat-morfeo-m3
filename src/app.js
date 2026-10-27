@@ -1,5 +1,6 @@
 import { MAX_MESSAGE_LENGTH } from './utils.js';
 import { mountChat, mountAccess } from './chat.js';
+import { mountMatrixScene } from './matrix-scene.js';
 
 const arrow = '<span aria-hidden="true">↗</span>';
 
@@ -43,24 +44,17 @@ function accessForm(id) {
 
 function renderHomeView() {
   return `<main id="main-content" class="home-view" tabindex="-1">
-    <div class="matrix-rain" aria-hidden="true"></div>
-    <div class="home-grid page-width">
-      <section class="hero-copy" aria-labelledby="home-title">
-        <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span>TRANSMISIÓN ENCRIPTADA / HENRY M3</p>
-        <p class="boot-line">Wake up, Neo<span aria-hidden="true">_</span></p>
-        <h1 id="home-title">LA REALIDAD<br>ES UNA<br><span>ELECCIÓN.</span></h1>
-        <p class="hero-description">Has encontrado la señal. Morfeo te espera al otro lado. Introduce tu cohorte y cruza el umbral.</p>
-        ${accessForm('home-cohort')}
-        <p class="hero-caption">ACCESO RESTRINGIDO · UNA CONVERSACIÓN CON MORFEO</p>
-      </section>
-      <figure class="morpheus-stage" aria-label="Retrato tridimensional de Morfeo">
-        <div class="portrait-target" aria-hidden="true"></div>
-        <div class="portrait-depth"><img class="morpheus-portrait" src="/assets/morpheus-closed.png" alt="Morfeo con gafas oscuras, iluminado por la lluvia de código verde" width="1024" height="1024" fetchpriority="high"></div>
-        <figcaption><span>SUBJECT / MORPHEUS</span><span>LINK ESTABLISHED <b>●</b></span></figcaption>
-        <span class="portrait-coordinate" aria-hidden="true">ZION_NET // 079<br>35° 41′ 22″ N</span>
-      </figure>
-    </div>
-    <div class="home-bottom page-width"><span class="home-note">[ FOLLOW THE WHITE RABBIT. ]<br>Tu historial desaparece al recargar.</span><button class="motion-control" type="button" aria-pressed="false">Pausar animación Ⅱ</button></div>
+    <div class="matrix-scene" aria-hidden="true"></div>
+    <div class="matrix-vignette" aria-hidden="true"></div>
+    <div class="scene-telemetry" aria-hidden="true"><span>ZION MAINFRAME<br>SUBJECT_01 / MORPHEUS</span><span>THE SYSTEM IS A LIE<br>FOLLOW THE WHITE RABBIT</span></div>
+    <section class="home-console" aria-labelledby="home-title">
+      <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span>SEÑAL ENCONTRADA / CANAL 079</p>
+      <h1 id="home-title">Wake up, Neo<span aria-hidden="true">_</span></h1>
+      <p class="home-instruction">Introduce el código para establecer acceso seguro.</p>
+      ${accessForm('home-cohort')}
+      <p class="home-disclaimer">Una puerta. Una elección. Morfeo te espera.</p>
+    </section>
+    <div class="scene-bottom"><span aria-hidden="true">[ FREE YOUR MIND. ]</span><button class="motion-control" type="button" aria-pressed="false">Pausar animación Ⅱ</button></div>
   </main>`;
 }
 
@@ -121,43 +115,6 @@ function renderNotFoundView() {
   return `<main id="main-content" class="not-found page-width" tabindex="-1"><p class="eyebrow">404 / RUTA NO ENCONTRADA</p><h1>Este camino<br>no existe<span class="text-accent">.</span></h1><p>Puedes regresar al inicio y elegir otra dirección.</p><a class="button button-primary" href="/home">Volver a Inicio <span aria-hidden="true">→</span></a></main>`;
 }
 
-/** El efecto pertenece a Home; el router llama a su cleanup antes de cambiar de vista. */
-function startMatrixRain(container, control) {
-  const characters = Array.from('アイウエオカキクケコサシスセソタチツテトナニヌネノ012345789');
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  let pausedByUser = false;
-  for (let column = 0; column < 64; column += 1) {
-    const stream = document.createElement('span');
-    stream.className = 'matrix-stream';
-    stream.textContent = Array.from({ length: 14 + Math.floor(Math.random() * 14) }, () => characters[Math.floor(Math.random() * characters.length)]).join('');
-    stream.style.setProperty('--column', `${((column + 0.5) / 64) * 100}%`);
-    stream.style.setProperty('--duration', `${3 + Math.random() * 5}s`);
-    stream.style.setProperty('--delay', `${-Math.random() * 8}s`);
-    container.append(stream);
-  }
-  const observer = new ResizeObserver(([entry]) => {
-    container.style.setProperty('--rain-travel', `${entry.contentRect.height}px`);
-  });
-  observer.observe(container);
-  function syncMotion() {
-    container.classList.toggle('is-paused', pausedByUser || document.hidden);
-    control.disabled = reducedMotion.matches;
-    control.setAttribute('aria-pressed', String(pausedByUser));
-    control.textContent = reducedMotion.matches ? 'Movimiento reducido' : pausedByUser ? 'Reanudar animación ▶' : 'Pausar animación Ⅱ';
-  }
-  function toggleMotion() { pausedByUser = !pausedByUser; syncMotion(); }
-  control.addEventListener('click', toggleMotion);
-  reducedMotion.addEventListener('change', syncMotion);
-  document.addEventListener('visibilitychange', syncMotion);
-  syncMotion();
-  return () => {
-    observer.disconnect();
-    control.removeEventListener('click', toggleMotion);
-    reducedMotion.removeEventListener('change', syncMotion);
-    document.removeEventListener('visibilitychange', syncMotion);
-    container.replaceChildren();
-  };
-}
 
 const views = {
   '/home': ['home', renderHomeView, 'Inicio'],
@@ -193,40 +150,38 @@ export function getSpaDestination({ href, target, download, button, modified, de
 }
 
 let cancelPortal = () => {};
-/** Crossfade de la boca y cámara hacia su centro; el cleanup evita navegar tras salir. */
+let homeScene;
+/** La cámara entra en la boca del mismo rostro de caracteres. Escape permite omitir. */
 function enterPortal(destination) {
   if (document.querySelector('.mouth-portal')) return;
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { navigateTo(destination); return; }
-  const source = document.querySelector('.morpheus-portrait');
-  if (!source) { navigateTo(destination); return; }
-  const rect = source.getBoundingClientRect();
+  if (!homeScene || window.matchMedia('(prefers-reduced-motion: reduce)').matches) { navigateTo(destination); return; }
   const portal = document.createElement('div');
   portal.className = 'mouth-portal';
   portal.setAttribute('role', 'dialog');
   portal.setAttribute('aria-modal', 'true');
   portal.setAttribute('aria-label', 'Entrando al chat');
-  portal.innerHTML = `<div class="portal-camera"><img class="portal-closed" src="/assets/morpheus-closed.png" alt=""><img class="portal-open" src="/assets/morpheus-open.png" alt=""><div class="portal-mouth"></div></div><p role="status">CRUZANDO EL UMBRAL…</p><button type="button">Omitir transición ↗</button>`;
-  const camera = portal.querySelector('.portal-camera');
-  Object.assign(camera.style, { left: `${rect.left}px`, top: `${rect.top}px`, width: `${rect.width}px`, height: `${rect.height}px` });
-  camera.style.setProperty('--portal-x', `${window.innerWidth / 2 - (rect.left + rect.width * .51)}px`);
-  camera.style.setProperty('--portal-y', `${window.innerHeight / 2 - (rect.top + rect.height * .59)}px`);
-  camera.style.setProperty('--portal-scale', Math.max(window.innerWidth, window.innerHeight) / Math.max(1, rect.width) * 28);
+  portal.innerHTML = `<p role="status">CRUZANDO EL UMBRAL…</p><button type="button">Omitir transición ↗</button>`;
   document.body.append(portal);
+  document.body.classList.add('is-entering');
   const app = document.querySelector('#app');
   const previousInert = app.inert;
   app.inert = true;
   const skip = portal.querySelector('button');
   let timer;
+  const finish = () => { cancelPortal(); navigateTo(destination); };
   const skipKey = (event) => {
     if (event.key === 'Escape') finish();
     if (event.key === 'Tab') { event.preventDefault(); skip.focus(); }
   };
   document.addEventListener('keydown', skipKey);
-  const finish = () => { cancelPortal(); navigateTo(destination); };
   skip.addEventListener('click', finish);
-  cancelPortal = () => { clearTimeout(timer); document.removeEventListener('keydown', skipKey); app.inert = previousInert; portal.remove(); cancelPortal = () => {}; };
+  cancelPortal = () => {
+    clearTimeout(timer); document.removeEventListener('keydown', skipKey); app.inert = previousInert;
+    homeScene?.cancel(); document.body.classList.remove('is-entering'); portal.remove(); cancelPortal = () => {};
+  };
+  homeScene.enter();
   skip.focus({ preventScroll: true });
-  timer = setTimeout(finish, 1800);
+  timer = setTimeout(finish, 2300);
 }
 
 let cleanupCurrentView = () => {};
@@ -246,10 +201,9 @@ function renderRoute({ moveFocus = false } = {}) {
   renderedLocation = `${route.path}${window.location.search}`;
   document.querySelector('#app').innerHTML = `${header(route.page)}${route.render()}${footer()}`;
   if (route.page === 'home') {
-    const openPortrait = new Image(); openPortrait.src = '/assets/morpheus-open.png';
-    const cleanRain = startMatrixRain(document.querySelector('.matrix-rain'), document.querySelector('.motion-control'));
+    homeScene = mountMatrixScene(document.querySelector('.matrix-scene'), document.querySelector('.motion-control'));
     const cleanAccess = mountAccess(document.querySelector('.access-form'), () => enterPortal('/chat'));
-    cleanupCurrentView = () => { cleanRain(); cleanAccess(); cancelPortal(); };
+    cleanupCurrentView = () => { cancelPortal(); cleanAccess(); homeScene?.dispose(); homeScene = null; };
   } else if (route.page === 'chat') {
     cleanupCurrentView = mountChat(document.querySelector('.chat-view'));
   }
@@ -297,8 +251,7 @@ function handleNavigation(event) {
   }, window.location.href);
   if (destination === null) return;
   event.preventDefault();
-  if (document.body.dataset.page === 'home' && normalizePathname(new URL(destination, window.location.href).pathname) === '/chat') enterPortal(destination);
-  else navigateTo(destination);
+  navigateTo(destination);
 }
 
 function initializeApp() {
