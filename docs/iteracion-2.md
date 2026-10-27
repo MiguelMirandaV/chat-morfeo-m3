@@ -4,7 +4,7 @@
 
 La versión entregada queda identificada por el tag `m3-v1-entregado`, sobre el commit `7af140e6c5d204968a085140da6ca6e043d1f3ea`. La iteración se desarrolla en `feat/matrix-v2`. `main` continúa representando la versión publicada; la integración se realizará al completar la revisión de Preview.
 
-Este documento describe funcionalidades aprobadas. Su presencia aquí no significa que estén implementadas. Las etapas 1–3 están implementadas en la rama: preparación, prototipo de Home y personajes con estado separado. Incluí una selección inicial sencilla para poder probarlos. La persistencia, el cambio solicitado dentro del chat y Smith 3+2 corresponden a las siguientes etapas.
+Este documento describe funcionalidades aprobadas. Su presencia aquí no significa que estén implementadas. Las etapas 1–4 están implementadas en la rama: preparación, prototipo de Home, personajes con estado separado y persistencia. Incluí una selección inicial sencilla para poder probarlos. El cambio solicitado dentro del chat y Smith 3+2 corresponden a las siguientes etapas.
 
 ## Decisiones aprobadas
 

@@ -25,10 +25,12 @@ Diseñé la interfaz como una terminal de Zion. En esta rama construí una entra
 - Conversar mediante Gemini, enviando el historial completo del personaje elegido en cada petición. Los borradores y errores también se mantienen separados.
 - Escribir hasta **280 caracteres visibles**, incluidos espacios, saltos y emojis compuestos. El texto pegado que excede el límite se conserva para corregirlo.
 - Ver el estado de escritura y recuperar el borrador si una respuesta falla.
+- Recuperar conversaciones y borradores al recargar; borrar una conversación o todas, con confirmación.
+- Resolver cambios detectados desde otra pestaña antes de sobrescribir un historial.
 - Consultar las solicitudes compartidas de la app: **15 en una ventana móvil de 60 segundos y 500 al día**.
 - Ver la intervención visual de Smith cuando el servidor rechaza una solicitud por cuota.
 
-En esta rama, la elección inicial ya funciona. El cambio de personaje solicitado dentro del chat y la persistencia se incorporarán en sus etapas. Por ahora uso el botón **Enviar**; Enter agrega una línea. Conservo la conversación en memoria al navegar y la borro al recargar. La ampliación que estoy desarrollando tiene sus reglas en [el alcance de la iteración](docs/iteracion-2.md).
+En esta rama, la elección inicial ya funciona. El cambio de personaje solicitado dentro del chat se incorporará en su etapa. Por ahora uso el botón **Enviar**; Enter agrega una línea. Guardo historiales y borradores por personaje en localStorage; se recuperan al volver al mismo sitio. El indicador muestra si el navegador pudo guardarlos. La ampliación que estoy desarrollando tiene sus reglas en [el alcance de la iteración](docs/iteracion-2.md).
 
 ## Cómo usar la aplicación
 
@@ -36,7 +38,8 @@ En esta rama, la elección inicial ya funciona. El cambio de personaje solicitad
 2. Entra al canal; puedes omitir la transición con el botón o Escape.
 3. Elige a **Morfeo, el Oráculo o Trinity**, escribe una pregunta y pulsa **Enviar**.
 4. Espera la respuesta. Ante un fallo, revisa el mensaje de estado y reintenta con el borrador conservado.
-5. Puedes ir a Acerca de y volver sin perder la conversación. Recargar inicia una conversación vacía.
+5. Puedes navegar o recargar y recuperar lo guardado en ese mismo navegador y sitio. Un envío interrumpido vuelve como borrador; no se reenvía automáticamente.
+6. Usa **Borrar esta conversación** o **Borrar todos los historiales** y confirma si quieres eliminarlos.
 
 Envío las preguntas a Gemini a través de mi función de servidor. No escribas contraseñas ni claves en la conversación.
 
@@ -52,6 +55,7 @@ src/matrix-scene.js    Rostro procedural, lluvia 3D, fallback y limpieza
 scripts/prepare-assets.js Copia local de módulos Three.js y licencia
 src/chat.js            Conversaciones separadas, peticiones HTTP y render del chat
 src/characters.js      Identificadores y metadatos públicos de personajes
+src/history-storage.js Validación, guardado, restauración y conflictos de localStorage
 src/utils.js           Conteo y validación de caracteres
 src/styles.css         Estilos responsive y estados visuales
 src/assets/            Retratos de la interfaz
@@ -116,11 +120,13 @@ npm test
 npm run test:watch
 ```
 
-Incluí **152 pruebas en cuatro archivos** para validar caracteres, navegación, historiales separados, identidad, estados, errores, transporte, acceso, cuotas y contratos de Gemini. Uso mocks para que la suite no consuma Gemini ni Redis reales y restauro el entorno entre pruebas.
+Incluí **188 pruebas en cinco archivos** para validar caracteres, navegación, historiales separados, identidad, estados, errores, transporte, acceso, cuotas y contratos de Gemini. Uso mocks para que la suite no consuma Gemini ni Redis reales y restauro el entorno entre pruebas.
 
 [Personajes y contrato](docs/personajes.md) · [Detalle de las pruebas](docs/pruebas-unitarias.md) · [Comprobaciones y límites](docs/pruebas.md).
 
 ## Acceso, datos y cuotas
+
+Guardo conversaciones y borradores en texto en localStorage, únicamente bajo la clave propia `morfeo.conversations.v1`. El borrado conserva las demás claves del navegador y las cuotas Redis. [Detalles del guardado y sus límites](docs/persistencia.md).
 
 Mantengo la API key y los tres prompts en el servidor. El navegador se comunica mediante `POST /api/functions`; envío códigos de error controlados y muestro mensajes con `textContent`.
 

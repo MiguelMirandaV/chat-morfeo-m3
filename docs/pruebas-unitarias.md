@@ -1,8 +1,12 @@
 # Pruebas unitarias
 
-## Iteración 2: personajes e historiales
+## Iteración 2: persistencia
 
-Resultado vigente: **152 casos en cuatro archivos**. La suite conserva las pruebas de regresión y adapta el contrato de generación a `{character, messages}` y `{character, reply, quota}`.
+Resultado vigente: **188 casos en cinco archivos**. `tests/history-storage.test.js` agrega 36 casos de formato externo, límite global, guardado, restauración, envíos interrumpidos, borrado seguro, fallos, conflictos y retirada del controlador al cerrar una página. Usa almacenamiento y proveedor sustituidos; no consume Gemini ni Redis.
+
+## Registro de la etapa de personajes
+
+Resultado de esa etapa: **152 casos en cuatro archivos**. La suite conserva las pruebas de regresión y adapta el contrato de generación a `{character, messages}` y `{character, reply, quota}`.
 
 Agregué `tests/characters.test.js` con 22 casos sobre identificadores permitidos, rechazo antes de reservar cuota, prompts por personaje, identidad de respuesta, cuota compartida, selección inicial, borradores/contextos separados, respuestas pendientes y recuperación de errores. Estos tests sustituyen al proveedor y no certifican el tono de sus generaciones reales.
 

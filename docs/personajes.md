@@ -17,7 +17,7 @@ Comparten reglas de brevedad, atención al contexto, respuestas originales y dis
 3. Al elegir, adapta nombre del canal, autor, texto de espera y campo de escritura. El Oráculo y Trinity muestran emblemas, sin reutilizar el retrato de Morfeo.
 4. Envía el historial de ese personaje y recibe su respuesta.
 
-La selección inicial es funcional; el diseño completo de terminal, cambio solicitado dentro de la conversación y tarjetas de Acerca de se completarán en su etapa. Los mensajes aún viven en memoria: navegar los conserva, recargar los borra. La persistencia con localStorage es el paso siguiente.
+La selección inicial es funcional; el diseño completo de terminal, cambio solicitado dentro de la conversación y tarjetas de Acerca de se completarán en su etapa. Los mensajes y borradores se conservan por personaje en localStorage cuando el navegador permite guardar. [Restauración, borrado y fallos de almacenamiento](persistencia.md).
 
 ## Contrato de generación
 

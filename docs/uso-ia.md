@@ -201,3 +201,12 @@ Codex implementó identificadores públicos permitidos, prompts de servidor dist
 La suite suma 152 casos. Al actualizar el contrato se corrigieron expectativas y un fixture antiguo sin identidad en la respuesta; no se eliminó la prueba de recuperación que lo detectó. Se comprobaron tres respuestas reales mediante la interfaz local, una por personaje, con preguntas y nombres ficticios. Redis pasó de 30 a 33 reservas diarias. La consulta inicial de disponibilidad falló de forma transitoria; el reintento de desbloqueo y la lectura posterior funcionaron, sin sustituir las cuotas reales por contadores locales. La muestra confirma integración, no una evaluación exhaustiva de personalidad o seguridad.
 
 La revisión visual comprobó la selección tras autenticar, etiquetas de autor/canal, tamaños 320/1024 sin desbordamiento y conservación de personaje/borrador al navegar entre Chat y Acerca de. No se modificaron credenciales ni configuración de Redis, y no se presentó persistencia tras recarga como si ya existiera.
+
+
+## Iteración 2 — Persistencia
+
+Codex implementó la clave versionada morfeo.conversations.v1, validación externa, guardado de historiales/borradores, restauración, indicador y borrado actual/todos con diálogo. El controlador conserva registros inválidos hasta una decisión explícita, informa fallos de lectura/escritura y pausa al detectar cambios externos. No cambió credenciales, dependencias, API de generación ni cuotas.
+
+La revisión detectó dos situaciones que se corrigieron: el callback de un envío podía escribir al cerrar la página, y el aborto de fetch podía retirar la marca de interrupción antes de pagehide. Se añadió limpieza del controlador y se conserva la marca ante errores de red/timeout. También se corrigió el borrado de una conversación cuyo borrador excedía el límite de almacenamiento.
+
+Se usaron escenarios locales con datos ficticios y proveedor/cuotas simulados para revisar recarga, interrupción sin reenvío, diálogo y cancelación, conflicto entre pestañas, guardado bloqueado y contenido oculto antes de 79. El borrado efectivo y sus fallos se comprobaron en tests con almacenamiento sustituido. La suite alcanza 188 casos. Se reinició la instancia Vercel Dev propia porque su manifiesto inicial no incluía history-storage.js; se comprobó después que respondía 200 con el tipo JavaScript correcto. No se generaron respuestas Gemini para esta etapa.
