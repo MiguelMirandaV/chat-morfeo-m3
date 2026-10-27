@@ -41,4 +41,4 @@ El diálogo tiene un botón para omitir; Escape también lo hace. El resto de la
 | Dependencias de producción | `npm audit --omit=dev`: 0 vulnerabilidades. Las herramientas de desarrollo mantienen avisos conocidos. |
 | Gemini | 0 generaciones para probar esta etapa. |
 
-La revisión de rendimiento en equipos físicos y la integración con selección de personajes y Smith pertenecen a las etapas siguientes. El chat de esta rama conserva temporalmente el funcionamiento de la versión entregada: Morfeo, memoria de sesión, botón Enviar y Smith por cuota.
+La revisión de rendimiento en equipos físicos y la integración con selección de personajes y Smith pertenecen a las etapas siguientes. Esta evidencia corresponde al cierre del prototipo visual. El chat se amplió después con [tres personajes e historiales separados](personajes.md); la persistencia y el ciclo narrativo de Smith se implementarán en sus etapas.
