@@ -74,3 +74,7 @@ Estos avisos pertenecen a dependencias de las herramientas, incluyendo el árbol
 ## Comprobaciones pendientes
 
 Siguen pendientes la conversación en memoria, fetching, función serverless, Gemini y validación final de producción. Las pruebas actuales cubren conteo y routing; la suite se ampliará al incorporar las funciones restantes.
+
+### Corrección tras la revisión de Miguel
+
+Miguel observó dos respuestas exactamente iguales. Cada tema de la simulación tenía un único texto, por lo que el comportamiento era repetitivo. Se incorporaron tres variantes por tema, selección de las menos usadas y exclusión de la respuesta anterior. Dos tests de regresión cubren cinco turnos del mismo tema y cinco sin palabras clave, incluyendo la reutilización del banco sin repetición consecutiva. Suite: 33 tests pasando. En una pestaña independiente se enviaron dos preguntas sobre aprendizaje y se comprobaron respuestas diferentes. Esto mejora el mock; sigue siendo texto predefinido sin razonamiento de IA.

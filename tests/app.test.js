@@ -150,6 +150,27 @@ describe('sesión de chat en memoria', () => {
     expect(chat.getState().messages.at(-1).content).toContain('Aprender');
     expect(chat.getState().pending).toBe(false);
   });
+
+  it.each([
+    ['tema repetido', ['Quiero aprender', 'Quiero programar', 'Quiero estudiar', 'Quiero aprender más', 'Practicar código']],
+    ['preguntas sin palabra clave', ['¿Por dónde empiezo?', '¿Qué opinas?', '¿Y después?', '¿Qué puedo hacer?', '¿Cómo sigo?']],
+  ])('varía las respuestas de la simulación sin repetir la anterior: %s', async (_, questions) => {
+    vi.useFakeTimers();
+    const chat = createChatSession();
+    const replies = [];
+    for (const question of questions) {
+      chat.setDraft(question);
+      const turn = chat.send();
+      await vi.advanceTimersByTimeAsync(1100);
+      expect(await turn).toBe(true);
+      const reply = chat.getState().messages.at(-1).content;
+      expect(reply).not.toBe(replies.at(-1));
+      replies.push(reply);
+    }
+    // Las tres variantes se usan antes de reutilizar una, y el historial sigue completo.
+    expect(new Set(replies.slice(0, 3)).size).toBe(3);
+    expect(chat.getState().messages).toHaveLength(10);
+  });
 });
 
 describe('intercepción de enlaces', () => {

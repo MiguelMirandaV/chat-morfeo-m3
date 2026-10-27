@@ -4,19 +4,44 @@ import { countCharacters, getMessageError, MAX_MESSAGE_LENGTH } from './utils.js
 export async function simulateReply(messages) {
   await new Promise((resolve) => setTimeout(resolve, 1100));
   const question = messages.at(-1).content.toLocaleLowerCase('es');
+  let replies;
   if (/\b(hola|buenas|saludos)\b/.test(question)) {
-    return 'Bienvenido. Antes de buscar una respuesta, detente en tu pregunta. ¿Qué te ha traído hasta aquí?';
+    replies = [
+      'Bienvenido. Antes de buscar una respuesta, detente en tu pregunta. ¿Qué te ha traído hasta aquí?',
+      'Aquí puedes empezar con una inquietud. ¿Hay algo que quieras mirar desde otra perspectiva?',
+      'Te escucho. No necesitas tener todo claro para comenzar. ¿Qué deseas preguntar?',
+    ];
+  } else if (/miedo|duda|difícil/.test(question)) {
+    replies = [
+      'La duda no cierra el camino. Te invita a mirar con atención. ¿Qué pequeño paso puedes dar, aun con ese miedo?',
+      'Equivocarte puede mostrarte un límite que todavía no comprendías. ¿Qué podrías intentar en un espacio donde el error sea parte del aprendizaje?',
+      'Observa ese temor: ¿nace de algo que ya ocurrió o de algo que imaginas? Distinguirlos puede ayudarte a elegir el siguiente paso.',
+    ];
+  } else if (/aprender|estudi|program|código/.test(question)) {
+    replies = [
+      'Aprender exige poner a prueba lo que crees comprender. Elige una idea, construye algo pequeño y observa qué ocurre. ¿Qué quieres explorar primero?',
+      'Intenta explicar una sola idea con tus palabras y después comprobarla con un ejemplo. ¿En qué parte de esa explicación aparece una duda?',
+      'Divide el problema hasta encontrar una acción que puedas probar. Un resultado pequeño te dará algo concreto que observar. ¿Cuál sería esa primera prueba?',
+    ];
+  } else if (/realidad|matrix|libertad|elegir/.test(question)) {
+    replies = [
+      'Lo familiar puede parecer la única posibilidad. Cuestionarlo es el comienzo de una elección. ¿Qué estás dando por cierto?',
+      'Una elección empieza por reconocer las posibilidades que tienes delante. ¿Qué opción has descartado sin examinarla?',
+      'Tus sentidos ofrecen una parte de lo que conoces. También interpretas y supones. ¿Qué evidencia te ayudaría a revisar esa interpretación?',
+    ];
+  } else {
+    replies = [
+      'Puedo acompañarte en la pregunta. Mira lo que sabes, lo que supones y lo que aún puedes comprobar. ¿Cuál de esas partes te inquieta?',
+      'Elige un aspecto concreto de esa inquietud. ¿Qué observación te permitiría comprenderlo mejor?',
+      'Considera qué cambiaría si revisaras una de tus suposiciones. ¿Qué pregunta podrías hacer para ponerla a prueba?',
+    ];
   }
-  if (/miedo|duda|difícil/.test(question)) {
-    return 'La duda no cierra el camino. Te invita a mirar con atención. ¿Qué pequeño paso puedes dar, aun con ese miedo?';
-  }
-  if (/aprender|estudi|program|código/.test(question)) {
-    return 'Aprender exige poner a prueba lo que crees comprender. Elige una idea, construye algo pequeño y observa qué ocurre. ¿Qué quieres explorar primero?';
-  }
-  if (/realidad|matrix|libertad|elegir/.test(question)) {
-    return 'Lo familiar puede parecer la única posibilidad. Cuestionarlo es el comienzo de una elección. ¿Qué estás dando por cierto?';
-  }
-  return 'Puedo acompañarte en la pregunta. Mira lo que sabes, lo que supones y lo que aún puedes comprobar. ¿Cuál de esas partes te inquieta?';
+
+  // Prioriza las variantes menos usadas y excluye la respuesta anterior, incluso al agotar el banco.
+  const previousReplies = messages.filter(({ role }) => role === 'assistant').map(({ content }) => content);
+  const candidates = replies.filter((reply) => reply !== previousReplies.at(-1));
+  const usage = (reply) => previousReplies.filter((previous) => previous === reply).length;
+  return candidates.reduce((selected, reply) => usage(reply) < usage(selected) ? reply : selected);
 }
 
 /** La sesión no depende del DOM: puede terminar un turno mientras otra vista está abierta. */

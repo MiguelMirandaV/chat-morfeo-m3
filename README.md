@@ -4,9 +4,9 @@ Proyecto Integrador del Módulo 3 de Full Stack de Henry. Aplicación en desarro
 
 ## Estado del proyecto
 
-Los pasos 1–5 están completos: definición, entorno, interfaz responsive, routing SPA y chat en memoria con respuestas simuladas. Inicio, Chat y Acerca de se renderizan sin recargar, con Atrás/Adelante, carga directa, normalización de rutas y vista interna de no encontrado. Home incluye una cascada de caracteres verdes con pausa. El chat valida el máximo de 280 caracteres, muestra la espera y conserva conversación y borrador entre vistas. Pasan 31 tests unitarios. El proyecto está vinculado a GitHub y al espacio Hobby de Vercel de Miguel.
+Los pasos 1–5 están completos: definición, entorno, interfaz responsive, routing SPA y chat en memoria con respuestas simuladas. Inicio, Chat y Acerca de se renderizan sin recargar, con Atrás/Adelante, carga directa, normalización de rutas y vista interna de no encontrado. Home incluye una cascada de caracteres verdes con pausa. El chat valida el máximo de 280 caracteres, muestra la espera y conserva conversación y borrador entre vistas. Pasan 33 tests unitarios. El proyecto está vinculado a GitHub y al espacio Hobby de Vercel de Miguel.
 
-El envío está habilitado en modo de prueba: las respuestas son textos predefinidos, con una espera simulada de 1,1 segundos. Gemini y la función serverless se integrarán en las siguientes etapas. La URL de entrega se documentará después de validar la aplicación completa.
+El envío está habilitado en modo de prueba: las respuestas son textos predefinidos, con una espera simulada de 1,1 segundos. La simulación prioriza variantes menos usadas y evita repetir la respuesta inmediatamente anterior, incluso al agotar su banco finito de textos. Gemini y la función serverless se integrarán en las siguientes etapas. La URL de entrega se documentará después de validar la aplicación completa.
 
 ## Alcance acordado
 
@@ -83,10 +83,10 @@ npm test
 npm run test:watch
 ```
 
-Actualmente pasan 31 tests en dos archivos:
+Actualmente pasan 33 tests en dos archivos:
 
 - `utils.test.js`: seis casos de conteo y validación, incluyendo bordes 279/280/281, espacios/saltos de línea, tildes equivalentes, emojis compuestos y tipos incorrectos.
-- `app.test.js`: trece casos de routing y doce de sesión: historial completo, bloqueo de concurrencia, cambios de suscripción, recuperación de fallos, respuestas inválidas, aislamiento de datos y espera simulada con reloj falso.
+- `app.test.js`: trece casos de routing y catorce de sesión: historial completo, bloqueo de concurrencia, cambios de suscripción, recuperación de fallos, respuestas inválidas, aislamiento de datos y espera simulada con reloj falso.
 
 Los tests importan funciones sin montar un DOM y utilizan mocks para verificar History API, orden de llamadas y proveedores simulados. La recuperación de errores se comprueba con un proveedor que falla una vez y responde al reintentar, sin red. Las pruebas de fetch y del contrato serverless se añadirán al implementar esas funciones. Las pruebas actuales no verifican una integración Gemini que aún no existe.
 

@@ -57,3 +57,5 @@
 **Iteración:** la comprobación visual detectó pérdida del foco al deshabilitar el botón. Se movió al campo al enviar y se verificó que permaneciera allí durante/después de la respuesta. Se acotó la altura móvil del panel para que el historial largo tenga scroll interno. Acerca de explica el estado actual de simulación.
 
 **Verificación:** Codex comprobó la conversación, estados, navegación durante la espera, borrador, recarga, doble click, texto literal y tres tamaños en el navegador. Los fallos y reintentos se probaron con un proveedor inyectado en Vitest. Las respuestas de esta etapa no fueron generadas por Gemini y no demuestran comprensión contextual del personaje.
+
+**Corrección solicitada por Miguel:** señaló respuestas idénticas en dos interacciones. Codex identificó un único texto por categoría y añadió variantes seleccionadas mediante el historial, sin repetir la respuesta previa. Se añadieron dos tests de regresión y se comprobó en navegador. Miguel comprendió el motivo de la simulación y pidió continuar al paso 6.
