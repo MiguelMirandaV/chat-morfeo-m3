@@ -92,12 +92,13 @@ function renderChatView() {
             <div class="composer-top"><label for="message-input">TU MENSAJE &gt;</label><output id="character-count" for="message-input" aria-label="Caracteres escritos">0 / ${MAX_MESSAGE_LENGTH}</output></div>
             <textarea id="message-input" name="message" rows="3" placeholder="Escribe a Morfeo…" aria-describedby="message-help message-error" spellcheck="true"></textarea>
             <p id="message-error" class="input-error" role="status" hidden></p>
-            <div class="composer-bottom"><p id="message-help">Máximo ${MAX_MESSAGE_LENGTH} caracteres.<br>Enter agrega una nueva línea.</p><button class="button button-primary" type="submit" disabled>ENVIAR ↗</button></div>
+            <div class="composer-bottom"><p id="message-help">Máximo ${MAX_MESSAGE_LENGTH} caracteres.<br>Enter envía · Shift+Enter agrega una línea.<br>Para cambiar: /hablar trinity</p><button class="button button-primary" type="submit" disabled>ENVIAR ↗</button></div>
           </form>
         </div>
       </section>
     </div>
     <dialog class="history-dialog" data-history-dialog aria-labelledby="history-dialog-title" aria-describedby="history-dialog-description"><form><h2 id="history-dialog-title">¿Borrar el historial?</h2><p id="history-dialog-description"></p><div><button type="button" data-history-cancel>Cancelar</button><button type="submit">Confirmar</button></div></form></dialog>
+    <dialog class="history-dialog" data-transfer-dialog aria-labelledby="transfer-title" aria-describedby="transfer-description"><form><p class="eyebrow">ENRUTAMIENTO / ZION</p><h2 id="transfer-title">¿Cambiar de personaje?</h2><p id="transfer-description"></p><div><button type="button" data-transfer-cancel>Cancelar</button><button type="submit">Cambiar canal ↗</button></div></form></dialog>
     <p class="chat-caption">IA generativa · Interpretaciones ficticias de Matrix. Historiales guardados en este navegador cuando el almacenamiento está disponible.</p>
   </main>`;
 }
@@ -106,19 +107,17 @@ function renderAboutView() {
   return `
     <main id="main-content" class="about-view page-width" tabindex="-1">
       <div class="page-heading"><div><p class="eyebrow">DETRÁS DE LA TERMINAL</p><h1>Acerca del proyecto<span class="text-accent">.</span></h1></div><span class="section-index" aria-hidden="true">03 / ABOUT</span></div>
-      <div class="about-grid">
-        <section class="about-character" aria-labelledby="character-title">
-          <p class="eyebrow">EL PERSONAJE</p><h2 id="character-title">Morfeo<span class="text-accent">_</span></h2>
-          <p>Sereno, firme y convencido de que aprender comienza por cuestionar. Morfeo guía a Neo a través de una realidad que nunca había imaginado.</p>
-          <p>Esta interpretación se inspira en el personaje de <cite>The Matrix (1999)</cite>: su manera de hacer preguntas, sus metáforas y su confianza en la libertad de elegir.</p>
-          <div class="character-facts"><div><span>UNIVERSO</span><strong>The Matrix</strong></div><div><span>VOZ</span><strong>Español · Reflexiva</strong></div></div>
-          <a class="text-link" href="/chat">Volver a las preguntas ${arrow}</a>
-        </section>
-        <div class="about-details">
-          <section class="detail-section" aria-labelledby="project-title"><span class="detail-number" aria-hidden="true">01</span><div><h2 id="project-title">Una experiencia de aprendizaje</h2><p>Proyecto Integrador del Módulo 3 de Full Stack de Henry. Desarrollado por Miguel Miranda con asistencia de Codex para explorar interfaces responsive, navegación SPA e integración de inteligencia artificial.</p></div></section>
-          <section class="detail-section" aria-labelledby="tech-title"><span class="detail-number" aria-hidden="true">02</span><div><h2 id="tech-title">Cómo está construido</h2><p>HTML, CSS y JavaScript con módulos, con pruebas de lógica en Vitest. El chat se comunica con una función de Vercel. Gemini genera las respuestas; su clave permanece en el servidor. El acceso se valida con una cookie firmada y los límites se comprueban antes de cada solicitud.</p><ul class="tech-list" aria-label="Tecnologías"><li>JavaScript</li><li>Gemini</li><li>Vercel</li><li>Vitest</li></ul></div></section>
-          <section class="detail-section" aria-labelledby="session-title"><span class="detail-number" aria-hidden="true">03</span><div><h2 id="session-title">Una conversación, una sesión</h2><p>Los mensajes se conservan en memoria hasta que recargas la aplicación. Cada mensaje tuyo admite hasta 280 caracteres. Gemini recibe el historial completo para responder con contexto. El código de cohorte abre una sesión compartida de acceso: no identifica personas. Los contadores guardan cantidades y tiempos, nunca conversaciones.</p></div></section>
-        </div>
+      <p class="about-intro">Tres voces. Tres formas de mirar la misma realidad. Elige tu primera conexión al desbloquear el chat con el código <strong>79</strong>.</p>
+      <section class="character-gallery" aria-label="Personajes de la terminal">
+        ${CHARACTERS.map((character, index) => `<article class="character-card character-card--${character.id}">
+          <div class="character-card-art"><img src="/assets/${character.id}-signal.svg" alt="" width="480" height="420" loading="lazy"><span aria-hidden="true">SIGNAL / 0${index + 1}</span></div>
+          <div class="character-card-body"><p class="eyebrow">${character.voice}</p><h2>${character.name}</h2><p>${character.description}</p><p class="character-card-quote">${['La pregunta es el comienzo del camino.', 'Una elección también cuenta tu historia.', 'Da el paso. Estaré al otro lado.'][index]}</p><span class="character-card-label">${character.terminal}@zion</span></div>
+        </article>`).join('')}
+      </section>
+      <div class="about-details about-details--wide">
+        <section class="detail-section" aria-labelledby="project-title"><span class="detail-number" aria-hidden="true">01</span><div><h2 id="project-title">Mi terminal de aprendizaje</h2><p>Creé esta experiencia para el Proyecto Integrador del Módulo 3 de Full Stack de Henry, con asistencia de Codex. Me inspiré en <cite>The Matrix (1999)</cite> para explorar una SPA responsive e inteligencia artificial. Los personajes son interpretaciones ficticias.</p></div></section>
+        <section class="detail-section" aria-labelledby="tech-title"><span class="detail-number" aria-hidden="true">02</span><div><h2 id="tech-title">Una voz, un contexto</h2><p>Cada personaje tiene sus propias instrucciones en el servidor. Para cambiar, pídeselo desde la conversación: «Quiero hablar con Trinity» o <code>/hablar trinity</code>. Confirma el cambio para recuperar su historial. La petición de cambio no consume Gemini.</p><ul class="tech-list" aria-label="Tecnologías"><li>JavaScript</li><li>Three.js</li><li>Gemini</li><li>Redis</li><li>Vercel</li></ul></div></section>
+        <section class="detail-section" aria-labelledby="session-title"><span class="detail-number" aria-hidden="true">03</span><div><h2 id="session-title">Tu señal permanece</h2><p>Guardo mensajes y borradores separados en este navegador cuando localStorage está disponible. Puedes borrarlos con confirmación. Enter envía; Shift+Enter agrega una línea. Cada mensaje admite 280 caracteres. El código 79 abre un acceso compartido; no identifica personas. Las claves y los contadores de solicitudes permanecen en el servidor.</p><a class="text-link" href="/chat">Entrar a la terminal ${arrow}</a></div></section>
       </div>
     </main>`;
 }

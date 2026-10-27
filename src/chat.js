@@ -1,3 +1,4 @@
+import { parseCharacterRequest, getComposerKeyAction } from './chat-controls.js';
 import { createHistoryStorage, validateStoredHistory } from './history-storage.js';
 import { CHARACTERS, getCharacter, isCharacterId } from './characters.js';
 import { countCharacters, getMessageError, MAX_MESSAGE_LENGTH } from './utils.js';
@@ -127,7 +128,7 @@ export function mountAccess(form, onUnlocked) {
   return () => { mounted = false; unsubscribe(); form.removeEventListener('submit', submit); };
 }
 
-/** La sesión de conversación es volátil; los contadores y el acceso se comprueban en servidor. */
+/** Estado de un personaje. El coordinador conecta su persistencia; el servidor comprueba acceso y cuotas. */
 export function createChatSession({ respond = requestReply, character = 'morpheus', initialState } = {}) {
   if (!isCharacterId(character)) throw new TypeError('Personaje no permitido.');
   let messages = initialState ? initialState.messages.map(message => ({ ...message })) : [];
@@ -165,13 +166,13 @@ export function createCharacterSession({ respond = requestReply, initialCharacte
   if (initialCharacter !== null && !isCharacterId(initialCharacter)) throw new TypeError('Personaje no permitido.');
   let conversations = new Map(CHARACTERS.map(({ id }) => [id, createChatSession({ respond, character: id })]));
   const listeners = new Set();
-  let character = initialCharacter, revision = 0, batching = false;
+  let character = initialCharacter, revision = 0, batching = false, transfer = null, controlMessage = '';
   let childSubscriptions = [];
   const isPending = () => [...conversations.values()].some(session => session.getState().pending);
   function getState() {
     const snapshots = Object.fromEntries([...conversations].map(([id, session]) => [id, session.getState()]));
     const current = character ? snapshots[character] : { messages: [], draft: '', pending: false, error: '', errorCode: '' };
-    return { ...current, character, revision, pending: Object.values(snapshots).some(session => session.pending), conversations: snapshots };
+    return { ...current, character, revision, transfer: transfer ? { from: transfer.from, to: transfer.to } : null, controlMessage, pending: Object.values(snapshots).some(session => session.pending), conversations: snapshots };
   }
   function notify() { if (!batching) for (const listener of listeners) listener(getState()); }
   function connectChildren() { childSubscriptions = [...conversations.values()].map(session => session.subscribe(notify)); }
@@ -183,17 +184,41 @@ export function createCharacterSession({ respond = requestReply, initialCharacte
     batching = true;
     for (const unsubscribe of childSubscriptions) unsubscribe();
     conversations = new Map(CHARACTERS.map(({ id }) => [id, createChatSession({ respond, character: id, initialState: document.conversations[id] })]));
-    character = document.character; revision += 1; connectChildren();
+    character = document.character; transfer = null; controlMessage = ''; revision += 1; connectChildren();
     batching = false; notify(); return true;
   }
   function selectCharacter(id) {
-    if (!isCharacterId(id) || isPending()) return false;
-    character = id; notify(); return true;
+    if (!isCharacterId(id) || isPending() || transfer) return false;
+    character = id; controlMessage = ''; notify(); return true;
   }
   return {
     getState, selectCharacter, restore,
-    setDraft(text) { if (character) conversations.get(character).setDraft(text); },
-    send() { return character && !isPending() ? conversations.get(character).send() : Promise.resolve(false); },
+    setDraft(text) {
+      if (character && !transfer && !isPending()) { controlMessage = ''; conversations.get(character).setDraft(text); }
+    },
+    async send() {
+      if (!character || isPending() || transfer) return false;
+      const draft = conversations.get(character).getState().draft;
+      if (getMessageError(draft)) return false;
+      const request = parseCharacterRequest(draft);
+      if (!request) { controlMessage = ''; return conversations.get(character).send(); }
+      if (request.type === 'help') controlMessage = 'Usa /hablar morfeo, /hablar oráculo o /hablar trinity.';
+      else if (request.target === character) controlMessage = `Ya estás hablando con ${getCharacter(character).name}.`;
+      else { transfer = { from: character, to: request.target, draft, revision }; controlMessage = 'Confirma el cambio de canal.'; }
+      notify(); return false;
+    },
+    confirmTransfer() {
+      if (!transfer || isPending() || transfer.from !== character || transfer.revision !== revision || conversations.get(character).getState().draft !== transfer.draft) return false;
+      const target = transfer.to;
+      batching = true;
+      conversations.get(character).setDraft('');
+      character = target; transfer = null; controlMessage = `Conexión restablecida con ${getCharacter(target).name}.`;
+      batching = false; notify(); return true;
+    },
+    cancelTransfer() {
+      if (!transfer) return false;
+      transfer = null; controlMessage = 'Cambio cancelado. Conservé tu mensaje.'; notify(); return true;
+    },
     subscribe(listener) { listeners.add(listener); listener(getState()); return () => listeners.delete(listener); },
   };
 }
@@ -217,6 +242,8 @@ export function mountChat(root, chatSession = session, storage = chatSession ===
   const storageStatus = root.querySelector('[data-storage-status]');
   const storageActions = root.querySelector('[data-storage-actions]');
   const dialog = root.querySelector('[data-history-dialog]');
+  const transferDialog = root.querySelector('[data-transfer-dialog]');
+  let composing = false, compositionEndedAt = -Infinity;
   let renderedCharacter, renderedRevision, confirmedAction;
   let renderedCount = 0, scrollFrame = 0, focusFrame = 0, lastIntercepted = false;
   let wasAuthenticated = access.authenticated === true;
@@ -237,6 +264,7 @@ export function mountChat(root, chatSession = session, storage = chatSession ===
     gate.hidden = authenticated;
     if (wasAuthenticated && !authenticated) {
       if (dialog.open) dialog.close();
+      chatSession.cancelTransfer();
       // Espera a que el formulario haya habilitado su input al cambiar la sesión.
       cancelAnimationFrame(focusFrame);
       focusFrame = requestAnimationFrame(() => { if (mounted && access.authenticated !== true) gate.querySelector('input').focus(); });
@@ -272,7 +300,11 @@ export function mountChat(root, chatSession = session, storage = chatSession ===
     terminal.setAttribute('aria-label', character ? `Conversación con ${character.name}` : 'Terminal de conversación');
     if (input.value !== (authenticated ? state.draft : '')) input.value = authenticated ? state.draft : '';
     renderStorage(authenticated);
-    input.readOnly = state.pending;
+    input.readOnly = state.pending || Boolean(state.transfer);
+    if (authenticated && state.transfer) {
+      writeText(transferDialog.querySelector('#transfer-description'), `Origen: ${getCharacter(state.transfer.from).name}. Destino: ${getCharacter(state.transfer.to).name}. Recuperarás el historial y borrador de ese personaje. La solicitud de cambio no se envía a Gemini.`);
+      if (!transferDialog.open) { transferDialog.showModal(); transferDialog.querySelector('[data-transfer-cancel]').focus(); }
+    } else if (transferDialog.open) transferDialog.close();
     const length = countCharacters(state.draft), tooLong = length > MAX_MESSAGE_LENGTH;
     writeText(count, `${length} / ${MAX_MESSAGE_LENGTH}`);
     count.classList.toggle('is-over-limit', tooLong);
@@ -280,11 +312,12 @@ export function mountChat(root, chatSession = session, storage = chatSession ===
     fieldError.hidden = !tooLong;
     writeText(fieldError, tooLong ? getMessageError(state.draft) : '');
     const intercepted = access.interceptedUntil > Date.now();
-    button.disabled = !authenticated || !selected || state.pending || intercepted || Boolean(getMessageError(state.draft));
-    writeText(button, state.pending ? 'TRANSMITIENDO…' : intercepted ? 'CANAL BLOQUEADO' : state.error ? 'REINTENTAR ↗' : 'ENVIAR ↗');
+    const isControl = Boolean(parseCharacterRequest(state.draft));
+    button.disabled = !authenticated || !selected || state.pending || Boolean(state.transfer) || (intercepted && !isControl) || Boolean(getMessageError(state.draft));
+    writeText(button, state.pending ? 'TRANSMITIENDO…' : isControl ? 'SOLICITAR CAMBIO ↗' : intercepted ? 'CANAL BLOQUEADO' : state.error ? 'REINTENTAR ↗' : 'ENVIAR ↗');
     status.classList.toggle('chat-status--loading', state.pending);
-    status.classList.toggle('chat-status--error', Boolean(state.error));
-    const statusText = !selected ? 'CANAL ABIERTO · Selecciona un personaje para comenzar.' : state.pending ? `${character.name} está escribiendo…` : intercepted ? 'SEÑAL INTERCEPTADA · Tu mensaje está a salvo.' : state.error || `CANAL ABIERTO · ${character.name} está al otro lado.`;
+    status.classList.toggle('chat-status--error', Boolean(state.error && !state.controlMessage));
+    const statusText = state.controlMessage || (!selected ? 'CANAL ABIERTO · Selecciona un personaje para comenzar.' : state.pending ? `${character.name} está escribiendo…` : intercepted ? 'SEÑAL INTERCEPTADA · Tu mensaje está a salvo.' : state.error || `CANAL ABIERTO · ${character.name} está al otro lado.`);
     if (status.textContent !== statusText) status.textContent = statusText;
     smith.hidden = !intercepted;
     terminal.classList.toggle('is-intercepted', intercepted);
@@ -317,7 +350,7 @@ export function mountChat(root, chatSession = session, storage = chatSession ===
   }
   function historyAction(event) {
     const action = event.target.closest('button[data-history-action]')?.dataset.historyAction;
-    if (!action || !storage || access.authenticated !== true || state.pending) return;
+    if (!action || !storage || access.authenticated !== true || state.pending || state.transfer) return;
     const descriptions = {
       current: `Se borrarán los mensajes y el borrador de ${getCharacter(state.character)?.name}. Las otras conversaciones se conservarán.`,
       all: 'Se borrarán los mensajes y borradores de los tres personajes guardados en este navegador. Las cuotas del canal se conservan.',
@@ -343,6 +376,26 @@ export function mountChat(root, chatSession = session, storage = chatSession ===
   dialog.querySelector('[data-history-cancel]').addEventListener('click', cancelHistory);
   dialog.addEventListener('cancel', cancelHistory);
   function handleInput() { chatSession.setDraft(input.value); }
+  function handleKey(event) {
+    const action = getComposerKeyAction(event, { composing, justComposed: performance.now() - compositionEndedAt < 80 });
+    if (!action) return;
+    event.preventDefault();
+    if (action === 'submit' && !button.disabled) form.requestSubmit();
+  }
+  function compositionStart() { composing = true; }
+  function compositionEnd() { composing = false; compositionEndedAt = performance.now(); }
+  function cancelTransfer(event) { event?.preventDefault(); chatSession.cancelTransfer(); input.focus(); }
+  function confirmTransfer(event) {
+    event.preventDefault();
+    if (access.authenticated === true && chatSession.confirmTransfer()) input.focus();
+    else chatSession.cancelTransfer();
+  }
+  transferDialog.addEventListener('cancel', cancelTransfer);
+  transferDialog.querySelector('[data-transfer-cancel]').addEventListener('click', cancelTransfer);
+  transferDialog.querySelector('form').addEventListener('submit', confirmTransfer);
+  input.addEventListener('keydown', handleKey);
+  input.addEventListener('compositionstart', compositionStart);
+  input.addEventListener('compositionend', compositionEnd);
   function handleSubmit(event) { event.preventDefault(); if (button.disabled) return; input.focus({ preventScroll: true }); void chatSession.send(); }
   function chooseCharacter(event) {
     const choice = event.target.closest('button[data-character]');
@@ -369,5 +422,10 @@ export function mountChat(root, chatSession = session, storage = chatSession ===
     }
   }, 1000);
   function authenticatedNow() { return access.authenticated === true; }
-  return () => { mounted = false; clearInterval(tick); unsubscribeChat(); unsubscribeAccess(); unsubscribeStorage(); cleanGate(); if (dialog.open) dialog.close(); storageActions.removeEventListener('click', historyAction); dialog.querySelector('form').removeEventListener('submit', confirmHistory); dialog.querySelector('[data-history-cancel]').removeEventListener('click', cancelHistory); dialog.removeEventListener('cancel', cancelHistory); cancelAnimationFrame(scrollFrame); cancelAnimationFrame(focusFrame); input.removeEventListener('input', handleInput); form.removeEventListener('submit', handleSubmit); picker.removeEventListener('click', chooseCharacter); };
+  return () => { mounted = false; chatSession.cancelTransfer(); if (transferDialog.open) transferDialog.close();
+    transferDialog.removeEventListener('cancel', cancelTransfer);
+    transferDialog.querySelector('[data-transfer-cancel]').removeEventListener('click', cancelTransfer);
+    transferDialog.querySelector('form').removeEventListener('submit', confirmTransfer);
+    input.removeEventListener('keydown', handleKey); input.removeEventListener('compositionstart', compositionStart); input.removeEventListener('compositionend', compositionEnd);
+    clearInterval(tick); unsubscribeChat(); unsubscribeAccess(); unsubscribeStorage(); cleanGate(); if (dialog.open) dialog.close(); storageActions.removeEventListener('click', historyAction); dialog.querySelector('form').removeEventListener('submit', confirmHistory); dialog.querySelector('[data-history-cancel]').removeEventListener('click', cancelHistory); dialog.removeEventListener('cancel', cancelHistory); cancelAnimationFrame(scrollFrame); cancelAnimationFrame(focusFrame); input.removeEventListener('input', handleInput); form.removeEventListener('submit', handleSubmit); picker.removeEventListener('click', chooseCharacter); };
 }

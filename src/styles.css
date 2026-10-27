@@ -327,3 +327,20 @@ body[data-page="home"] { background: #000402; --accent: #68ff99; }
   .chat-terminal { height: auto; min-height: 44rem; }
   .chat-log { min-height: 10rem; max-height: 26rem; }
 }
+
+/* Los retratos de Acerca de son señales vectoriales; las tarjetas no cambian el canal. */
+.about-intro { max-width: 48rem; color: var(--text-muted, #9ab9a8); line-height: 1.8; margin: 0 0 2rem; }
+.character-gallery { display: grid; grid-template-columns: 1fr; gap: 1.25rem; margin-bottom: 3rem; }
+.character-card { min-width: 0; border: 1px solid #245d3d; background: #06120c; overflow: hidden; }
+.character-card-art { position: relative; background: #020b07; border-bottom: 1px solid #245d3d; }
+.character-card-art img { display: block; width: 100%; height: auto; aspect-ratio: 8 / 7; object-fit: cover; }
+.character-card-art > span { position: absolute; top: 1rem; left: 1rem; font-size: .65rem; letter-spacing: .15em; color: #a6e9bd; }
+.character-card-body { padding: 1.5rem; }
+.character-card-body h2 { margin: .5rem 0 1rem; font-size: 1.8rem; color: #d9ffe3; }
+.character-card-body > p { line-height: 1.7; }
+.character-card-body .eyebrow { font-size: .65rem; }
+.character-card-quote { color: #72ff9b; border-left: 2px solid #48d879; padding-left: .8rem; margin-top: 1.5rem; }
+.character-card-label { display: inline-block; margin-top: .8rem; font-size: .72rem; color: #91b99f; }
+.about-details--wide { max-width: 58rem; margin-inline: auto; }
+@media (min-width: 768px) { .character-gallery { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; } .character-card-body { padding: 1.1rem; } .character-card-body h2 { font-size: 1.5rem; } }
+@media (min-width: 1024px) { .character-card-body { padding: 1.7rem; } .character-card-body h2 { font-size: 1.9rem; } }
