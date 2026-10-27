@@ -75,9 +75,12 @@ export function toGeminiContents(messages) {
 export function parseGeminiReply(response) {
   if (response?.promptFeedback?.blockReason) throw new ApiError(422, 'BLOCKED_RESPONSE', 'No se pudo responder a ese mensaje. Prueba con otra pregunta.');
   const candidate = response?.candidates?.[0];
+  if (!candidate || typeof candidate.finishReason !== 'string') throw new ApiError(502, 'INVALID_RESPONSE', 'El servicio devolvió una respuesta inválida.');
   if (candidate?.finishReason === 'MAX_TOKENS') throw new ApiError(502, 'TRUNCATED_RESPONSE', 'La respuesta quedó incompleta. Prueba con una pregunta más concreta.');
   if (candidate?.finishReason !== 'STOP') throw new ApiError(422, 'BLOCKED_RESPONSE', 'No se pudo completar esa respuesta. Prueba con otra pregunta.');
-  const text = candidate.content?.parts?.filter((part) => typeof part.text === 'string' && !part.thought).map((part) => part.text).join('').trim();
+  const parts = candidate.content?.parts;
+  if (!Array.isArray(parts)) throw new ApiError(502, 'INVALID_RESPONSE', 'El servicio devolvió una respuesta inválida.');
+  const text = parts.filter((part) => part && typeof part.text === 'string' && !part.thought).map((part) => part.text).join('').trim();
   if (!text) throw new ApiError(502, 'INVALID_RESPONSE', 'El servicio devolvió una respuesta vacía.');
   return text;
 }

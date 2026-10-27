@@ -182,3 +182,14 @@ Desde una pestaña nueva de QA se abrió sesión con79 y se envió una pregunta 
 [Comprobación HTTP y proceso independiente](capturas/redis-app-real.json), [captura después del reinicio](capturas/chat-redis-real.jpg). La consola consultada no mostró errores/advertencias. Total de esta comprobación: una llamada real a Gemini. No se modificó código de aplicación ni se agregaron dependencias. También se corrigió un enlace de captura inexistente en README; el resto de enlaces locales de README/docs se comprobó.
 
 Queda cerrado el paso8 en local con Gemini y Redis reales. Siguen pendientes9–13: consolidación de pruebas, revisión/documentación, variables en Vercel, verificación de despliegue HTTPS y auditoría final. Conectar localmente Redis no equivale a haber configurado las variables del proyecto publicado.
+
+
+## Paso 9 — Consolidación de pruebas (27 de octubre de 2026)
+
+Se añadieron14 casos a los116 existentes. La ejecución inicial con siete regresiones produjo siete fallos reproducibles: clasificación de respuestas Gemini sin candidato, partes no array/nulas y códigos heredados como toString/__proto__. Se corrigió el parseo y la lista de códigos aceptados, conservando mensajes controlados. Se agregaron siete casos de acceso/recuperación del cliente y se hizo independiente la expectativa del historial adaptado a Gemini.
+
+Se incorporaron vitest.config.js y tests/setup.js para bloquear fetch no sustituido, aislar variables privadas dentro del proceso, restaurar mocks/globals/entorno y limpiar temporizadores. Los casos del acceso en memoria importan un módulo nuevo por prueba. Sin cambios en dependencias ni llamadas reales a proveedores.
+
+Resultado:130/130 en tres archivos; también130/130 con orden mezclado, semilla79. La ejecución final normal volvió a pasar. Se preservaron logs inicial/final y JSON para Miguel. [Matriz y explicación](pruebas-unitarias.md), [resumen de resultados](capturas/paso-9-resultados.json).
+
+No se atribuye cobertura visual, evaluación de voz de IA ni producción a esta suite. Paso9 completado; siguiente10: revisión UX/responsive y casos borde en navegador. No se repitió la evaluación real de proveedores porque las correcciones se verificaron con respuestas sustituidas que reproducían los defectos.

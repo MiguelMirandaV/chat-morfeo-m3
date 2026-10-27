@@ -172,6 +172,14 @@ describe('transporte HTTP del chat', () => {
     expect(fetchImpl).toHaveBeenCalledTimes(1);
   });
 
+  it.each(['toString', '__proto__'])('rechaza códigos heredados del prototipo: %s', async (code) => {
+    const fetchImpl = vi.fn().mockResolvedValue(new Response(JSON.stringify({ error: { code, message: 'detalle interno' } }), { status: 503 }));
+    const error = await requestReply(history, { fetchImpl }).catch(error => error);
+    expect(error).toMatchObject({ name: 'ChatRequestError', code: 'SERVICE_UNAVAILABLE' });
+    expect(error.message).not.toContain('function');
+    expect(error.message).not.toContain('detalle interno');
+  });
+
   it.each(['no es JSON', '{}', '{"reply":"  "}', '{"reply":123}', 'null'])('rechaza un éxito con cuerpo inválido: %s', async (body) => {
     const fetchImpl = vi.fn().mockResolvedValue(new Response(body));
     await expect(requestReply(history, { fetchImpl })).rejects.toMatchObject({ code: 'INVALID_RESPONSE' });

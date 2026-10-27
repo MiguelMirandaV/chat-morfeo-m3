@@ -1,10 +1,10 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { ApiError, createHandler, createAccessToken, verifyAccessToken, hasAccess, updateQuota,
   pacificDay, nextPacificMidnight, createFileQuotaStore, createRedisQuotaStore, getQuotaStore,
-  generateGeminiReply, parseGeminiReply, toGeminiContents, DEFAULT_GEMINI_MODEL } from '../api/functions.js';
+  generateGeminiReply, parseGeminiReply, DEFAULT_GEMINI_MODEL } from '../api/functions.js';
 import { getAccessState, postApi, requestReply } from '../src/chat.js';
 
 const now = Date.parse('2026-10-26T19:00:00Z');
@@ -133,7 +133,7 @@ describe('contadores compartidos y recuperación', () => {
     const error = await store(true, now).catch(error => error);
     expect(error.code).toBe('QUOTA_UNAVAILABLE'); expect(error.message).not.toContain('token');
   });
-  it('conserva el borrador y publica el contador de una respuesta 429', async () => {
+  it('publica el contador de una respuesta 429 y retira la intervención al recuperarse', async () => {
     const quota = { ...updateQuota({}, Date.now()).quota, minuteUsed: 15, blocked: true, retryAt: Date.now() + 60_000 };
     await expect(requestReply(messages, { fetchImpl: async () => new Response(JSON.stringify({ error: { code: 'RATE_LIMITED' }, quota }), { status: 429 }) })).rejects.toMatchObject({ code: 'RATE_LIMITED' });
     expect(getAccessState().quota.minuteUsed).toBe(15); expect(getAccessState().interceptedUntil).toBe(quota.retryAt);
@@ -151,9 +151,30 @@ describe('adaptador Gemini real con proveedor sustituido en tests', () => {
     expect(await generateGeminiReply(messages, { environment, clientFactory: factory })).toBe('Ariadna.');
     expect(factory.mock.calls[0][0].httpOptions.retryOptions.attempts).toBe(1);
     const options = generateContent.mock.calls[0][0];
-    expect(options.contents).toEqual(toGeminiContents(messages)); expect(options.contents[1].role).toBe('model');
+    expect(options.contents).toEqual([
+      { role: 'user', parts: [{ text: 'Me llamo Ariadna.' }] },
+      { role: 'model', parts: [{ text: 'Bienvenida.' }] },
+      { role: 'user', parts: [{ text: '¿Cómo me llamo?' }] },
+    ]);
+    options.contents[0].parts[0].text = 'mutado';
+    expect(messages[0].content).toBe('Me llamo Ariadna.');
     expect(options.config.systemInstruction).toContain('Morfeo'); expect(options.config.maxOutputTokens).toBe(1024);
     expect(options.config).not.toHaveProperty('temperature'); expect(generateContent).toHaveBeenCalledTimes(1);
+  });
+  it.each([
+    undefined,
+    {},
+    { candidates: [] },
+    { candidates: [{ finishReason: 'STOP', content: { parts: {} } }] },
+  ])('normaliza datos ausentes o mal formados como INVALID_RESPONSE: %j', response => {
+    expect(() => parseGeminiReply(response)).toThrow(expect.objectContaining({ code: 'INVALID_RESPONSE', status: 502 }));
+  });
+  it('combina solo texto público e ignora partes ajenas o nulas', () => {
+    const response = { candidates: [{ finishReason: 'STOP', content: { parts: [
+      null, { functionCall: { name: 'no-text' } }, { text: 'pensamiento privado', thought: true },
+      { text: ' Hola, ' }, { text: 'Ariadna. ' },
+    ] } }] };
+    expect(parseGeminiReply(response)).toBe('Hola, Ariadna.');
   });
   it.each([
     [{ promptFeedback: { blockReason: 'SAFETY' } }, 'BLOCKED_RESPONSE'],
@@ -173,5 +194,111 @@ describe('adaptador Gemini real con proveedor sustituido en tests', () => {
     const result = generateGeminiReply(messages, { environment, clientFactory: () => ({ models: { generateContent } }) });
     const check = expect(result).rejects.toMatchObject({ code: 'TIMEOUT' });
     await vi.advanceTimersByTimeAsync(16_000); await check; expect(generateContent).toHaveBeenCalledTimes(1); expect(vi.getTimerCount()).toBe(0);
+  });
+});
+
+
+describe('acceso y recuperación en el cliente', () => {
+  let client;
+  const quota = { minuteUsed: 0, minuteLimit: 15, dayUsed: 0, dayLimit: 500,
+    minuteResetAt: now + 60_000, dayResetAt: nextPacificMidnight(now), blocked: false, retryAt: now + 60_000, scope: 'app' };
+  const json = (body, status = 200) => new Response(JSON.stringify(body), { status });
+
+  beforeEach(async () => {
+    // El módulo guarda una sesión; cada caso empieza con su propio estado.
+    vi.resetModules();
+    client = await import('../src/chat.js');
+  });
+
+  it('comparte una consulta de sesión pendiente y retira la suscripción', async () => {
+    let finish;
+    const fetchMock = vi.fn(() => new Promise(resolve => { finish = resolve; }));
+    vi.stubGlobal('fetch', fetchMock);
+    const listener = vi.fn();
+    const unsubscribe = client.subscribeAccess(listener);
+    const first = client.refreshAccess(), second = client.refreshAccess();
+    expect(second).toBe(first);
+    expect(client.getAccessState()).toMatchObject({ busy: true, authenticated: null });
+    unsubscribe(); const calls = listener.mock.calls.length;
+    finish(json({ authenticated: true, quota })); await first;
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({ action: 'session' });
+    expect(client.getAccessState()).toMatchObject({ busy: false, authenticated: true, error: '' });
+    expect(listener).toHaveBeenCalledTimes(calls);
+  });
+
+  it('bloquea un segundo desbloqueo mientras el primero está pendiente', async () => {
+    let finish;
+    const fetchMock = vi.fn(() => new Promise(resolve => { finish = resolve; }));
+    vi.stubGlobal('fetch', fetchMock);
+    const pending = client.unlockCohort('79');
+    expect(await client.unlockCohort('79')).toBe(false);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const options = fetchMock.mock.calls[0][1];
+    expect(JSON.parse(options.body)).toEqual({ action: 'unlock', cohort: '79' });
+    expect(options.credentials).toBe('same-origin');
+    finish(json({ authenticated: true, quota }));
+    expect(await pending).toBe(true);
+    expect(client.getAccessState()).toMatchObject({ authenticated: true, busy: false });
+  });
+
+  it('deniega una cohorte incorrecta y permite corregirla sin conservar el error', async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(json({ error: { code: 'INVALID_COHORT', message: 'detalle privado' } }, 403))
+      .mockResolvedValueOnce(json({ authenticated: true, quota }));
+    vi.stubGlobal('fetch', fetchMock);
+    expect(await client.unlockCohort('78')).toBe(false);
+    expect(client.getAccessState().authenticated).not.toBe(true);
+    expect(client.getAccessState()).toMatchObject({ busy: false, error: 'Esta cohorte no tiene acceso al canal.' });
+    expect(await client.unlockCohort('79')).toBe(true);
+    expect(client.getAccessState()).toMatchObject({ authenticated: true, busy: false, error: '' });
+  });
+
+  it('pierde el acceso ante 401 y conserva conversación y borrador para volver a entrar', async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(json({ authenticated: true, quota }))
+      .mockResolvedValueOnce(json({ reply: 'Bienvenida.', quota }))
+      .mockResolvedValueOnce(json({ error: { code: 'AUTH_REQUIRED' } }, 401));
+    vi.stubGlobal('fetch', fetchMock);
+    await client.unlockCohort('79');
+    const chat = client.createChatSession();
+    chat.setDraft('Hola'); expect(await chat.send()).toBe(true);
+    chat.setDraft('Mi siguiente pregunta'); expect(await chat.send()).toBe(false);
+    expect(client.getAccessState().authenticated).toBe(false);
+    expect(chat.getState()).toMatchObject({ pending: false, draft: 'Mi siguiente pregunta', errorCode: 'AUTH_REQUIRED',
+      messages: [{ role: 'user', content: 'Hola' }, { role: 'assistant', content: 'Bienvenida.' }] });
+  });
+
+  it('muestra la solicitud 15 admitida sin activar Smith antes del primer rechazo', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(json({ reply: 'Sigamos.', quota: { ...quota, minuteUsed: 15, dayUsed: 15, blocked: true } }));
+    vi.stubGlobal('fetch', fetchMock);
+    expect(await client.requestReply([messages[0]])).toBe('Sigamos.');
+    expect(client.getAccessState()).toMatchObject({ quota: { minuteUsed: 15 }, interceptedUntil: 0 });
+  });
+
+  it('mantiene el bloqueo diario tras un minuto sin reenviar mensajes automáticamente', async () => {
+    vi.useFakeTimers(); vi.setSystemTime(now);
+    const daily = { ...quota, dayUsed: 500, blocked: true, retryAt: nextPacificMidnight(now) };
+    const fetchMock = vi.fn().mockResolvedValue(json({ error: { code: 'DAILY_LIMIT' }, quota: daily }, 429));
+    vi.stubGlobal('fetch', fetchMock);
+    const chat = client.createChatSession(); chat.setDraft('No perder esta pregunta');
+    expect(await chat.send()).toBe(false);
+    await vi.advanceTimersByTimeAsync(60_000);
+    expect(client.getAccessState().interceptedUntil).toBe(daily.retryAt);
+    expect(client.getAccessState().interceptedUntil).toBeGreaterThan(Date.now());
+    expect(chat.getState()).toMatchObject({ draft: 'No perder esta pregunta', pending: false, messages: [], errorCode: 'DAILY_LIMIT' });
+    expect(fetchMock).toHaveBeenCalledTimes(1); expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('libera el estado ocupado tras un fallo de sesión y permite consultar otra vez', async () => {
+    const fetchMock = vi.fn().mockRejectedValueOnce(new Error('detalle privado'))
+      .mockResolvedValueOnce(json({ authenticated: true, quota }));
+    vi.stubGlobal('fetch', fetchMock);
+    await client.refreshAccess();
+    expect(client.getAccessState()).toMatchObject({ authenticated: false, busy: false });
+    expect(client.getAccessState().error).not.toContain('privado');
+    await client.refreshAccess();
+    expect(client.getAccessState()).toMatchObject({ authenticated: true, busy: false, error: '' });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 });

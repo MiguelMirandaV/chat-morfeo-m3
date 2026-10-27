@@ -19,7 +19,13 @@ const requestErrors = {
   REQUEST_REJECTED: 'El servidor no pudo aceptar el mensaje. Inténtalo de nuevo.',
 };
 export class ChatRequestError extends Error {
-  constructor(code) { super(requestErrors[code] || requestErrors.REQUEST_REJECTED); this.name = 'ChatRequestError'; this.code = code; }
+  constructor(code) {
+    // Solo códigos declarados; las propiedades heredadas no son errores de la app.
+    const safeCode = typeof code === 'string' && Object.hasOwn(requestErrors, code) ? code : 'REQUEST_REJECTED';
+    super(requestErrors[safeCode]);
+    this.name = 'ChatRequestError';
+    this.code = safeCode;
+  }
 }
 
 let access = { authenticated: null, busy: false, error: '', quota: null, interceptedUntil: 0 };
@@ -51,7 +57,7 @@ export async function postApi(payload, { fetchImpl = globalThis.fetch, timeoutMs
       const fallback = response.status === 401 ? 'AUTH_REQUIRED' : response.status === 413 ? 'HISTORY_TOO_LARGE'
         : response.status === 429 ? 'RATE_LIMITED' : response.status === 400 ? 'INVALID_HISTORY'
         : response.status >= 500 ? 'SERVICE_UNAVAILABLE' : 'REQUEST_REJECTED';
-      const code = requestErrors[data?.error?.code] ? data.error.code : fallback;
+      const code = typeof data?.error?.code === 'string' && Object.hasOwn(requestErrors, data.error.code) ? data.error.code : fallback;
       if (code === 'AUTH_REQUIRED') { access.authenticated = false; publishAccess(); }
       throw new ChatRequestError(code);
     }

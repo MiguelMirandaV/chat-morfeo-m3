@@ -118,3 +118,10 @@ Briefs aplicados (resumen de las indicaciones visuales):
 ### Conexión real de Redis — 27 de octubre de 2026
 
 Miguel creó/reutilizó la base e introdujo personalmente sus credenciales en .env; confirmó el guardado. Codex comprobó presencia y conexión sin revelar valores, reinició el servidor y verificó el Lua real en claves temporales aisladas. Se probaron20 reservas concurrentes, persistencia entre clientes, ventana móvil,500/501 y expiraciones; se eliminaron solo las dos claves de QA. El contador real no se alteró por esas pruebas. Una solicitud real desde la interfaz a Gemini incrementó el contador diario a1, que permaneció después de reiniciar Vercel Dev y coincidió con una lectura de un proceso nuevo. No fue necesario cambiar código ni instalar paquetes. Se actualizaron documentación y evidencias sin guardar credenciales.
+
+
+## 9. Consolidación de pruebas unitarias
+
+Miguel pidió continuar. Codex revisó los116 casos, detectó huecos concretos en el parseo de respuestas y en el acceso del cliente y añadió primero siete regresiones. La ejecución produjo siete fallos reales; se corrigieron la clasificación de respuestas ausentes, el manejo de partes mal formadas/nulas y la aceptación accidental de propiedades heredadas como códigos de error. Después se añadieron siete pruebas del acceso y su recuperación.
+
+Se introdujo configuración de Vitest y un setup con fetch bloqueado salvo sustitución explícita, entorno de pruebas aislado y restauración entre casos. Se evitó una expectativa que usaba la misma transformación de la implementación para comprobar su resultado. Resultado final130/130 en orden normal y mezclado con semilla79. No se agregaron paquetes, porcentajes arbitrarios de cobertura, llamadas a Google/Redis ni cambios de diseño. La revisión visual y la prueba pública siguen en sus pasos del plan.

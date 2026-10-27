@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-27",
+  "passed": 130,
+  "failed": 0,
+  "files": [
+    {
+      "file": "access-quota-gemini.test.js",
+      "passed": 48,
+      "failed": 0
+    },
+    {
+      "file": "app.test.js",
+      "passed": 76,
+      "failed": 0
+    },
+    {
+      "file": "utils.test.js",
+      "passed": 6,
+      "failed": 0
+    }
+  ],
+  "shuffledRun": {
+    "seed": 79,
+    "passed": 130,
+    "failed": 0
+  },
+  "realGeminiRequests": 0,
+  "realRedisRequests": 0
+}

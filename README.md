@@ -4,7 +4,7 @@ Proyecto Integrador M3 de Full Stack de Henry. SPA en español para conversar co
 
 ## Estado
 
-Pasos 1–8 completos en el entorno local, con Gemini y Redis reales. Se incorporó la ampliación solicitada por Miguel: entrada cyberpunk, retrato CGI, transición por la boca, acceso por cohorte y cuotas con intervención de Smith. **Redis de Upstash conectado y verificado el 27 de octubre de 2026.** Continúan pendientes la revisión final y el despliegue público del plan.
+Pasos 1–9 completos en el entorno local, con Gemini y Redis reales. Se incorporó la ampliación solicitada por Miguel: entrada cyberpunk, retrato CGI, transición por la boca, acceso por cohorte y cuotas con intervención de Smith. **Redis de Upstash conectado y verificado el 27 de octubre de 2026.** Continúan pendientes la revisión final y el despliegue público del plan.
 
 ![Inicio](docs/capturas/paso-8-home-1024.jpg)
 
@@ -123,7 +123,9 @@ npm test
 npm run test:watch
 ```
 
-**116 tests en tres archivos**, sin llamadas reales ni consumo de Gemini. Incluyen grafemas, router, historial, concurrencia, rollback, transporte, timeouts, respuestas bloqueadas/truncadas, firma/expiración, cohorte, origen, cuotas y archivo concurrente entre instancias. El contrato Redis se prueba con fetch sustituido. Además, se verificó el script Lua contra Redis real con claves aisladas: concurrencia, persistencia, ventana móvil, límite diario y expiraciones; véase el registro de pruebas.
+**130 tests en tres archivos**, sin llamadas reales ni consumo de Gemini. Incluyen grafemas, router, historial, concurrencia, rollback, transporte, timeouts, respuestas bloqueadas/truncadas, firma/expiración, cohorte, origen, cuotas y archivo concurrente entre instancias. El contrato Redis se prueba con fetch sustituido. Además, se verificó el script Lua contra Redis real con claves aisladas: concurrencia, persistencia, ventana móvil, límite diario y expiraciones; véase el registro de pruebas.
+
+La configuración de Vitest restaura mocks, globals y entorno entre casos. Un setup bloquea cualquier fetch no sustituido y aísla las variables privadas dentro del proceso de pruebas, sin editar archivos de entorno. La suite pasó también con orden mezclado y semilla79. [Matriz, hallazgos y explicación del paso9](docs/pruebas-unitarias.md).
 
 Las comprobaciones de navegador se registran en [pruebas.md](docs/pruebas.md), distinguiendo Gemini real del entorno aislado usado para provocar 429 y verificar Smith sin gastar cuota. Los tests antiguos del banco de respuestas simuladas se retiraron al sustituirlo por Gemini.
 
@@ -136,6 +138,7 @@ Proyecto vinculado a GitHub y Vercel Hobby. En el paso 12 se configurarán las v
 - [Alcance y decisiones](docs/alcance.md).
 - [Registro de IA y prompts visuales](docs/uso-ia.md).
 - [Verificaciones](docs/pruebas.md).
+- [Pruebas unitarias consolidadas](docs/pruebas-unitarias.md).
 - [Redis](docs/redis.md).
 
 Miguel eligió personaje, dirección visual, requisitos y creó/guardó la clave. Codex implementó el código, los retratos generados y las pruebas. El uso de Matrix es una interpretación académica; no es un producto oficial.
