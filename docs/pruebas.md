@@ -120,3 +120,39 @@ Hallazgos: v1 suponía falta de crecimiento profesional no mencionada por el usu
 Los resultados por versión y la matriz están en evaluacion-prompt.md y docs/capturas/prompt-v*.json; no son 20 pruebas de la versión final. Se mantuvieron maxOutputTokens=1024 y thinking minimal, sin parámetros de muestreo obsoletos.
 
 Suite final: 83 tests pasando. El chat continúa usando el mock del handler; el SDK, el flujo real desde la interfaz y los fallos del proveedor corresponden al paso 8. El paso 7 queda completo con evaluación y limitaciones documentadas.
+
+
+## Paso 8 — Gemini real y ampliación Matrix (26 de octubre de 2026)
+
+### Integración y controles
+
+- SDK @google/genai 2.31.0 instalado y fijado; se retiró el proveedor simulado de la app.
+- Dos turnos reales desde /chat: presentación ficticia Ariadna/programación y pregunta de recuerdo. Ambas respuestas llegaron; la segunda recordó los dos datos. El contador diario pasó de 0 a 2. La ventana móvil dejó expirar la primera reserva durante la revisión, por eso el contador de minuto no siempre coincide con el diario.
+- Invocación HTTP directa sin cookie: 401 AUTH_REQUIRED; no llegó al proveedor.
+- Desde Home, cohorte 78: rechazo visible; 79: sesión abierta y navegación por el portal. La API firma/valida la cookie; no basta modificar una variable del frontend.
+- Transición visible con apertura/crossfade y zoom; termina en Chat y retira la capa. El acceso desde la navegación de Home usa la misma transición. El control para omitir y Escape están implementados; movimiento reducido evita iniciar el efecto.
+- Borrador e historial permanecieron tras navegar Acerca de → Chat. Se probó 281 emojis compuestos: contador 281/280 y envío deshabilitado, sin truncado.
+
+### Cuotas y Smith
+
+116 tests en tres archivos, todos aprobados. Los tests del banco simulado se retiraron al reemplazar el proveedor. Se incorporaron pruebas del adaptador Gemini, errores y abortos; firmas y expiración; cohorte; origen; 15 solicitudes aceptadas y la siguiente bloqueada; reserva 500 y bloqueo diario; cambio de horario del Pacífico; archivo entre dos instancias con 20 reservas simultáneas (15 admitidas); contrato Redis y fallos cerrados. Los tests no usan la red ni consumen Gemini.
+
+Para verificar Smith se inició un servidor HTTP aislado de QA en localhost:3001, con el mismo frontend y handler pero cuota/proveedor sustituidos. Primer envío → 429 con contador15/15 → retrato Smith, corrupción breve, cuenta atrás y botón bloqueado. El texto permaneció íntegro. Al expirar, la app consultó la cuota, retiró Smith y habilitó Reintentar. El reintento generó exactamente un par user/assistant. Se volvió a probar con el retrato final a 1024 y320: imagen cargada, texto preservado y sin overflow horizontal. Este entorno no llamó a Google ni modificó el contador real; fue cerrado y su script no se publica.
+
+La conexión a Redis real está pendiente de credenciales. Se verificó el contrato REST y el fallo cerrado, no una base externa operativa. En desarrollo funciona el archivo privado; en Vercel no se permite ese fallback. Las cuotas cuentan esta app, no toda la actividad del proyecto de Google.
+
+### Responsive, assets y movimiento
+
+Las nueve combinaciones de Home/Chat/Acerca de a320/768/1024 tuvieron innerWidth igual al ancho solicitado y scrollWidth igual a innerWidth. Evidencia con medidas: [JSON](capturas/paso-8-responsive.json). Los retratos visibles cargaron. El log tiene altura acotada también en móvil; con Smith a320 se mantuvo en112px y conservó scroll. Se corrigió esa altura móvil durante la revisión. La pausa de Home detuvo sus64 columnas y el control permitió reanudarlas. Se mantuvieron las reglas de movimiento reducido; no se cambió la preferencia del sistema del usuario para esta prueba.
+
+Capturas nuevas:
+
+- Home: [320](capturas/paso-8-home-320.jpg), [768](capturas/paso-8-home-768.jpg), [1024](capturas/paso-8-home-1024.jpg).
+- Chat: [320](capturas/paso-8-chat-320.jpg), [768](capturas/paso-8-chat-768.jpg), [1024](capturas/paso-8-chat-1024.jpg), [Gemini real con memoria](capturas/paso-8-chat-gemini-1280.jpg).
+- [Apertura de la boca](capturas/paso-8-transicion-boca.jpg), [Smith](capturas/paso-8-smith-cuota.jpg), [Smith móvil](capturas/paso-8-smith-320.jpg). Las capturas Smith corresponden al escenario controlado descrito.
+
+La consola del chat real consultada no mostró errores ni advertencias. Se restauró el tamaño del navegador y se cerraron las pestañas/servidor QA. Se conservaron las pestañas con la home y la conversación real para revisión.
+
+Auditoría tras agregar el SDK: npm audit --omit=dev informó0 vulnerabilidades. Los33 avisos transitivos de las herramientas de desarrollo conocidos en pasos anteriores no se corrigieron con cambios forzados; ese informe de producción no significa que todas las herramientas carezcan de avisos.
+
+Pendientes: conectar/probar Redis; consolidar la revisión de los pasos9–11; variables/despliegue y prueba HTTPS en12; auditoría final13. No se presenta este resultado local como entrega pública completa.

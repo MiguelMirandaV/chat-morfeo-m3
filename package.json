@@ -17,5 +17,8 @@
   "devDependencies": {
     "vercel": "65.3.1",
     "vitest": "5.0.5"
+  },
+  "dependencies": {
+    "@google/genai": "2.31.0"
   }
 }

@@ -1,7 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { getSpaDestination, navigateTo, normalizePathname, resolveRoute } from '../src/app.js';
 import { ChatRequestError, createChatSession, requestReply } from '../src/chat.js';
-import { createHandler, DEFAULT_GEMINI_MODEL, getGeminiConfig, MAX_REQUEST_BYTES, simulateReply, validateHistory } from '../api/functions.js';
+import { createHandler as rawHandler, DEFAULT_GEMINI_MODEL, getGeminiConfig, MAX_REQUEST_BYTES, validateHistory } from '../api/functions.js';
+
+const createHandler = (options) => rawHandler({ authorize: () => true, quotaStore: async () => ({ allowed: true, quota: {} }), ...options });
 
 const origin = 'http://localhost:3000';
 const click = { href: '/chat', button: 0, modified: false, download: false, target: null, defaultPrevented: false };
@@ -28,7 +30,7 @@ describe('sesión de chat en memoria', () => {
 
   it('parte vacía y conserva el borrador sin introducirlo en el historial', () => {
     const chat = createChatSession();
-    expect(chat.getState()).toEqual({ messages: [], draft: '', pending: false, error: '' });
+    expect(chat.getState()).toEqual({ messages: [], draft: '', pending: false, error: '', errorCode: '' });
     chat.setDraft('Primera línea\nSegunda línea');
     expect(chat.getState()).toMatchObject({ messages: [], draft: 'Primera línea\nSegunda línea' });
     chat.setDraft(null);
@@ -139,39 +141,6 @@ describe('sesión de chat en memoria', () => {
     expect(createChatSession().getState().messages).toEqual([]);
   });
 
-  it('simula una espera asíncrona sin consumir una API', async () => {
-    vi.useFakeTimers();
-    const chat = createChatSession({ respond: simulateReply });
-    chat.setDraft('Quiero aprender a programar');
-    const turn = chat.send();
-    await vi.advanceTimersByTimeAsync(1099);
-    expect(chat.getState().pending).toBe(true);
-    await vi.advanceTimersByTimeAsync(1);
-    expect(await turn).toBe(true);
-    expect(chat.getState().messages.at(-1).content).toContain('Aprender');
-    expect(chat.getState().pending).toBe(false);
-  });
-
-  it.each([
-    ['tema repetido', ['Quiero aprender', 'Quiero programar', 'Quiero estudiar', 'Quiero aprender más', 'Practicar código']],
-    ['preguntas sin palabra clave', ['¿Por dónde empiezo?', '¿Qué opinas?', '¿Y después?', '¿Qué puedo hacer?', '¿Cómo sigo?']],
-  ])('varía las respuestas de la simulación sin repetir la anterior: %s', async (_, questions) => {
-    vi.useFakeTimers();
-    const chat = createChatSession({ respond: simulateReply });
-    const replies = [];
-    for (const question of questions) {
-      chat.setDraft(question);
-      const turn = chat.send();
-      await vi.advanceTimersByTimeAsync(1100);
-      expect(await turn).toBe(true);
-      const reply = chat.getState().messages.at(-1).content;
-      expect(reply).not.toBe(replies.at(-1));
-      replies.push(reply);
-    }
-    // Las tres variantes se usan antes de reutilizar una, y el historial sigue completo.
-    expect(new Set(replies.slice(0, 3)).size).toBe(3);
-    expect(chat.getState().messages).toHaveLength(10);
-  });
 });
 
 describe('transporte HTTP del chat', () => {
@@ -195,11 +164,11 @@ describe('transporte HTTP del chat', () => {
     expect(history).toEqual(before);
   });
 
-  it.each([[400, 'INVALID_HISTORY'], [413, 'HISTORY_TOO_LARGE'], [429, 'RATE_LIMITED'], [503, 'SERVICE_UNAVAILABLE'], [405, 'REQUEST_REJECTED']])('maneja HTTP %s antes de intentar interpretar el cuerpo', async (status, code) => {
+  it.each([[400, 'INVALID_HISTORY'], [413, 'HISTORY_TOO_LARGE'], [429, 'RATE_LIMITED'], [503, 'SERVICE_UNAVAILABLE'], [405, 'REQUEST_REJECTED']])('maneja HTTP %s incluso si no hay un cuerpo JSON', async (status, code) => {
     const json = vi.fn();
     const fetchImpl = vi.fn().mockResolvedValue({ ok: false, status, json });
     await expect(requestReply(history, { fetchImpl })).rejects.toMatchObject({ name: 'ChatRequestError', code });
-    expect(json).not.toHaveBeenCalled();
+    expect(json).toHaveBeenCalledTimes(1);
     expect(fetchImpl).toHaveBeenCalledTimes(1);
   });
 
@@ -240,7 +209,7 @@ describe('transporte HTTP del chat', () => {
     chat.setDraft('Mi pregunta');
     expect(await chat.send()).toBe(false);
     expect(chat.getState()).toMatchObject({ messages: [], draft: 'Mi pregunta', pending: false });
-    expect(chat.getState().error).toContain('Espera un momento');
+    expect(chat.getState().error).toContain('límite de solicitudes');
     expect(vi.getTimerCount()).toBe(0);
     expect(await chat.send()).toBe(true);
     expect(chat.getState().messages).toHaveLength(2);
@@ -304,7 +273,7 @@ describe('función serverless', () => {
     const res = response();
     await createHandler({ respond })(request({ body: history }), res);
     expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith({ reply: 'Observa con atención.' });
+    expect(res.json).toHaveBeenCalledWith({ reply: 'Observa con atención.', quota: {} });
     expect(res.setHeader).toHaveBeenCalledWith('Cache-Control', 'no-store');
     expect(respond).toHaveBeenCalledExactlyOnceWith(history.messages);
     expect(history).toEqual(before);
@@ -397,7 +366,7 @@ describe('función serverless', () => {
     await createHandler({ respond: async () => { throw new Error('detalle interno sensible'); } })(request(), res);
     expect(res.status).toHaveBeenCalledWith(503);
     expect(JSON.stringify(res.json.mock.calls)).not.toContain('sensible');
-    expect(res.json).toHaveBeenCalledWith({ error: { code: 'SERVICE_UNAVAILABLE', message: expect.any(String) } });
+    expect(res.json).toHaveBeenCalledWith({ error: { code: 'SERVICE_UNAVAILABLE', message: expect.any(String) }, quota: {} });
   });
 
   it.each(['', ' \n ', null])('rechaza una respuesta del proveedor inválida: %j', async (reply) => {

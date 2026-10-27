@@ -93,3 +93,23 @@
 **Resultado verificable:** v3 en el servidor; 11/6/3 respuestas conservadas por versión con historial, parámetros, longitud y terminación. Se verificaron memoria y respuestas distintas, y se corrigieron las referencias implícitas a ficción y los preámbulos sobre brevedad. Las respuestas son de Gemini; la revisión e implementación son de Codex; la creación y almacenamiento de la clave fueron de Miguel.
 
 **Límites:** no se atribuye una garantía de obediencia o ausencia de repeticiones a esta muestra, y no se presenta la evaluación REST como una integración del chat. No se agregaron pruebas que intenten certificar voz de IA mediante comprobar palabras del prompt. La suite de código permanece en 83 tests; el paso 8 conectará el SDK y verificará el flujo completo.
+
+## 8. Gemini real, ampliación Matrix y cuotas
+
+**Solicitud de Miguel:** continuar e incorporar contador 15/min y 500/día, intervención Smith, estética cyberpunk, cara 3D de Morfeo, transición por la boca y acceso exclusivo para cohorte 79. Aportó dos capturas y [la referencia de The Guru Fox](https://dribbble.com/shots/27387438-Direct-Message-Daily-UI-013).
+
+**Trabajo de Codex:** SDK oficial @google/genai 2.31.0, historial completo, prompt v3 ya evaluado, parseo de terminación y errores, timeout sin reintentos automáticos; cookie firmada y validación de cohorte/origen en servidor; contador atómico local y adaptador Redis para Vercel; formulario de acceso, cuotas, intervención Smith, transición, nuevos retratos y CSS. No se recibió ni mostró la clave. El secreto de sesión local se generó de forma privada. La clave existente se conservó.
+
+**Ampliación del alcance:** la decisión posterior de Miguel prevalece sobre la exclusión inicial de acceso/persistencia. Se documentó que el código 79 es una puerta compartida, sin identidad individual; los únicos datos persistidos son contadores y tiempos, nunca conversación. La producción queda cerrada hasta conectar Redis. No se crea una base externa temporal ni se acepta un plan pago implícitamente.
+
+**Imágenes:** herramienta integrada imagegen, fondo transparente, archivos PNG propios de esta interfaz. Morfeo cerrado y abierto comparten encuadre frontal para crossfade; una tercera generación produjo Smith. Se conservaron los originales y se copiaron los assets finales al repositorio. No se copiaron imágenes de Dribbble ni de las capturas del usuario.
+
+Briefs aplicados (resumen de las indicaciones visuales):
+
+1. Morfeo: busto CGI cinematográfico de alta calidad, frontal y simétrico; calvo, gafas negras redondas, abrigo negro, luz de borde verde, rostro claramente iluminado, fondo transparente, sin texto. Cabeza y torso centrados, cara dominante para animación.
+2. Edición de Morfeo: preservar identidad, encuadre, pose, gafas y luz; abrir ampliamente la boca con cavidad oscura para convertirla en un portal. Mantener transparencia y alineación de ojos/cabeza.
+3. Smith, prompt completo: “Create an original high-end cinematic 3D CGI bust of Agent Smith from The Matrix (1999), recognizable stern male agent, short slick dark brown hair, black rectangular sunglasses, black suit, white shirt and black narrow tie, frontal symmetrical view looking directly at camera, intimidating impassive expression, subtle amber-red rim light on the right and green rim light on the left, face and chest clearly illuminated and detailed, realistic sculpted skin and fabric, centered square portrait, head almost touches top edge, cropped at mid chest. Transparent background, isolated character cutout, no environment, no symbols, no text, no typography, no watermark. This is a character portrait asset for a cyberpunk terminal intrusion overlay.”
+
+**Límite de la técnica visual:** retratos 3D renderizados, animados con CSS; no se atribuye al proyecto una malla WebGL o sincronización labial que no implementa.
+
+**Verificación:** 116 tests sin red; dos turnos reales de Gemini desde la interfaz con datos ficticios Ariadna/programación y memoria correcta. El escenario Smith se verificó en un servidor QA aislado con proveedor sustituido, 429, borrador, espera y reintento: no consumió cuota real. Se revisaron las tres vistas a 320/768/1024 con medidas reales y sin overflow horizontal. Se retiraron tres tests del banco simulado al retirar ese banco; se agregaron pruebas de los nuevos riesgos. Auditoría de dependencias de producción: cero vulnerabilidades reportadas. El contador Redis está probado por contrato con mocks, pendiente de conexión real; esto no equivale a haber validado una base externa.

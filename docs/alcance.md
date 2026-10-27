@@ -1,6 +1,16 @@
 # Paso 1 — Definición de Chat con Morfeo
 
-Estado: definición del producto completada y pasos 2–6 ejecutados: entorno, interfaz, routing, chat y función con simulación. El paso 7 quedó completo con clave local, acceso/cuota verificados y evaluación real del prompt; la integración en el chat corresponde al paso 8. Esta ficha conserva los criterios de aceptación del producto; los resultados realmente obtenidos se registran en `pruebas.md`.
+Estado actual: Gemini integrado y verificado localmente en el paso 8. Se incorporó la ampliación explícita de Miguel indicada a continuación. La conexión real de Redis y la publicación siguen pendientes. Esta ficha conserva también decisiones históricas de pasos anteriores; README y pruebas.md describen el comportamiento actual.
+
+## Ampliación autorizada en el paso 8
+
+Miguel pidió contador 15/minuto y 500/día con intervención visual del Agente Smith; estética cyberpunk más intensa; cara de Morfeo en 3D y transición por su boca; acceso por cohorte de Henry, admitiendo solo 79; inspiración en sus dos capturas y el diseño de The Guru Fox en Dribbble.
+
+Estas indicaciones posteriores amplían el alcance mínimo inicialmente acordado. Se implementa un acceso compartido mediante cookie firmada y persistencia exclusiva de contadores; el historial sigue siendo volátil. Smith aparece solo como intervención visual. No se agregan cuentas individuales, múltiples personajes conversacionales ni persistencia de mensajes. Se conserva la estructura simple y no se requiere PostgreSQL.
+
+La cara es un retrato CGI prerenderizado con perspectiva CSS; la apertura usa dos imágenes alineadas, crossfade y zoom hacia la boca. No es una malla 3D articulada. La animación dura 1,8 s, permite omitir y respeta movimiento reducido. El efecto de corrupción de Smith es breve y no emplea destellos rápidos de toda la pantalla.
+
+El contador se impone en servidor antes de Gemini: 15 reservas en ventana móvil de 60 s y 500/día del Pacífico. Muestra solicitudes de esta app; no mide toda la actividad externa de Google. En desarrollo usa un archivo privado; Vercel exige Redis compartido y falla cerrado si no está configurado. La conexión real se completará con las credenciales introducidas personalmente por Miguel.
 
 ## Decisiones de Miguel
 
@@ -50,7 +60,7 @@ El servidor añadirá estas instrucciones en cada petición bajo su control. El 
 
 ## Dirección visual y de interacción
 
-La referencia será una terminal sobria y legible: fondo casi negro, texto verde, tipografía monoespaciada y amplio espacio para leer la conversación. No dependeremos de imágenes ni fuentes descargadas para que el diseño funcione.
+Dirección inicial, sustituida por la ampliación visual del paso 8: una terminal sobria y legible: fondo casi negro, texto verde, tipografía monoespaciada y amplio espacio para leer la conversación. La versión actual incorpora retratos generados y conservados como assets locales, sin descargar imágenes de terceros en tiempo de uso.
 
 Paleta inicial propuesta:
 
