@@ -1,5 +1,22 @@
 # Registro de comprobaciones
 
+## Paso 5 — Chat en memoria y respuestas simuladas
+
+- `npm test`: 31 tests pasando en dos archivos (6 de conteo/validación, 13 de routing y 12 de sesión). El proveedor se inyecta en los tests; la espera simulada utiliza temporizadores falsos.
+- Se prueban: rechazo de blancos y exceso, aceptación de 280 emojis compuestos, historial completo en orden, conservación de espacios/saltos, bloqueo síncrono de otro envío, finalización sin una vista suscrita y entrega de la sesión al volver.
+- Se simula un fallo después de una conversación válida, seguido por un reintento exitoso: borrador restaurado, historial anterior intacto y ningún mensaje duplicado. Se comprueban también respuestas vacías/de tipo incorrecto y aislamiento de copias. Esta comprobación de errores se hizo con Vitest; no se presenta como un fallo real de red o de Gemini.
+- En el navegador integrado se comprobaron blancos, 281 caracteres bloqueados, 280 emojis compuestos habilitados y Enter insertando un salto sin enviar. Los estados `aria-invalid` y contador coincidieron.
+- Se observó el indicador estático de escritura, botón deshabilitado y campo de solo lectura durante la espera. Tras ajustar el manejo del foco, este permanece en `message-input` durante y después de la respuesta.
+- Se salió hacia Acerca de inmediatamente después de enviar y se regresó después: estaban los cuatro mensajes de los dos turnos, incluida la respuesta que finalizó con Chat desmontado.
+- Se pegaron etiquetas `<strong>` y dos líneas con un emoji: el contenido se mostró literal, sin elementos strong creados en el log, con `white-space: pre-wrap`.
+- Una conversación de cuatro turnos terminó con ocho mensajes tras un doble click. En móvil, el desfase del scroll respecto del final fue de -0,5 px (redondeo subpíxel): el último turno quedó visible dentro del panel.
+- Se conservó un borrador sin enviar al navegar entre vistas. Una recarga dejó cero mensajes, borrador vacío y la vista inicial.
+- Se revisó Chat a 320×800, 768×1024 y 1024×900: el ancho del documento coincidió con el viewport. Se capturaron los tres tamaños con conversación real de la simulación y se restauró el viewport habitual del navegador.
+- La consola consultada no mostró errores ni advertencias. El footer conserva el copyright y el enlace a GitHub.
+- La simulación usa únicamente textos predefinidos y un temporizador local. Todavía no se implementaron fetch, la función ni Gemini; no se atribuyen pruebas de integración a este paso.
+
+Capturas: `chat-memoria-320.jpg`, `chat-memoria-768.jpg` y `chat-memoria-1024.jpg` en `docs/capturas/`.
+
 ## Preparación del entorno
 
 - Node.js instalado: v24.21.0; npm: 11.19.0; Git: 2.55.0.

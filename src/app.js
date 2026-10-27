@@ -1,4 +1,5 @@
-import { countCharacters, MAX_MESSAGE_LENGTH } from './utils.js';
+import { MAX_MESSAGE_LENGTH } from './utils.js';
+import { mountChat } from './chat.js';
 
 const arrow = '<span aria-hidden="true">↗</span>';
 
@@ -70,7 +71,7 @@ function renderChatView() {
         <div class="chat-log" role="log" aria-label="Mensajes de la conversación" aria-live="polite" aria-relevant="additions text">
           <div class="empty-state"><span class="empty-symbol" aria-hidden="true">&gt;_</span><h2>Todo empieza con una pregunta.</h2><p>Escribe lo que tienes en mente.<br>Este espacio será tu conversación con Morfeo.</p></div>
         </div>
-        <p class="chat-status" role="status">Vista previa · El envío aún no está disponible.</p>
+        <p class="chat-status" role="status">Modo de prueba · Respuestas simuladas.</p>
         <form class="composer" aria-label="Escribir un mensaje">
           <div class="composer-top"><label for="message-input">TU MENSAJE <span aria-hidden="true">&gt;</span></label><output id="character-count" for="message-input" aria-label="Caracteres escritos">0 / ${MAX_MESSAGE_LENGTH}</output></div>
           <textarea id="message-input" name="message" rows="3" placeholder="¿Qué te gustaría preguntarle a Morfeo?" aria-describedby="message-help message-error" spellcheck="true"></textarea>
@@ -96,8 +97,8 @@ function renderAboutView() {
         </section>
         <div class="about-details">
           <section class="detail-section" aria-labelledby="project-title"><span class="detail-number" aria-hidden="true">01</span><div><h2 id="project-title">Una experiencia de aprendizaje</h2><p>Proyecto Integrador del Módulo 3 de Full Stack de Henry. Desarrollado por Miguel Miranda con asistencia de Codex para explorar interfaces responsive, navegación SPA e integración de inteligencia artificial.</p></div></section>
-          <section class="detail-section" aria-labelledby="tech-title"><span class="detail-number" aria-hidden="true">02</span><div><h2 id="tech-title">Cómo está construido</h2><p>HTML, CSS y JavaScript con módulos. El proyecto integra Gemini a través de una función de Vercel para mantener la clave en el servidor, y utiliza Vitest para probar su lógica.</p><ul class="tech-list" aria-label="Tecnologías"><li>JavaScript</li><li>Gemini</li><li>Vercel</li><li>Vitest</li></ul></div></section>
-          <section class="detail-section" aria-labelledby="session-title"><span class="detail-number" aria-hidden="true">03</span><div><h2 id="session-title">Una conversación, una sesión</h2><p>Los mensajes se conservan en memoria hasta que recargas la aplicación. Cada mensaje tuyo admite hasta 280 caracteres. Las respuestas son una interpretación del personaje generada por IA.</p></div></section>
+          <section class="detail-section" aria-labelledby="tech-title"><span class="detail-number" aria-hidden="true">02</span><div><h2 id="tech-title">Cómo está construido</h2><p>HTML, CSS y JavaScript con módulos, con pruebas de lógica en Vitest. La integración prevista utilizará Gemini a través de una función de Vercel para mantener la clave en el servidor.</p><ul class="tech-list" aria-label="Tecnologías"><li>JavaScript</li><li>Gemini</li><li>Vercel</li><li>Vitest</li></ul></div></section>
+          <section class="detail-section" aria-labelledby="session-title"><span class="detail-number" aria-hidden="true">03</span><div><h2 id="session-title">Una conversación, una sesión</h2><p>Los mensajes se conservan en memoria hasta que recargas la aplicación. Cada mensaje tuyo admite hasta 280 caracteres. Por ahora, las respuestas están simuladas para probar la conversación; Gemini se integrará en los siguientes pasos.</p></div></section>
         </div>
       </div>
     </main>`;
@@ -143,26 +144,6 @@ function startMatrixRain(container, control) {
     document.removeEventListener('visibilitychange', syncMotion);
     container.replaceChildren();
   };
-}
-
-function setupComposerPreview() {
-  const form = document.querySelector('.composer');
-  const input = form.querySelector('textarea');
-  const counter = form.querySelector('output');
-  const error = form.querySelector('.input-error');
-  function updateCounter() {
-    const length = countCharacters(input.value);
-    const tooLong = length > MAX_MESSAGE_LENGTH;
-    counter.textContent = `${length} / ${MAX_MESSAGE_LENGTH}`;
-    counter.classList.toggle('is-over-limit', tooLong);
-    input.setAttribute('aria-invalid', String(tooLong));
-    error.hidden = !tooLong;
-    error.textContent = tooLong ? `Tu mensaje supera el límite de ${MAX_MESSAGE_LENGTH} caracteres.` : '';
-  }
-  function preventPreviewSubmit(event) { event.preventDefault(); }
-  input.addEventListener('input', updateCounter);
-  form.addEventListener('submit', preventPreviewSubmit);
-  return () => { input.removeEventListener('input', updateCounter); form.removeEventListener('submit', preventPreviewSubmit); };
 }
 
 const views = {
@@ -217,7 +198,7 @@ function renderRoute({ moveFocus = false } = {}) {
   if (route.page === 'home') {
     cleanupCurrentView = startMatrixRain(document.querySelector('.matrix-rain'), document.querySelector('.motion-control'));
   } else if (route.page === 'chat') {
-    cleanupCurrentView = setupComposerPreview();
+    cleanupCurrentView = mountChat(document.querySelector('.chat-view'));
   }
 
   if (moveFocus) {

@@ -45,3 +45,15 @@
 **Verificación:** Codex comprobó navegación, Atrás/Adelante, foco, acceso directo, recarga y rutas desconocidas en el navegador. Para comprobar descargas de documentos utilizó un proxy temporal de observación HTTP, porque la herramienta del navegador no exponía la medición de rendimiento intentada inicialmente. El proxy no modifica la app, no registra cabeceras ni cuerpos y se cerró al terminar. Se observaron cero descargas HTML adicionales durante los cambios SPA. El footer se revisó y capturó en tres anchos.
 
 **Referencia técnica consultada:** [Configuración y negative lookahead en Vercel](https://vercel.com/docs/project-configuration/vercel-json#negative-lookahead).
+
+## 5. Chat en memoria
+
+**Solicitud de Miguel:** “Avanza”, continuando el plan aprobado por pasos.
+
+**Trabajo de Codex:** sesión única en `chat.js`, array de mensajes, borrador y estados de espera/error; respuestas predefinidas asíncronas; montaje y limpieza de suscripciones; render seguro con textContent, validación compartida y scroll acotado. Se amplió la suite a 31 tests.
+
+**Decisiones:** separar el estado de la vista para conservar respuestas que terminan fuera de Chat; bloquear envíos antes del primer await; copiar el historial para el proveedor; revertir solo el turno fallido y restaurar el borrador. El futuro proveedor HTTP podrá sustituir la simulación manteniendo el contrato de la sesión.
+
+**Iteración:** la comprobación visual detectó pérdida del foco al deshabilitar el botón. Se movió al campo al enviar y se verificó que permaneciera allí durante/después de la respuesta. Se acotó la altura móvil del panel para que el historial largo tenga scroll interno. Acerca de explica el estado actual de simulación.
+
+**Verificación:** Codex comprobó la conversación, estados, navegación durante la espera, borrador, recarga, doble click, texto literal y tres tamaños en el navegador. Los fallos y reintentos se probaron con un proveedor inyectado en Vitest. Las respuestas de esta etapa no fueron generadas por Gemini y no demuestran comprensión contextual del personaje.

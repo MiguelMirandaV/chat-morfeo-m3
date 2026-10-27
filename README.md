@@ -4,9 +4,9 @@ Proyecto Integrador del Módulo 3 de Full Stack de Henry. Aplicación en desarro
 
 ## Estado del proyecto
 
-Los pasos 1–4 están completos: definición, entorno, interfaz responsive y routing SPA con History API. Inicio, Chat y Acerca de se renderizan sin recargar, con Atrás/Adelante, carga directa, normalización de rutas y vista interna de no encontrado. Home incluye una cascada de caracteres verdes con pausa. El contador de 280 caracteres está funcionando. Pasan 17 tests unitarios entre conteo y routing. El proyecto está vinculado a GitHub y al espacio Hobby de Vercel de Miguel.
+Los pasos 1–5 están completos: definición, entorno, interfaz responsive, routing SPA y chat en memoria con respuestas simuladas. Inicio, Chat y Acerca de se renderizan sin recargar, con Atrás/Adelante, carga directa, normalización de rutas y vista interna de no encontrado. Home incluye una cascada de caracteres verdes con pausa. El chat valida el máximo de 280 caracteres, muestra la espera y conserva conversación y borrador entre vistas. Pasan 31 tests unitarios. El proyecto está vinculado a GitHub y al espacio Hobby de Vercel de Miguel.
 
-El chat permite revisar el campo de escritura y su contador, pero el envío está deshabilitado hasta desarrollar la conversación en memoria en el paso 5. Gemini no está integrado todavía. La URL de entrega se documentará después de validar la aplicación completa.
+El envío está habilitado en modo de prueba: las respuestas son textos predefinidos, con una espera simulada de 1,1 segundos. Gemini y la función serverless se integrarán en las siguientes etapas. La URL de entrega se documentará después de validar la aplicación completa.
 
 ## Alcance acordado
 
@@ -50,7 +50,7 @@ Cuando se integre Gemini, copia el ejemplo:
 cp .env.example .env
 ```
 
-Completa `GEMINI_API_KEY` y `GEMINI_MODEL` en el archivo local. La elección del modelo se verificará en AI Studio. `.env` está ignorado por Git y no debe compartirse. La página de preparación actual no consume Gemini ni requiere una clave.
+Completa `GEMINI_API_KEY` y `GEMINI_MODEL` en el archivo local. La elección del modelo se verificará en AI Studio. `.env` está ignorado por Git y no debe compartirse. La simulación actual no consume Gemini ni requiere una clave.
 
 ## Desarrollo local
 
@@ -83,12 +83,25 @@ npm test
 npm run test:watch
 ```
 
-Actualmente pasan 17 tests en dos archivos:
+Actualmente pasan 31 tests en dos archivos:
 
-- `utils.test.js`: cuatro casos de conteo, incluyendo bordes 279/280/281, espacios/saltos de línea, tildes equivalentes y emojis compuestos.
-- `app.test.js`: trece casos de rutas, normalización, selección de enlaces, orden pushState/render, destinos repetidos y bloqueo de destinos externos en navigateTo.
+- `utils.test.js`: seis casos de conteo y validación, incluyendo bordes 279/280/281, espacios/saltos de línea, tildes equivalentes, emojis compuestos y tipos incorrectos.
+- `app.test.js`: trece casos de routing y doce de sesión: historial completo, bloqueo de concurrencia, cambios de suscripción, recuperación de fallos, respuestas inválidas, aislamiento de datos y espera simulada con reloj falso.
 
-Los tests del router importan funciones sin montar un DOM y utilizan mocks para verificar History API y el orden de las llamadas. Se añadirán pruebas de la lógica del chat, transformación de respuestas y errores con fetch mockeado al implementar esas funciones. Las pruebas actuales no verifican una integración Gemini que aún no existe.
+Los tests importan funciones sin montar un DOM y utilizan mocks para verificar History API, orden de llamadas y proveedores simulados. La recuperación de errores se comprueba con un proveedor que falla una vez y responde al reintentar, sin red. Las pruebas de fetch y del contrato serverless se añadirán al implementar esas funciones. Las pruebas actuales no verifican una integración Gemini que aún no existe.
+
+## Chat en memoria
+
+1. Abre `/chat`, escribe un mensaje y pulsa **Enviar**. Enter inserta una línea.
+2. Durante la espera, se muestra **Morfeo está escribiendo…**; el botón queda deshabilitado y el campo conserva el foco, temporalmente de solo lectura.
+3. Cambia a Inicio o Acerca de y regresa: los turnos y el borrador permanecen. Una respuesta pendiente puede finalizar fuera de Chat.
+4. Recarga la página para empezar con una sesión vacía.
+
+`chat.js` mantiene una sola sesión fuera del render. El router suscribe cada vista y la desuscribe al desmontarla, sin cancelar el turno. El historial contiene exclusivamente objetos `{ role, content }`; ni la espera ni los errores son mensajes. Cada solicitud recibe una copia del historial completo. En un fallo, se revierte el turno incompleto y se restaura el texto para reintentar sin duplicados. Los snapshots también son copias, para impedir cambios externos sobre el estado.
+
+El render añade solo mensajes nuevos y utiliza `textContent`, de modo que etiquetas pegadas en el chat se muestran como texto. El panel tiene altura acotada y scroll propio; cada mensaje nuevo desplaza la conversación al final. El contador usa grafemas y no trunca el contenido pegado.
+
+Evidencias del paso 5: [móvil 320 px](docs/capturas/chat-memoria-320.jpg), [tablet 768 px](docs/capturas/chat-memoria-768.jpg) y [escritorio 1024 px](docs/capturas/chat-memoria-1024.jpg).
 
 ## Navegación SPA
 
@@ -137,7 +150,7 @@ La ficha del personaje y los criterios completos están en [docs/alcance.md](doc
 
 ## Despliegue
 
-Se conectará este repositorio a Vercel en la etapa de publicación. Se configurarán las variables del servidor y se verificará tanto la SPA como la función real. La URL productiva y las instrucciones finales se documentarán después de comprobar ese despliegue.
+El repositorio ya está vinculado al proyecto de Vercel. En la etapa de publicación se configurarán las variables del servidor y se verificará tanto la SPA como la función real. La URL productiva y las instrucciones finales se documentarán después de comprobar ese despliegue.
 
 ## Evidencias y uso de IA
 

@@ -102,8 +102,11 @@ main:focus { outline: none; }
 .heading-aside { font-size: 0.65rem; line-height: 1.8; color: var(--muted); }
 .section-index { font-size: 0.62rem; color: var(--muted); }
 .chat-view { flex: 1; display: flex; flex-direction: column; padding-bottom: 1.5rem; }
-.chat-terminal { display: flex; flex-direction: column; min-height: 31rem; }
-.chat-log { overflow-y: auto; min-height: 12rem; flex: 1; padding: 1.5rem 1rem; scrollbar-color: var(--border) transparent; }
+.chat-terminal { display: flex; flex-direction: column; height: max(35rem, 70svh); }
+.chat-terminal > :not(.chat-log) { flex-shrink: 0; }
+.chat-log { overflow-y: auto; min-height: 8rem; flex: 1; padding: 1.5rem 1rem; scrollbar-color: var(--border) transparent; }
+.chat-log .message + .message { margin-top: 1.5rem; }
+.message-content { white-space: pre-wrap; }
 .empty-state { min-height: 11rem; display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center; padding-block: 0.5rem; }
 .empty-symbol { display: inline-block; font-size: 1.5rem; color: var(--accent); line-height: 1; margin-bottom: 1rem; }
 .empty-state h2 { font-size: 0.86rem; line-height: 1.6; font-weight: 500; }
