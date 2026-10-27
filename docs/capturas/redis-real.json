@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-27",
+  "geminiRequests": 0,
+  "results": [
+    {
+      "check": "20 reservas simultáneas con Lua real en claves aisladas",
+      "accepted": 15,
+      "rejected": 5,
+      "passed": true
+    },
+    {
+      "check": "Otro cliente lee las mismas reservas",
+      "minuteUsed": 15,
+      "dayUsed": 15,
+      "passed": true
+    },
+    {
+      "check": "Ventana móvil expira y permite una nueva reserva (reloj de prueba)",
+      "passed": true
+    },
+    {
+      "check": "Reserva 500 admitida y 501 bloqueada hasta medianoche del Pacífico",
+      "passed": true
+    },
+    {
+      "check": "Claves de prueba tienen expiración",
+      "passed": true
+    },
+    {
+      "check": "Contador real de la app sin reservas de QA",
+      "before": 0,
+      "after": 0,
+      "passed": true
+    },
+    {
+      "check": "Limpieza exclusiva de las dos claves de QA",
+      "deleted": 2,
+      "passed": true
+    }
+  ]
+}

@@ -4,9 +4,9 @@ Proyecto Integrador M3 de Full Stack de Henry. SPA en español para conversar co
 
 ## Estado
 
-Pasos 1–7 completos; paso 8 implementado y probado localmente con Gemini real. Se incorporó la ampliación solicitada por Miguel: entrada cyberpunk, retrato CGI, transición por la boca, acceso por cohorte y cuotas con intervención de Smith. **Falta conectar Redis de Upstash y verificarlo antes de publicar en Vercel.** Continúan pendientes la revisión final y el despliegue público del plan.
+Pasos 1–8 completos en el entorno local, con Gemini y Redis reales. Se incorporó la ampliación solicitada por Miguel: entrada cyberpunk, retrato CGI, transición por la boca, acceso por cohorte y cuotas con intervención de Smith. **Redis de Upstash conectado y verificado el 27 de octubre de 2026.** Continúan pendientes la revisión final y el despliegue público del plan.
 
-![Inicio](docs/capturas/paso-8-home-1280.jpg)
+![Inicio](docs/capturas/paso-8-home-1024.jpg)
 
 ## Funciones
 
@@ -123,7 +123,7 @@ npm test
 npm run test:watch
 ```
 
-**116 tests en tres archivos**, sin llamadas reales ni consumo de Gemini. Incluyen grafemas, router, historial, concurrencia, rollback, transporte, timeouts, respuestas bloqueadas/truncadas, firma/expiración, cohorte, origen, cuotas y archivo concurrente entre instancias. El contrato Redis se prueba con fetch sustituido; la conexión real queda pendiente.
+**116 tests en tres archivos**, sin llamadas reales ni consumo de Gemini. Incluyen grafemas, router, historial, concurrencia, rollback, transporte, timeouts, respuestas bloqueadas/truncadas, firma/expiración, cohorte, origen, cuotas y archivo concurrente entre instancias. El contrato Redis se prueba con fetch sustituido. Además, se verificó el script Lua contra Redis real con claves aisladas: concurrencia, persistencia, ventana móvil, límite diario y expiraciones; véase el registro de pruebas.
 
 Las comprobaciones de navegador se registran en [pruebas.md](docs/pruebas.md), distinguiendo Gemini real del entorno aislado usado para provocar 429 y verificar Smith sin gastar cuota. Los tests antiguos del banco de respuestas simuladas se retiraron al sustituirlo por Gemini.
 

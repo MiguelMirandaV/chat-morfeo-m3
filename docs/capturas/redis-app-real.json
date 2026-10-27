@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-27",
+  "serverRestarted": true,
+  "sessionStatus": 200,
+  "authenticated": true,
+  "quota": {
+    "minuteUsed": 0,
+    "minuteLimit": 15,
+    "dayUsed": 1,
+    "dayLimit": 500,
+    "minuteResetAt": 1793111470269,
+    "dayResetAt": 1793170800000,
+    "blocked": false,
+    "retryAt": 1793111470269,
+    "scope": "app"
+  },
+  "freshProcessMatchesServer": true,
+  "geminiRequestsInUiTest": 1
+}

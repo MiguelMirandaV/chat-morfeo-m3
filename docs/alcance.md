@@ -1,6 +1,6 @@
 # Paso 1 — Definición de Chat con Morfeo
 
-Estado actual: Gemini integrado y verificado localmente en el paso 8. Se incorporó la ampliación explícita de Miguel indicada a continuación. La conexión real de Redis y la publicación siguen pendientes. Esta ficha conserva también decisiones históricas de pasos anteriores; README y pruebas.md describen el comportamiento actual.
+Estado actual: Gemini integrado y verificado localmente en el paso 8. Se incorporó la ampliación explícita de Miguel indicada a continuación. Redis real se conectó y verificó el 27 de octubre de 2026; la publicación sigue pendiente. Esta ficha conserva también decisiones históricas de pasos anteriores; README y pruebas.md describen el comportamiento actual.
 
 ## Ampliación autorizada en el paso 8
 
@@ -10,7 +10,7 @@ Estas indicaciones posteriores amplían el alcance mínimo inicialmente acordado
 
 La cara es un retrato CGI prerenderizado con perspectiva CSS; la apertura usa dos imágenes alineadas, crossfade y zoom hacia la boca. No es una malla 3D articulada. La animación dura 1,8 s, permite omitir y respeta movimiento reducido. El efecto de corrupción de Smith es breve y no emplea destellos rápidos de toda la pantalla.
 
-El contador se impone en servidor antes de Gemini: 15 reservas en ventana móvil de 60 s y 500/día del Pacífico. Muestra solicitudes de esta app; no mide toda la actividad externa de Google. En desarrollo usa un archivo privado; Vercel exige Redis compartido y falla cerrado si no está configurado. La conexión real se completará con las credenciales introducidas personalmente por Miguel.
+El contador se impone en servidor antes de Gemini: 15 reservas en ventana móvil de 60 s y 500/día del Pacífico. Muestra solicitudes de esta app; no mide toda la actividad externa de Google. En desarrollo usa un archivo privado; Vercel exige Redis compartido y falla cerrado si no está configurado. Miguel introdujo personalmente las credenciales y la conexión real se verificó el 27 de octubre de 2026.
 
 ## Decisiones de Miguel
 

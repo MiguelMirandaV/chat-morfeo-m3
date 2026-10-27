@@ -1,6 +1,6 @@
 # Conectar el contador compartido de Upstash
 
-Estado: adaptador y pruebas con respuestas controladas implementados; faltan las credenciales de Miguel y la comprobación real. El desarrollo local ya funciona con archivo privado. Esta conexión se requiere antes de publicar la versión con cuotas en Vercel.
+Estado al 27 de octubre de 2026: credenciales guardadas por Miguel, conexión real verificada y servidor local usando Redis. Se comprobó el script Lua real en claves aisladas y una solicitud real a Gemini con reserva en Redis. Falta configurar las variables y verificar HTTPS en Vercel durante el paso 12. Los pasos de conexión siguientes quedan como referencia para una copia nueva.
 
 ## Por qué se necesita
 
@@ -36,4 +36,4 @@ Un envío fallido se mantiene contabilizado: el proveedor puede haberlo procesad
 
 ## Alcance de las pruebas
 
-Vitest comprueba el contrato REST y que un fallo no habilite llamadas al proveedor. La concurrencia y persistencia se prueban con el archivo local; el script Redis debe comprobarse contra la base real al conectar. No se presenta un mock de fetch como evidencia de una base operativa.
+Vitest comprueba el contrato REST y que un fallo no habilite llamadas al proveedor. La concurrencia y persistencia se probaron con el archivo local y, después de conectar, con el script Lua real en la base de Upstash. Se enviaron 20 reservas concurrentes a claves temporales de QA: 15 admitidas y 5 rechazadas. Otro cliente leyó las mismas reservas; se comprobaron ventana móvil, reservas 500/501 y expiraciones. Las dos claves de QA se eliminaron al finalizar; el contador real no cambió por estas pruebas. [Resultados](capturas/redis-real.json).

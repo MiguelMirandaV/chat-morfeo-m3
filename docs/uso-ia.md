@@ -113,3 +113,8 @@ Briefs aplicados (resumen de las indicaciones visuales):
 **Límite de la técnica visual:** retratos 3D renderizados, animados con CSS; no se atribuye al proyecto una malla WebGL o sincronización labial que no implementa.
 
 **Verificación:** 116 tests sin red; dos turnos reales de Gemini desde la interfaz con datos ficticios Ariadna/programación y memoria correcta. El escenario Smith se verificó en un servidor QA aislado con proveedor sustituido, 429, borrador, espera y reintento: no consumió cuota real. Se revisaron las tres vistas a 320/768/1024 con medidas reales y sin overflow horizontal. Se retiraron tres tests del banco simulado al retirar ese banco; se agregaron pruebas de los nuevos riesgos. Auditoría de dependencias de producción: cero vulnerabilidades reportadas. El contador Redis está probado por contrato con mocks, pendiente de conexión real; esto no equivale a haber validado una base externa.
+
+
+### Conexión real de Redis — 27 de octubre de 2026
+
+Miguel creó/reutilizó la base e introdujo personalmente sus credenciales en .env; confirmó el guardado. Codex comprobó presencia y conexión sin revelar valores, reinició el servidor y verificó el Lua real en claves temporales aisladas. Se probaron20 reservas concurrentes, persistencia entre clientes, ventana móvil,500/501 y expiraciones; se eliminaron solo las dos claves de QA. El contador real no se alteró por esas pruebas. Una solicitud real desde la interfaz a Gemini incrementó el contador diario a1, que permaneció después de reiniciar Vercel Dev y coincidió con una lectura de un proceso nuevo. No fue necesario cambiar código ni instalar paquetes. Se actualizaron documentación y evidencias sin guardar credenciales.

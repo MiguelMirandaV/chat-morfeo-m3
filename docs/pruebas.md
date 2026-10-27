@@ -156,3 +156,29 @@ La consola del chat real consultada no mostró errores ni advertencias. Se resta
 Auditoría tras agregar el SDK: npm audit --omit=dev informó0 vulnerabilidades. Los33 avisos transitivos de las herramientas de desarrollo conocidos en pasos anteriores no se corrigieron con cambios forzados; ese informe de producción no significa que todas las herramientas carezcan de avisos.
 
 Pendientes: conectar/probar Redis; consolidar la revisión de los pasos9–11; variables/despliegue y prueba HTTPS en12; auditoría final13. No se presenta este resultado local como entrega pública completa.
+
+
+## Cierre del paso 8 — Redis real (27 de octubre de 2026)
+
+Miguel confirmó «Redis guardado en .env». Se validó la conexión HTTPS con las credenciales privadas del archivo, sin mostrarlas ni modificar .env.local. Se reinició Vercel Dev para cargar las variables; Redis tiene prioridad sobre QUOTA_DRIVER=local.
+
+### Pruebas reales del script Lua
+
+Se ejecutó createRedisQuotaStore contra la base real. El transporte de QA sustituyó exclusivamente los dos nombres de claves por un prefijo aleatorio aislado; el script y su lógica fueron los mismos de producción. No llamó a Gemini ni reservó solicitudes en las claves reales.
+
+- 20 reservas concurrentes →15 admitidas y5 rechazadas.
+- Una nueva instancia del cliente leyó15/minuto y15/día, probando estado compartido fuera de la memoria del cliente.
+- Reloj controlado +60.001ms en las claves de QA →nueva reserva admitida con1/minuto y16/día.
+- Contador de QA preparado en499 →reserva500 admitida y501 bloqueada hasta medianoche del Pacífico.
+- Ambas claves tenían TTL positivo; al finalizar se eliminaron únicamente esas dos claves de prueba.
+- Antes/después de QA, el contador real permaneció0/día.
+
+[Resultados sin credenciales](capturas/redis-real.json).
+
+### Flujo completo y persistencia
+
+Desde una pestaña nueva de QA se abrió sesión con79 y se envió una pregunta genérica. Gemini respondió en dos frases; el contador real pasó0→1/día. Después se reinició otra vez el servidor. El navegador conservó el par de mensajes al navegar Acerca de→Chat y mostró1/500; una lectura independiente desde un proceso nuevo coincidió con POST action=session del servidor reiniciado: HTTP200, sesión válida y1/día. El contador de minuto expiró naturalmente y mostró0/15. No se borró ni reinició el contador real.
+
+[Comprobación HTTP y proceso independiente](capturas/redis-app-real.json), [captura después del reinicio](capturas/chat-redis-real.jpg). La consola consultada no mostró errores/advertencias. Total de esta comprobación: una llamada real a Gemini. No se modificó código de aplicación ni se agregaron dependencias. También se corrigió un enlace de captura inexistente en README; el resto de enlaces locales de README/docs se comprobó.
+
+Queda cerrado el paso8 en local con Gemini y Redis reales. Siguen pendientes9–13: consolidación de pruebas, revisión/documentación, variables en Vercel, verificación de despliegue HTTPS y auditoría final. Conectar localmente Redis no equivale a haber configurado las variables del proyecto publicado.
