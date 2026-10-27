@@ -4,11 +4,11 @@ Proyecto Integrador M3 de Full Stack de Henry. SPA en español para conversar co
 
 ## Estado
 
-Pasos 1–11 completos en el entorno local, con Gemini y Redis reales. Se incorporó la ampliación solicitada por Miguel: entrada cyberpunk, retrato CGI, transición por la boca, acceso por cohorte y cuotas con intervención de Smith. **Redis de Upstash conectado y verificado el 27 de octubre de 2026.** Revisión UX local completada. Documentación consolidada. Continúan pendientes el despliegue público y la auditoría final del plan.
+Pasos 1–12 completos, con Gemini y Redis reales en local y producción. Se incorporó la ampliación solicitada por Miguel: entrada cyberpunk, retrato CGI, transición por la boca, acceso por cohorte y cuotas con intervención de Smith. **Redis de Upstash conectado y verificado el 27 de octubre de 2026.** Revisión UX local completada. Documentación consolidada. Aplicación publicada y verificada bajo HTTPS. Pendiente la auditoría final del paso 13.
 
 **Repositorio:** [MiguelMirandaV/chat-morfeo-m3](https://github.com/MiguelMirandaV/chat-morfeo-m3).
 
-**Aplicación pública:** pendiente de despliegue y prueba en el paso 12. No hay todavía una URL productiva verificada para esta entrega.
+**Aplicación pública:** [chat-morfeo-m3.vercel.app](https://chat-morfeo-m3.vercel.app/home), verificada el 27 de octubre de 2026. Introduce la cohorte **79** para abrir el chat.
 
 ![Inicio en escritorio](docs/capturas/paso-8-home-1024.jpg)
 
@@ -190,7 +190,7 @@ Las capturas siguientes son locales, no de producción. Las de Home muestran la 
 
 [Guía completa para Vercel](docs/despliegue.md): conectar el repositorio al proyecto existente, conservar la raíz del repositorio, publicar `src`, configurar Node 24 y las cinco variables del servidor, desplegar y probar las rutas/función bajo HTTPS.
 
-La vinculación local de la CLI ya existe. En el paso 12 se comprobará también la conexión GitHub–Vercel, se configurarán las variables remotas y se registrarán URL, commit y resultado real. Las variables nuevas solo se aplican a despliegues nuevos. [Referencia de Vercel](https://vercel.com/docs/environment-variables).
+La conexión GitHub–Vercel con main, las variables Production/Preview y el chat real bajo HTTPS se verificaron en el paso 12. El commit funcional probado es `6b73ce1`; los cambios posteriores de este paso documentan esa versión. Las variables nuevas solo se aplican a despliegues nuevos. [Resultado de publicación](docs/produccion.md) · [Referencia de Vercel](https://vercel.com/docs/environment-variables).
 
 ## Problemas frecuentes
 
@@ -213,13 +213,14 @@ La vinculación local de la CLI ya existe. En el paso 12 se comprobará también
 - El cuerpo de la conversación admite hasta 64 KiB; se rechaza el exceso íntegro, sin recortar historial.
 - El retrato es CGI prerenderizado con animación CSS; no una malla articulada.
 - La revisión cubrió un navegador local y tamaños concretos. No se certificó con lector de pantalla real ni con todos los dispositivos.
-- HTTPS público, variables remotas y una instalación desde copia limpia siguen pendientes de los pasos 12–13.
+- HTTPS público y variables remotas verificados; la instalación desde copia limpia y la auditoría final corresponden al paso 13.
 
 ## Documentación y atribución
 
 - [Alcance y decisiones](docs/alcance.md).
 - [Arquitectura y conceptos del módulo](docs/arquitectura.md).
 - [Guía de despliegue](docs/despliegue.md).
+- [Producción verificada](docs/produccion.md).
 - [Mapa de evidencias para la entrega](docs/entrega.md).
 - [Registro de IA y prompts visuales](docs/uso-ia.md).
 - [Verificaciones](docs/pruebas.md).

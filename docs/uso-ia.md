@@ -168,3 +168,8 @@ Miguel pidió continuar cuando se corrigieran los puntos identificados. Codex co
 Miguel pidió continuar. Codex contrastó README y documentos con la consigna/rúbrica conservadas y con el código real. Se completaron clonación, instalación, uso, arquitectura, despliegue, variables y problemas frecuentes; se agregaron capturas identificadas como reales o controladas y un mapa de evidencia. Se sustituyó la ficha de alcance desactualizada por el alcance vigente y se aclaró la cronología de este registro.
 
 Se consultaron las ayudas de la CLI instalada y las guías oficiales de Vercel para Git, configuración, variables y protección. La guía de publicación es preparación; no se afirmó una URL productiva ni acciones remotas no ejecutadas. No se cambió código funcional, no se hicieron nuevas generaciones Gemini ni operaciones Redis. La validación documental se registra en pruebas.md.
+
+
+## 12. Publicación real
+
+Miguel pidió continuar y después solicitó estado por la demora. Codex configuró las cinco variables en Vercel por stdin y comprobó la conexión GitHub/main, sin mostrar valores. La inspección previa detectó .env en la subida CLI: se agregó .vercelignore antes de desplegar. La prueba real detectó timeouts de 16 s; se midieron, se ampliaron plazos y se volvió a comprobar la lógica y dos turnos públicos correctos. Se registran también intentos fallidos, consumo y límites; no se presenta una respuesta simulada como Gemini. La recarga de una pestaña con posible borrador fue rechazada por revisión automática; se usó una pestaña nueva sin perder estado. Evidencia final en produccion.md.

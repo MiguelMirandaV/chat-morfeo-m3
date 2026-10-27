@@ -209,3 +209,8 @@ Se contrastaron la consigna y las ocho categorías de la rúbrica con las instru
 Validación documental: 11 documentos Markdown, 84 enlaces relativos comprobados, 0 destinos ausentes. Las seis variables necesarias coinciden con .env.example y sus cuatro valores privados están vacíos; scripts documentados presentes y engine 24.x. Se consultaron la ayuda de la CLI 65.3.1 instalada y documentación oficial de Vercel. [Resultado estructurado](capturas/paso-11-documentacion.json).
 
 Sin cambios funcionales ni dependencias; se conserva la última suite 130/130 del paso 10, sin repetirla para estas ediciones de texto. No se hicieron llamadas Gemini/Redis. La instalación desde copia limpia y la prueba HTTPS pública permanecen pendientes. Paso 11 documental completo; siguiente 12: configuración remota y publicación real.
+
+
+## Paso 12 — Producción HTTPS
+
+Vercel y GitHub conectados, variables Production/Preview configuradas y despliegue real verificado. Se corrigieron exclusiones de subida y márgenes de timeout. 130/130 tests; tres rutas públicas, siete assets coincidentes, siete rutas privadas 404, contratos API, dos turnos Gemini con contexto, Redis 10→12 y nueve combinaciones responsive. [Registro, hallazgos y límites](produccion.md). Paso 12 completo; siguiente 13: instalación limpia y auditoría de entrega.

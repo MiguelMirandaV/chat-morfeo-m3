@@ -1,6 +1,6 @@
 # Desplegar Chat con Morfeo en Vercel
 
-**Preparación documental del paso 11. Publicación y verificación pendientes del paso 12.** Esta guía describe qué configurar; no demuestra que ya esté configurado en la cuenta ni que exista una URL pública operativa.
+**Paso 12 completado el 27 de octubre de 2026.** [Aplicación pública](https://chat-morfeo-m3.vercel.app/home) y [pruebas realizadas](produccion.md). Los pasos siguientes quedan como instrucciones para reproducir la configuración.
 
 ## 1. Comprobar el repositorio
 

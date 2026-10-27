@@ -1,0 +1,10 @@
+{
+  "fileCount": 79,
+  "totalSize": 8901594,
+  "privateInputsIncluded": 0,
+  "environmentExampleIncluded": true,
+  "configFiles": [
+    ".vercelignore",
+    "vercel.json"
+  ]
+}

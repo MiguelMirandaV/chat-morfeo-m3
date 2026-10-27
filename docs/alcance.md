@@ -53,6 +53,6 @@ HTML/CSS/JavaScript ES modules, Vercel Function Node 24, Gemini SDK y Vitest. No
 
 ## Aceptación y límites
 
-[Mapa de las ocho categorías](entrega.md), [revisión UX](revision-ux.md) y [tests](pruebas-unitarias.md) relacionan requisitos con evidencia. Gemini y Redis se verificaron localmente. La publicación HTTPS y la auditoría desde una copia limpia siguen pendientes de los pasos 12–13. El criterio Excelente orienta la revisión; Henry determina la calificación final.
+[Mapa de las ocho categorías](entrega.md), [revisión UX](revision-ux.md) y [tests](pruebas-unitarias.md) relacionan requisitos con evidencia. Gemini y Redis se verificaron localmente. La publicación HTTPS se verificó en el paso 12; la auditoría desde una copia limpia sigue pendiente del paso 13. El criterio Excelente orienta la revisión; Henry determina la calificación final.
 
 El modelo puede fallar o repetirse. La cuota de esta app no mide llamadas externas ni tokens. La revisión responsive cubre tamaños concretos, sin certificar todos los dispositivos o lectores de pantalla.

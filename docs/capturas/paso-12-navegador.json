@@ -1,0 +1,75 @@
+{
+  "url": "https://chat-morfeo-m3.vercel.app",
+  "runtimeCommit": "6b73ce13d3e9207171236e37c3dfaee3cd344b47",
+  "quotaBefore": "10 / 500",
+  "backPreserves": true,
+  "forwardTitle": "Acerca de · Chat con Morfeo",
+  "messages": [
+    "TÚ >Me llamo Ariadna y estoy aprendiendo JavaScript. ¿Cómo puedo practicar mejor?",
+    "MORFEO >La mejor forma de practicar JavaScript es construyendo proyectos pequeños que resuelvan problemas reales para ti, Ariadna. Escribe código todos los días, aunque sea una sola función, y desglosa los errores con paciencia en lugar de evitarlos. ¿Hay alguna pequeña aplicación o idea que te gustaría intentar programar primero?",
+    "TÚ >¿Cómo me llamo y qué lenguaje estoy aprendiendo?",
+    "MORFEO >Te llamas Ariadna y estás aprendiendo JavaScript. La constancia en la práctica diaria te dará el dominio que buscas sobre ese lenguaje."
+  ],
+  "quotaAfter": "12 / 500",
+  "status": "CANAL ABIERTO · Morfeo está al otro lado.",
+  "responsive": [
+    {
+      "route": "home",
+      "requested": 320,
+      "images": true,
+      "scrollWidth": 320,
+      "width": 320
+    },
+    {
+      "route": "about",
+      "requested": 320,
+      "scrollWidth": 320,
+      "width": 320
+    },
+    {
+      "route": "chat",
+      "requested": 320,
+      "scrollWidth": 320,
+      "width": 320
+    },
+    {
+      "route": "home",
+      "requested": 768,
+      "images": true,
+      "scrollWidth": 768,
+      "width": 768
+    },
+    {
+      "route": "about",
+      "requested": 768,
+      "scrollWidth": 768,
+      "width": 768
+    },
+    {
+      "route": "chat",
+      "requested": 768,
+      "scrollWidth": 768,
+      "width": 768
+    },
+    {
+      "route": "home",
+      "requested": 1024,
+      "images": true,
+      "scrollWidth": 1024,
+      "width": 1024
+    },
+    {
+      "route": "about",
+      "requested": 1024,
+      "scrollWidth": 1024,
+      "width": 1024
+    },
+    {
+      "route": "chat",
+      "requested": 1024,
+      "scrollWidth": 1024,
+      "width": 1024
+    }
+  ],
+  "logs": []
+}

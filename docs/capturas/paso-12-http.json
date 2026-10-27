@@ -1,0 +1,167 @@
+{
+  "base": "https://chat-morfeo-m3.vercel.app",
+  "date": "2026-10-27T19:41:13.793Z",
+  "anonymousHttp": true,
+  "realGeminiRequestsFromThisScript": 0,
+  "routes": [
+    {
+      "path": "/home",
+      "status": 200,
+      "html": true,
+      "appShell": true,
+      "credentialsPresent": false
+    },
+    {
+      "path": "/chat",
+      "status": 200,
+      "html": true,
+      "appShell": true,
+      "credentialsPresent": false
+    },
+    {
+      "path": "/about",
+      "status": 200,
+      "html": true,
+      "appShell": true,
+      "credentialsPresent": false
+    }
+  ],
+  "assets": [
+    {
+      "path": "/app.js",
+      "status": 200,
+      "contentType": "application/javascript; charset=utf-8",
+      "matchesLocalSource": true,
+      "credentialsPresent": false
+    },
+    {
+      "path": "/chat.js",
+      "status": 200,
+      "contentType": "application/javascript; charset=utf-8",
+      "matchesLocalSource": true,
+      "credentialsPresent": false
+    },
+    {
+      "path": "/utils.js",
+      "status": 200,
+      "contentType": "application/javascript; charset=utf-8",
+      "matchesLocalSource": true,
+      "credentialsPresent": false
+    },
+    {
+      "path": "/styles.css",
+      "status": 200,
+      "contentType": "text/css; charset=utf-8",
+      "matchesLocalSource": true,
+      "credentialsPresent": false
+    },
+    {
+      "path": "/assets/morpheus-closed.png",
+      "status": 200,
+      "contentType": "image/png",
+      "matchesLocalSource": true,
+      "credentialsPresent": false
+    },
+    {
+      "path": "/assets/morpheus-open.png",
+      "status": 200,
+      "contentType": "image/png",
+      "matchesLocalSource": true,
+      "credentialsPresent": false
+    },
+    {
+      "path": "/assets/agent-smith.png",
+      "status": 200,
+      "contentType": "image/png",
+      "matchesLocalSource": true,
+      "credentialsPresent": false
+    }
+  ],
+  "privatePaths": [
+    {
+      "path": "/.env",
+      "status": 404,
+      "credentialsPresent": false,
+      "privateFileDelivered": false
+    },
+    {
+      "path": "/.env.local",
+      "status": 404,
+      "credentialsPresent": false,
+      "privateFileDelivered": false
+    },
+    {
+      "path": "/.data/quota.json",
+      "status": 404,
+      "credentialsPresent": false,
+      "privateFileDelivered": false
+    },
+    {
+      "path": "/package.json",
+      "status": 404,
+      "credentialsPresent": false,
+      "privateFileDelivered": false
+    },
+    {
+      "path": "/vercel.json",
+      "status": 404,
+      "credentialsPresent": false,
+      "privateFileDelivered": false
+    },
+    {
+      "path": "/.git/config",
+      "status": 404,
+      "credentialsPresent": false,
+      "privateFileDelivered": false
+    },
+    {
+      "path": "/docs/uso-ia.md",
+      "status": 404,
+      "credentialsPresent": false,
+      "privateFileDelivered": false
+    }
+  ],
+  "api": [
+    {
+      "case": "Sin acceso",
+      "status": 401,
+      "code": "AUTH_REQUIRED"
+    },
+    {
+      "case": "Cohorte78",
+      "status": 403,
+      "code": "INVALID_COHORT"
+    },
+    {
+      "case": "Cohorte79",
+      "status": 200,
+      "authenticated": true,
+      "cookie": {
+        "httpOnly": true,
+        "secure": true,
+        "sameSiteStrict": true
+      },
+      "credentialsInBody": false
+    },
+    {
+      "case": "281 caracteres",
+      "status": 400,
+      "code": "INVALID_MESSAGE"
+    },
+    {
+      "case": "Origen ajeno",
+      "status": 403,
+      "code": "INVALID_ORIGIN"
+    },
+    {
+      "case": "GET rechazado",
+      "status": 405,
+      "allow": "POST"
+    },
+    {
+      "case": "Tipo no JSON",
+      "status": 415
+    }
+  ],
+  "passed": true
+}
