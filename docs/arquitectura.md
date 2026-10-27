@@ -39,6 +39,7 @@ El desbloqueo se hace antes de este recorrido: `{action:"unlock",cohort:"79"}` o
 | `scripts/prepare-assets.js` | Copia los módulos Three.js fijados y su licencia a `src/vendor`, generado e ignorado en Git. |
 | `src/chat.js` | `createCharacterSession` coordina tres `createChatSession`, con mensajes/borrador/error separados; `postApi` gestiona fetch, JSON y errores; `mountChat`/`mountAccess` conectan estado y DOM. |
 | `src/history-storage.js` | Valida registros versionados, guarda/restaura, protege borradores, coordina conflictos y borrado de la clave propia. |
+| `src/chat-controls.js` | Reconoce peticiones directas de cambio y decide Enter/Shift+Enter/composición; no interpreta respuestas del modelo. |
 | `src/characters.js` | Identificadores permitidos y metadatos públicos, sin prompts. |
 | `src/utils.js` | `countCharacters` con Intl.Segmenter y `getMessageError`; la función backend reutiliza la validación. |
 | `api/functions.js` | `createHandler`, acceso firmado, validación del historial, reserva, adaptador Gemini y parseo. Usa dependencias inyectables para ensayar fallos sin red. |
@@ -88,3 +89,7 @@ El contrato de generación es `{character, messages}`, con `character` limitado 
 La separación de historiales se implementa en el cliente; el servidor valida la estructura del historial recibido y no conserva conversaciones. Las cuotas Redis siguen siendo globales entre personajes. El estado se guarda mediante un controlador de localStorage independiente de la vista. La clave contiene selección, mensajes, borradores y marcas de interrupción; los errores transitorios, cuotas y credenciales quedan fuera. [Formato, fallos y coordinación entre pestañas](persistencia.md). La elección inicial permite revisar las voces; el cambio pedido dentro del chat tendrá su control y confirmación en la etapa de terminal.
 
 Los prompts tienen una base compartida de conversación, brevedad y límites de ficción. Morfeo acompaña la reflexión y el aprendizaje; el Oráculo explora elecciones con calidez sin predecir el futuro real; Trinity propone acciones concretas sin fingir haberlas ejecutado. La configuración de Gemini y los tiempos de espera se mantienen.
+
+## Transferencia de canal
+
+El coordinador separa un control de cambio de una pregunta antes de llamar al proveedor. Conserva una intención privada con origen, destino, borrador y revisión. Confirmar limpia únicamente el comando del origen y selecciona el destino en una sola notificación; cancelar conserva el texto. No hay mensajes de control en el contexto Gemini. Las intenciones no se serializan: recargar exige volver a solicitar y confirmar. Una restauración invalida cualquier intención anterior. [Detalle](terminal.md).

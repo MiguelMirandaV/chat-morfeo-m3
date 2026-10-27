@@ -1,8 +1,12 @@
 # Pruebas unitarias
 
-## Iteración 2: persistencia
+## Iteración 2: terminal
 
-Resultado vigente: **188 casos en cinco archivos**. `tests/history-storage.test.js` agrega 36 casos de formato externo, límite global, guardado, restauración, envíos interrumpidos, borrado seguro, fallos, conflictos y retirada del controlador al cerrar una página. Usa almacenamiento y proveedor sustituidos; no consume Gemini ni Redis.
+Resultado vigente: **220 casos en seis archivos**. `tests/chat-controls.test.js` añade 32 casos sobre solicitudes directas, falsas menciones, comandos inválidos, confirmación/cancelación, restauración, aislamiento del proveedor, concurrencia y reglas de teclado/composición. La prueba de IME usa eventos representados por objetos; no equivale a una sesión física con todos los teclados.
+
+## Registro de persistencia
+
+Resultado de esa etapa: **188 casos en cinco archivos**. `tests/history-storage.test.js` agrega 36 casos de formato externo, límite global, guardado, restauración, envíos interrumpidos, borrado seguro, fallos, conflictos y retirada del controlador al cerrar una página. Usa almacenamiento y proveedor sustituidos; no consume Gemini ni Redis.
 
 ## Registro de la etapa de personajes
 

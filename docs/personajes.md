@@ -17,7 +17,7 @@ Comparten reglas de brevedad, atención al contexto, respuestas originales y dis
 3. Al elegir, adapta nombre del canal, autor, texto de espera y campo de escritura. El Oráculo y Trinity muestran emblemas, sin reutilizar el retrato de Morfeo.
 4. Envía el historial de ese personaje y recibe su respuesta.
 
-La selección inicial es funcional; el diseño completo de terminal, cambio solicitado dentro de la conversación y tarjetas de Acerca de se completarán en su etapa. Los mensajes y borradores se conservan por personaje en localStorage cuando el navegador permite guardar. [Restauración, borrado y fallos de almacenamiento](persistencia.md).
+Para cambiar, escribo «Quiero hablar con Trinity» o `/hablar trinity` y confirmo. Acerca de presenta las tres voces con retratos vectoriales originales. [Reglas de transferencias y teclado](terminal.md). Los mensajes y borradores se conservan por personaje en localStorage cuando el navegador permite guardar. [Restauración, borrado y fallos de almacenamiento](persistencia.md).
 
 ## Contrato de generación
 
@@ -64,7 +64,7 @@ La separación es del estado cliente. El backend recibe y valida el historial en
 
 ## Verificación
 
-- **152 tests** pasan; 22 nuevos cubren riesgos de identidad, contrato, separación, concurrencia y errores. El test de cuotas alterna los tres personajes y rechaza la reserva 16.
+- En la etapa de personajes pasaron **152 tests**; 22 nuevos cubren riesgos de identidad, contrato, separación, concurrencia y errores. El test de cuotas alterna los tres personajes y rechaza la reserva 16.
 - Se probaron tres respuestas reales por la interfaz local, una por personaje, usando preguntas y nombres ficticios. Las tres terminaron correctamente; las reservas diarias compartidas pasaron de **30 a 33**.
 - Morfeo explicó cómo expresar la lógica en lenguaje sencillo al atascarse con JavaScript. El Oráculo comparó concentración y debate al elegir cómo estudiar. Trinity propuso reproducir el error y revisar la consola.
 - Esta muestra comprueba integración y ofrece una primera observación de voz. No reemplaza la evaluación más amplia de la etapa de pruebas.

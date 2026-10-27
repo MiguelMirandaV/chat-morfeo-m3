@@ -210,3 +210,9 @@ Codex implementó la clave versionada morfeo.conversations.v1, validación exter
 La revisión detectó dos situaciones que se corrigieron: el callback de un envío podía escribir al cerrar la página, y el aborto de fetch podía retirar la marca de interrupción antes de pagehide. Se añadió limpieza del controlador y se conserva la marca ante errores de red/timeout. También se corrigió el borrado de una conversación cuyo borrador excedía el límite de almacenamiento.
 
 Se usaron escenarios locales con datos ficticios y proveedor/cuotas simulados para revisar recarga, interrupción sin reenvío, diálogo y cancelación, conflicto entre pestañas, guardado bloqueado y contenido oculto antes de 79. El borrado efectivo y sus fallos se comprobaron en tests con almacenamiento sustituido. La suite alcanza 188 casos. Se reinició la instancia Vercel Dev propia porque su manifiesto inicial no incluía history-storage.js; se comprobó después que respondía 200 con el tipo JavaScript correcto. No se generaron respuestas Gemini para esta etapa.
+
+## Iteración 2 — Terminal y teclado
+
+Usé Codex para implementar peticiones directas de transferencia con confirmación, Enter/Shift+Enter y tres tarjetas con SVG originales. Revisé el cambio como un control local, separado del contexto del modelo: cancelar conserva el comando, confirmar recupera solo el historial del destino y las intenciones no se guardan. Se corrigió el selector del texto descriptivo del diálogo y se usó Object.hasOwn para rechazar nombres heredados como constructor.
+
+La suite alcanza 220 casos; las pruebas de UI usaron respuestas simuladas en un puerto propio, sin nuevas generaciones Gemini ni operaciones Redis. Se comprobaron Enter, Shift+Enter, Escape/foco, bloqueo de 281 caracteres, transferencias, restauración y tarjetas a 320/768/1024 px. La composición IME se verificó como lógica de eventos, no con teclado físico. Smith 3+2 sigue pendiente de su etapa.

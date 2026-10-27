@@ -21,8 +21,9 @@ Diseñé la interfaz como una terminal de Zion. En esta rama construí una entra
 ## Qué puedes hacer
 
 - Navegar por **Inicio**, **Chat** y **Acerca de** sin recargar la página; usar Atrás y Adelante.
-- Elegir a **Morfeo, el Oráculo o Trinity** después de desbloquear el canal.
+- Elegir a **Morfeo, el Oráculo o Trinity** después de desbloquear el canal y solicitar un cambio desde la conversación, con confirmación.
 - Conversar mediante Gemini, enviando el historial completo del personaje elegido en cada petición. Los borradores y errores también se mantienen separados.
+- Enviar con **Enter** o el botón; agregar líneas con **Shift+Enter**.
 - Escribir hasta **280 caracteres visibles**, incluidos espacios, saltos y emojis compuestos. El texto pegado que excede el límite se conserva para corregirlo.
 - Ver el estado de escritura y recuperar el borrador si una respuesta falla.
 - Recuperar conversaciones y borradores al recargar; borrar una conversación o todas, con confirmación.
@@ -30,13 +31,13 @@ Diseñé la interfaz como una terminal de Zion. En esta rama construí una entra
 - Consultar las solicitudes compartidas de la app: **15 en una ventana móvil de 60 segundos y 500 al día**.
 - Ver la intervención visual de Smith cuando el servidor rechaza una solicitud por cuota.
 
-En esta rama, la elección inicial ya funciona. El cambio de personaje solicitado dentro del chat se incorporará en su etapa. Por ahora uso el botón **Enviar**; Enter agrega una línea. Guardo historiales y borradores por personaje en localStorage; se recuperan al volver al mismo sitio. El indicador muestra si el navegador pudo guardarlos. La ampliación que estoy desarrollando tiene sus reglas en [el alcance de la iteración](docs/iteracion-2.md).
+Guardo historiales y borradores por personaje en localStorage; se recuperan al volver al mismo sitio. El indicador muestra si el navegador pudo guardarlos. Para cambiar, escribe **«Quiero hablar con Trinity»** o **`/hablar trinity`** y confirma. Acerca de presenta las tres voces con retratos vectoriales originales. [Explico las reglas de esta iteración](docs/iteracion-2.md).
 
 ## Cómo usar la aplicación
 
 1. Abre la aplicación e introduce **79**.
 2. Entra al canal; puedes omitir la transición con el botón o Escape.
-3. Elige a **Morfeo, el Oráculo o Trinity**, escribe una pregunta y pulsa **Enviar**.
+3. Elige a **Morfeo, el Oráculo o Trinity**, escribe una pregunta y presiona **Enter** o pulsa **Enviar**. Usa **Shift+Enter** para agregar una línea.
 4. Espera la respuesta. Ante un fallo, revisa el mensaje de estado y reintenta con el borrador conservado.
 5. Puedes navegar o recargar y recuperar lo guardado en ese mismo navegador y sitio. Un envío interrumpido vuelve como borrador; no se reenvía automáticamente.
 6. Usa **Borrar esta conversación** o **Borrar todos los historiales** y confirma si quieres eliminarlos.
@@ -54,6 +55,7 @@ src/app.js             Vistas, routing, foco y transición
 src/matrix-scene.js    Rostro procedural, lluvia 3D, fallback y limpieza
 scripts/prepare-assets.js Copia local de módulos Three.js y licencia
 src/chat.js            Conversaciones separadas, peticiones HTTP y render del chat
+src/chat-controls.js   Peticiones de cambio y reglas del teclado
 src/characters.js      Identificadores y metadatos públicos de personajes
 src/history-storage.js Validación, guardado, restauración y conflictos de localStorage
 src/utils.js           Conteo y validación de caracteres
@@ -120,7 +122,7 @@ npm test
 npm run test:watch
 ```
 
-Incluí **188 pruebas en cinco archivos** para validar caracteres, navegación, historiales separados, identidad, estados, errores, transporte, acceso, cuotas y contratos de Gemini. Uso mocks para que la suite no consuma Gemini ni Redis reales y restauro el entorno entre pruebas.
+Incluí **220 pruebas en seis archivos** para validar caracteres, navegación, historiales separados, identidad, estados, errores, transporte, acceso, cuotas y contratos de Gemini. Uso mocks para que la suite no consuma Gemini ni Redis reales y restauro el entorno entre pruebas.
 
 [Personajes y contrato](docs/personajes.md) · [Detalle de las pruebas](docs/pruebas-unitarias.md) · [Comprobaciones y límites](docs/pruebas.md).
 
