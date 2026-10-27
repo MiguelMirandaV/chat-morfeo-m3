@@ -4,7 +4,7 @@ Proyecto Integrador M3 de Full Stack de Henry. SPA en español para conversar co
 
 ## Estado
 
-Pasos 1–9 completos en el entorno local, con Gemini y Redis reales. Se incorporó la ampliación solicitada por Miguel: entrada cyberpunk, retrato CGI, transición por la boca, acceso por cohorte y cuotas con intervención de Smith. **Redis de Upstash conectado y verificado el 27 de octubre de 2026.** Continúan pendientes la revisión final y el despliegue público del plan.
+Pasos 1–10 completos en el entorno local, con Gemini y Redis reales. Se incorporó la ampliación solicitada por Miguel: entrada cyberpunk, retrato CGI, transición por la boca, acceso por cohorte y cuotas con intervención de Smith. **Redis de Upstash conectado y verificado el 27 de octubre de 2026.** Revisión UX local completada. Continúan pendientes la consolidación documental, el despliegue público y la auditoría final del plan.
 
 ![Inicio](docs/capturas/paso-8-home-1024.jpg)
 
@@ -139,6 +139,7 @@ Proyecto vinculado a GitHub y Vercel Hobby. En el paso 12 se configurarán las v
 - [Registro de IA y prompts visuales](docs/uso-ia.md).
 - [Verificaciones](docs/pruebas.md).
 - [Pruebas unitarias consolidadas](docs/pruebas-unitarias.md).
+- [Revisión UX y casos borde](docs/revision-ux.md).
 - [Redis](docs/redis.md).
 
 Miguel eligió personaje, dirección visual, requisitos y creó/guardó la clave. Codex implementó el código, los retratos generados y las pruebas. El uso de Matrix es una interpretación académica; no es un producto oficial.

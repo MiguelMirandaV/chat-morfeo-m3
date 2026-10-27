@@ -58,7 +58,7 @@ export async function postApi(payload, { fetchImpl = globalThis.fetch, timeoutMs
         : response.status === 429 ? 'RATE_LIMITED' : response.status === 400 ? 'INVALID_HISTORY'
         : response.status >= 500 ? 'SERVICE_UNAVAILABLE' : 'REQUEST_REJECTED';
       const code = typeof data?.error?.code === 'string' && Object.hasOwn(requestErrors, data.error.code) ? data.error.code : fallback;
-      if (code === 'AUTH_REQUIRED') { access.authenticated = false; publishAccess(); }
+      if (code === 'AUTH_REQUIRED') { access.authenticated = false; access.error = requestErrors.AUTH_REQUIRED; publishAccess(); }
       throw new ChatRequestError(code);
     }
     return data;
@@ -169,7 +169,8 @@ export function mountChat(root, chatSession = session) {
   const button = form.querySelector('button');
   const smith = root.querySelector('.smith-intrusion');
   const terminal = root.querySelector('.chat-terminal');
-  let renderedCount = 0, scrollFrame = 0, lastIntercepted = false;
+  let renderedCount = 0, scrollFrame = 0, focusFrame = 0, lastIntercepted = false;
+  let wasAuthenticated = access.authenticated === true;
   let state = chatSession.getState();
   let refreshing = false, mounted = true, refreshedAt = 0;
   function append({ role, content }) {
@@ -179,13 +180,20 @@ export function mountChat(root, chatSession = session) {
     const text = document.createElement('p'); text.className = 'message-content'; text.textContent = content;
     article.append(author, text); log.append(article);
   }
+  function writeText(node, text) { if (node.textContent !== text) node.textContent = text; }
   function render() {
     if (!mounted) return;
     const authenticated = access.authenticated === true;
     consoleView.hidden = !authenticated;
     gate.hidden = authenticated;
+    if (wasAuthenticated && !authenticated) {
+      // Espera a que el formulario haya habilitado su input al cambiar la sesión.
+      cancelAnimationFrame(focusFrame);
+      focusFrame = requestAnimationFrame(() => { if (mounted && access.authenticated !== true) gate.querySelector('input').focus(); });
+    }
+    wasAuthenticated = authenticated;
     const previous = renderedCount;
-    if (state.messages.length < renderedCount) { log.replaceChildren(); renderedCount = 0; }
+    while (state.messages.length < renderedCount) { log.lastElementChild?.remove(); renderedCount -= 1; }
     if (state.messages.length && !renderedCount) log.replaceChildren();
     for (const message of state.messages.slice(renderedCount)) append(message);
     renderedCount = state.messages.length;
@@ -194,14 +202,14 @@ export function mountChat(root, chatSession = session) {
     if (input.value !== state.draft) input.value = state.draft;
     input.readOnly = state.pending;
     const length = countCharacters(state.draft), tooLong = length > MAX_MESSAGE_LENGTH;
-    count.textContent = `${length} / ${MAX_MESSAGE_LENGTH}`;
+    writeText(count, `${length} / ${MAX_MESSAGE_LENGTH}`);
     count.classList.toggle('is-over-limit', tooLong);
     input.setAttribute('aria-invalid', String(tooLong));
     fieldError.hidden = !tooLong;
-    fieldError.textContent = tooLong ? getMessageError(state.draft) : '';
+    writeText(fieldError, tooLong ? getMessageError(state.draft) : '');
     const intercepted = access.interceptedUntil > Date.now();
     button.disabled = !authenticated || state.pending || intercepted || Boolean(getMessageError(state.draft));
-    button.textContent = state.pending ? 'TRANSMITIENDO…' : intercepted ? 'CANAL BLOQUEADO' : state.error ? 'REINTENTAR ↗' : 'ENVIAR ↗';
+    writeText(button, state.pending ? 'TRANSMITIENDO…' : intercepted ? 'CANAL BLOQUEADO' : state.error ? 'REINTENTAR ↗' : 'ENVIAR ↗');
     status.classList.toggle('chat-status--loading', state.pending);
     status.classList.toggle('chat-status--error', Boolean(state.error));
     const statusText = state.pending ? 'Morfeo está escribiendo…' : intercepted ? 'SEÑAL INTERCEPTADA · Tu mensaje está a salvo.' : state.error || 'CANAL ABIERTO · Morfeo está al otro lado.';
@@ -215,10 +223,10 @@ export function mountChat(root, chatSession = session) {
     }
     lastIntercepted = intercepted;
     const seconds = Math.max(0, Math.ceil((access.interceptedUntil - Date.now()) / 1000));
-    root.querySelector('[data-smith-countdown]').textContent = seconds >= 3600 ? `${Math.ceil(seconds / 3600)} h` : seconds >= 60 ? `${Math.ceil(seconds / 60)} min` : `${seconds} s`;
+    writeText(root.querySelector('[data-smith-countdown]'), seconds >= 3600 ? `${Math.ceil(seconds / 3600)} h` : seconds >= 60 ? `${Math.ceil(seconds / 60)} min` : `${seconds} s`);
     const quota = access.quota;
-    root.querySelector('[data-minute-quota]').textContent = quota ? `${quota.minuteUsed} / ${quota.minuteLimit}` : '— / 15';
-    root.querySelector('[data-day-quota]').textContent = quota ? `${quota.dayUsed} / ${quota.dayLimit}` : '— / 500';
+    writeText(root.querySelector('[data-minute-quota]'), quota ? `${quota.minuteUsed} / ${quota.minuteLimit}` : '— / 15');
+    writeText(root.querySelector('[data-day-quota]'), quota ? `${quota.dayUsed} / ${quota.dayLimit}` : '— / 500');
     root.querySelector('[data-minute-bar]').style.setProperty('--usage', `${quota ? Math.min(100, quota.minuteUsed / quota.minuteLimit * 100) : 0}%`);
     root.querySelector('[data-day-bar]').style.setProperty('--usage', `${quota ? Math.min(100, quota.dayUsed / quota.dayLimit * 100) : 0}%`);
   }
@@ -227,7 +235,10 @@ export function mountChat(root, chatSession = session) {
   input.addEventListener('input', handleInput); form.addEventListener('submit', handleSubmit);
   const unsubscribeChat = chatSession.subscribe((next) => { state = next; render(); });
   const unsubscribeAccess = subscribeAccess(render);
-  const cleanGate = mountAccess(gate.querySelector('form'), () => { render(); input.focus(); });
+  const cleanGate = mountAccess(gate.querySelector('form'), () => {
+    if (state.errorCode === 'AUTH_REQUIRED') chatSession.setDraft(state.draft);
+    render(); input.focus();
+  });
   const tick = setInterval(() => {
     render();
     const quota = access.quota;
@@ -238,5 +249,5 @@ export function mountChat(root, chatSession = session) {
     }
   }, 1000);
   function authenticatedNow() { return access.authenticated === true; }
-  return () => { mounted = false; clearInterval(tick); unsubscribeChat(); unsubscribeAccess(); cleanGate(); cancelAnimationFrame(scrollFrame); input.removeEventListener('input', handleInput); form.removeEventListener('submit', handleSubmit); };
+  return () => { mounted = false; clearInterval(tick); unsubscribeChat(); unsubscribeAccess(); cleanGate(); cancelAnimationFrame(scrollFrame); cancelAnimationFrame(focusFrame); input.removeEventListener('input', handleInput); form.removeEventListener('submit', handleSubmit); };
 }

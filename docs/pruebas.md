@@ -193,3 +193,8 @@ Se incorporaron vitest.config.js y tests/setup.js para bloquear fetch no sustitu
 Resultado:130/130 en tres archivos; también130/130 con orden mezclado, semilla79. La ejecución final normal volvió a pasar. Se preservaron logs inicial/final y JSON para Miguel. [Matriz y explicación](pruebas-unitarias.md), [resumen de resultados](capturas/paso-9-resultados.json).
 
 No se atribuye cobertura visual, evaluación de voz de IA ni producción a esta suite. Paso9 completado; siguiente10: revisión UX/responsive y casos borde en navegador. No se repitió la evaluación real de proveedores porque las correcciones se verificaron con respuestas sustituidas que reproducían los defectos.
+
+
+## Paso 10 — UX y casos borde (27 de octubre de 2026)
+
+Se corrigieron foco y modalidad del portal, recuperación del acceso401, scroll de teclado y mutaciones redundantes de textos. Se verificaron20 comprobaciones en navegador y12 combinaciones responsive, usando proveedor/cuotas sustituidos sin consumo externo. Suite posterior:130/130. [Método, evidencias y límites](revision-ux.md). Paso10 completo en local; siguiente11: documentación.

@@ -265,6 +265,7 @@ describe('acceso y recuperación en el cliente', () => {
     chat.setDraft('Hola'); expect(await chat.send()).toBe(true);
     chat.setDraft('Mi siguiente pregunta'); expect(await chat.send()).toBe(false);
     expect(client.getAccessState().authenticated).toBe(false);
+    expect(client.getAccessState().error).toContain('cohorte');
     expect(chat.getState()).toMatchObject({ pending: false, draft: 'Mi siguiente pregunta', errorCode: 'AUTH_REQUIRED',
       messages: [{ role: 'user', content: 'Hola' }, { role: 'assistant', content: 'Bienvenida.' }] });
   });

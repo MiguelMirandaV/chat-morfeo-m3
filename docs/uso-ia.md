@@ -125,3 +125,8 @@ Miguel creó/reutilizó la base e introdujo personalmente sus credenciales en .e
 Miguel pidió continuar. Codex revisó los116 casos, detectó huecos concretos en el parseo de respuestas y en el acceso del cliente y añadió primero siete regresiones. La ejecución produjo siete fallos reales; se corrigieron la clasificación de respuestas ausentes, el manejo de partes mal formadas/nulas y la aceptación accidental de propiedades heredadas como códigos de error. Después se añadieron siete pruebas del acceso y su recuperación.
 
 Se introdujo configuración de Vitest y un setup con fetch bloqueado salvo sustitución explícita, entorno de pruebas aislado y restauración entre casos. Se evitó una expectativa que usaba la misma transformación de la implementación para comprobar su resultado. Resultado final130/130 en orden normal y mezclado con semilla79. No se agregaron paquetes, porcentajes arbitrarios de cobertura, llamadas a Google/Redis ni cambios de diseño. La revisión visual y la prueba pública siguen en sus pasos del plan.
+
+
+## 10. Revisión UX y correcciones
+
+Miguel pidió continuar cuando se corrigieran los puntos identificados. Codex corrigió el foco del portal, la recuperación del formulario al vencer el acceso y el scroll con teclado. También evitó reconstruir mensajes anteriores ante errores y reescribir textos idénticos cada segundo. Codex verificó los cambios con respuestas/cuotas controladas, documentó veinte comprobaciones y doce combinaciones de viewport/vista y volvió a ejecutar130 tests. No se consumieron Gemini/Redis reales ni se cambiaron dependencias. La preferencia del sistema y un lector de pantalla real no se probaron activamente; los límites se registran en revision-ux.md.

@@ -1,0 +1,211 @@
+{
+  "environment": "QA aislado: frontend real, proveedor y cuotas sustituidos",
+  "realGeminiRequests": 0,
+  "realRedisRequests": 0,
+  "cases": [
+    {
+      "case": "Foco del portal",
+      "focusedInPortal": true
+    },
+    {
+      "case": "Cohorte incorrecta",
+      "focused": "chat-cohort"
+    },
+    {
+      "case": "Acceso correcto",
+      "backgroundInert": false,
+      "focused": "message-input"
+    },
+    {
+      "case": "Solo espacios",
+      "disabled": true
+    },
+    {
+      "case": "280 caracteres",
+      "enabled": true
+    },
+    {
+      "case": "Enter agrega línea y 281 bloquea",
+      "count": "281 / 280",
+      "disabled": true,
+      "messages": 0
+    },
+    {
+      "case": "Render seguro",
+      "htmlNodes": 0,
+      "messages": 2,
+      "scrollWidth": 320,
+      "viewportWidth": 320
+    },
+    {
+      "case": "401 y recuperación de foco",
+      "draft": "Este borrador debe sobrevivir al acceso vencido.",
+      "feedback": "Introduce tu cohorte para desbloquear el chat.",
+      "focused": "chat-cohort",
+      "messages": 2
+    },
+    {
+      "case": "Reabrir acceso",
+      "draft": "Este borrador debe sobrevivir al acceso vencido.",
+      "focused": "message-input",
+      "status": "CANAL ABIERTO · Morfeo está al otro lado."
+    },
+    {
+      "case": "503 recuperable",
+      "draft": "Este borrador debe sobrevivir al acceso vencido.",
+      "messages": 2,
+      "status": "Se perdió la señal con Morfeo. Inténtalo de nuevo. Tu mensaje sigue en el campo."
+    },
+    {
+      "case": "Conexión interrumpida",
+      "draft": "Este borrador debe sobrevivir al acceso vencido.",
+      "messages": 2,
+      "retryEnabled": true
+    },
+    {
+      "case": "Respuesta lenta y doble clic",
+      "disabled": true,
+      "messages": 3,
+      "pendingText": "Morfeo está escribiendo…",
+      "readOnly": true
+    },
+    {
+      "case": "Respuesta finalizada fuera de Chat",
+      "draft": "",
+      "messages": 4,
+      "status": "CANAL ABIERTO · Morfeo está al otro lado."
+    },
+    {
+      "case": "Texto largo y scroll de teclado",
+      "contentHeight": 1849,
+      "focusedRole": "log",
+      "height": 325,
+      "scrollWidth": 320,
+      "top": 1489,
+      "width": 320
+    },
+    {
+      "case": "Tiempo de espera",
+      "draft": "Conservar este borrador si se agota el tiempo.",
+      "messages": 6,
+      "readOnly": false,
+      "status": "La respuesta tardó demasiado. Inténtalo de nuevo. Tu mensaje sigue en el campo."
+    },
+    {
+      "case": "Cuota y Smith",
+      "button": "CANAL BLOQUEADO",
+      "draft": "Conservar este borrador si se agota el tiempo.",
+      "smithVisible": true,
+      "status": "SEÑAL INTERCEPTADA · Tu mensaje está a salvo."
+    },
+    {
+      "case": "Reintento después de Smith",
+      "draft": "",
+      "messages": 8,
+      "status": "CANAL ABIERTO · Morfeo está al otro lado."
+    },
+    {
+      "case": "Chat final 1024",
+      "scrollWidth": 1024,
+      "width": 1024
+    },
+    {
+      "case": "Pausa de la lluvia",
+      "button": "Reanudar animación ▶",
+      "pressed": "true",
+      "rainClass": "matrix-rain is-paused"
+    },
+    {
+      "case": "Recarga elimina conversación",
+      "draft": "",
+      "gateHidden": true,
+      "messages": 0
+    }
+  ],
+  "responsive": [
+    {
+      "width": 320,
+      "route": "about",
+      "images": true,
+      "scrollWidth": 320,
+      "viewportWidth": 320
+    },
+    {
+      "width": 320,
+      "route": "home",
+      "images": true,
+      "scrollWidth": 320,
+      "viewportWidth": 320
+    },
+    {
+      "width": 320,
+      "route": "chat",
+      "images": true,
+      "scrollWidth": 320,
+      "viewportWidth": 320
+    },
+    {
+      "width": 600,
+      "route": "about",
+      "images": true,
+      "scrollWidth": 600,
+      "viewportWidth": 600
+    },
+    {
+      "width": 600,
+      "route": "home",
+      "images": true,
+      "scrollWidth": 600,
+      "viewportWidth": 600
+    },
+    {
+      "width": 600,
+      "route": "chat",
+      "images": true,
+      "scrollWidth": 600,
+      "viewportWidth": 600
+    },
+    {
+      "width": 768,
+      "route": "about",
+      "images": true,
+      "scrollWidth": 768,
+      "viewportWidth": 768
+    },
+    {
+      "width": 768,
+      "route": "home",
+      "images": true,
+      "scrollWidth": 768,
+      "viewportWidth": 768
+    },
+    {
+      "width": 768,
+      "route": "chat",
+      "images": true,
+      "scrollWidth": 768,
+      "viewportWidth": 768
+    },
+    {
+      "width": 1024,
+      "route": "about",
+      "images": true,
+      "scrollWidth": 1024,
+      "viewportWidth": 1024
+    },
+    {
+      "width": 1024,
+      "route": "home",
+      "images": true,
+      "scrollWidth": 1024,
+      "viewportWidth": 1024
+    },
+    {
+      "width": 1024,
+      "route": "chat",
+      "images": true,
+      "scrollWidth": 1024,
+      "viewportWidth": 1024
+    }
+  ]
+}

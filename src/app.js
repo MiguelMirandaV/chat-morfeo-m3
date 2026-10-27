@@ -80,7 +80,7 @@ function renderChatView() {
         <div class="terminal-bar"><span><span class="terminal-square" aria-hidden="true"></span>morpheus@zion:~</span><span class="terminal-bar-end">SECURE CHANNEL</span></div>
         <div class="chat-gate" data-chat-gate><span class="gate-symbol" aria-hidden="true">[ × ]</span><p class="eyebrow">IDENTIFICACIÓN REQUERIDA</p><h2>La puerta está cerrada.</h2><p>Introduce el número de tu cohorte de Henry para abrir el canal.</p>${accessForm('chat-cohort')}</div>
         <div class="chat-console" data-chat-console hidden>
-          <div class="chat-log" role="log" aria-label="Mensajes de la conversación" aria-live="polite" aria-relevant="additions text"><div class="empty-state"><span class="empty-symbol" aria-hidden="true">&gt;_</span><h2>Te estaba esperando.</h2><p>Hay una diferencia entre conocer el camino<br>y recorrerlo. Haz tu primera pregunta.</p></div></div>
+          <div class="chat-log" role="log" tabindex="0" aria-label="Mensajes de la conversación" aria-live="polite" aria-relevant="additions text"><div class="empty-state"><span class="empty-symbol" aria-hidden="true">&gt;_</span><h2>Te estaba esperando.</h2><p>Hay una diferencia entre conocer el camino<br>y recorrerlo. Haz tu primera pregunta.</p></div></div>
           <div class="smith-intrusion" hidden><img class="smith-face" loading="lazy" src="/assets/agent-smith.png" alt="" width="1024" height="1024"><div><p class="eyebrow">INTRUSIÓN DETECTADA / AGENTE SMITH</p><h2>Señor Anderson…</h2><p>El canal ha alcanzado su límite.<br>Recuperación en <strong data-smith-countdown>60 s</strong>.</p><small>Efecto visual de la historia. Tu mensaje sigue en el campo.</small></div></div>
           <p class="chat-status" role="status">CONECTANDO…</p>
           <form class="composer" aria-label="Escribir un mensaje">
@@ -202,6 +202,9 @@ function enterPortal(destination) {
   const rect = source.getBoundingClientRect();
   const portal = document.createElement('div');
   portal.className = 'mouth-portal';
+  portal.setAttribute('role', 'dialog');
+  portal.setAttribute('aria-modal', 'true');
+  portal.setAttribute('aria-label', 'Entrando al chat');
   portal.innerHTML = `<div class="portal-camera"><img class="portal-closed" src="/assets/morpheus-closed.png" alt=""><img class="portal-open" src="/assets/morpheus-open.png" alt=""><div class="portal-mouth"></div></div><p role="status">CRUZANDO EL UMBRAL…</p><button type="button">Omitir transición ↗</button>`;
   const camera = portal.querySelector('.portal-camera');
   Object.assign(camera.style, { left: `${rect.left}px`, top: `${rect.top}px`, width: `${rect.width}px`, height: `${rect.height}px` });
@@ -209,12 +212,20 @@ function enterPortal(destination) {
   camera.style.setProperty('--portal-y', `${window.innerHeight / 2 - (rect.top + rect.height * .59)}px`);
   camera.style.setProperty('--portal-scale', Math.max(window.innerWidth, window.innerHeight) / Math.max(1, rect.width) * 28);
   document.body.append(portal);
+  const app = document.querySelector('#app');
+  const previousInert = app.inert;
+  app.inert = true;
+  const skip = portal.querySelector('button');
   let timer;
-  const skipKey = (event) => { if (event.key === 'Escape') finish(); };
+  const skipKey = (event) => {
+    if (event.key === 'Escape') finish();
+    if (event.key === 'Tab') { event.preventDefault(); skip.focus(); }
+  };
   document.addEventListener('keydown', skipKey);
   const finish = () => { cancelPortal(); navigateTo(destination); };
-  portal.querySelector('button').addEventListener('click', finish);
-  cancelPortal = () => { clearTimeout(timer); document.removeEventListener('keydown', skipKey); portal.remove(); cancelPortal = () => {}; };
+  skip.addEventListener('click', finish);
+  cancelPortal = () => { clearTimeout(timer); document.removeEventListener('keydown', skipKey); app.inert = previousInert; portal.remove(); cancelPortal = () => {}; };
+  skip.focus({ preventScroll: true });
   timer = setTimeout(finish, 1800);
 }
 
