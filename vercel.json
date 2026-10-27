@@ -2,6 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
   "outputDirectory": "src",
+  "installCommand": "npm ci",
   "buildCommand": "",
   "devCommand": "",
   "rewrites": [

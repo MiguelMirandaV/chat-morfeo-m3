@@ -28,7 +28,7 @@ En una cuenta nueva, importa tu fork o repositorio propio desde **Add New → Pr
 | Root Directory | Raíz del repositorio, no `src`. Allí están package.json y api. |
 | Output Directory | `src`, declarado en vercel.json. |
 | Build Command | Sin compilación; `buildCommand:""` ya declarado. |
-| Install Command | `npm ci`, para respetar package-lock.json. |
+| Install Command | `npm ci`, declarado en vercel.json para respetar package-lock.json. |
 | Node.js | 24.x, también declarado en engines. |
 | Production Branch | `main`, a comprobar en el proyecto. |
 
@@ -49,6 +49,12 @@ En **Settings → Environment Variables**, agrega las siguientes al proyecto par
 `QUOTA_DRIVER=local` no habilita archivos en Vercel y no hace falta agregarlo allí. El runtime aporta VERCEL_ENV; no lo definas manualmente. Para mantener un cupo compartido, Preview y Production usan la misma base si consumen el mismo proyecto de Google. [Detalles de Redis](redis.md).
 
 En una copia nueva, crea tus credenciales propias. Para Miguel, se conservarán las existentes; no es necesario regenerarlas. El archivo local no carga automáticamente las variables remotas de Production. Cada cambio remoto exige un nuevo despliegue; no modifica uno anterior. [Variables de entorno de Vercel](https://vercel.com/docs/environment-variables).
+
+## Paquete de subida y archivos privados
+
+`.vercelignore` excluye explícitamente `.env*` (salvo el ejemplo sin secretos), `.data/`, `.vercel/`, `.git/` y dependencias locales. `.gitignore` protege el historial de Git; no se asume que sustituya esta lista de subida de la CLI. Antes de publicar se revisa `vercel deploy --dry --json`.
+
+En el paso 12, la primera inspección sin subida mostró el .env local incluido. Se detuvo el flujo antes de desplegar, se agregó la exclusión y la segunda inspección confirmó cero archivos privados incluidos. Las credenciales remotas se transfirieron por stdin, sin escribirlas en comandos o evidencia.
 
 ## 5. Crear el despliegue
 

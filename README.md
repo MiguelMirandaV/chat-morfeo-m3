@@ -118,6 +118,7 @@ tests/                 Vitest: lógica, transporte, acceso, cuotas y proveedor
 docs/                  Alcance, pruebas, uso de IA y capturas
 .env.example           Nombres y ejemplos sin secretos
 vercel.json            Estáticos desde src y función desde api
+.vercelignore          Excluye credenciales y datos locales de la subida
 ```
 
 Sin React, Express ni PostgreSQL. Redis persiste exclusivamente contadores; Smith es un estado visual, no un segundo personaje conversacional. [Flujo de datos y explicación del código](docs/arquitectura.md).
