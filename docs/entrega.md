@@ -1,6 +1,6 @@
 # Mapa de evidencias de la entrega
 
-Estado al 27 de octubre de 2026: pasos 1–12 completos, con publicación verificada. Este documento orienta al evaluador; no sustituye la auditoría final del paso 13 ni garantiza la nota.
+Estado al 27 de octubre de 2026: pasos 1–13 completos, con publicación y auditoría verificadas. Este documento orienta al evaluador. [Auditoría final](auditoria-final.md); la calificación corresponde a Henry.
 
 - Repositorio: [MiguelMirandaV/chat-morfeo-m3](https://github.com/MiguelMirandaV/chat-morfeo-m3).
 - URL pública: [chat-morfeo-m3.vercel.app](https://chat-morfeo-m3.vercel.app/home).
@@ -8,20 +8,20 @@ Estado al 27 de octubre de 2026: pasos 1–12 completos, con publicación verifi
 - Guía de publicación: [despliegue.md](despliegue.md).
 - Registro de decisiones y prompts: [uso-ia.md](uso-ia.md).
 
-Publicación: [evidencia HTTPS y conversación real](produccion.md). Las comprobaciones de producción de la tabla siguiente ya se realizaron en el paso 12; queda contrastar la entrega completa y la instalación limpia en el paso 13.
+Publicación: [evidencia HTTPS y conversación real](produccion.md). Las comprobaciones de producción se realizaron en el paso 12; la instalación limpia y el contraste de la entrega quedaron completados en el paso 13.
 
 ## Ocho categorías de la rúbrica
 
 | Categoría | Evidencia disponible | Estado después de publicar |
 | --- | --- | --- |
 | Responsive | CSS mobile-first, Grid/Flex,768/1024; [12 combinaciones de vistas/tamaños](capturas/paso-10-casos.json) y capturas en README. | Verificado en paso 12. |
-| SPA | Vistas/routing en app.js, tests del router y [verificación de Atrás/Adelante del paso 4](pruebas.md). | Rutas directas verificadas; revisión final pendiente. |
+| SPA | Vistas/routing en app.js, tests del router y [verificación de Atrás/Adelante del paso 4](pruebas.md). | Rutas directas y revisión final verificadas. |
 | Asincronía y Fetch | postApi, sesión y tests de estados; [fallos y navegación durante peticiones](revision-ux.md). | Verificado en paso 12. |
 | Gemini | System prompt v3, historial completo, parseo y [evaluación real por versiones](evaluacion-prompt.md); integración real en paso 8. | Verificados, con recuerdo de nombre/lenguaje. |
 | Seguridad y serverless | Secretos en servidor, env.example, cookie firmada, validaciones, cuotas atómicas y tests. | Variables, cookies, assets y respuestas HTTP verificados; no se capturó Network del navegador. |
 | Chat y UX | Diferenciación TÚ/MORFEO, log acotado, auto-scroll, escritura, borrador y sesión; [revisión UX](revision-ux.md). | Conversación, navegación y nueve tamaños/vistas verificados. |
-| Vitest |130 casos en 3 archivos, mocks restaurados, fetch real bloqueado; [matriz de pruebas](pruebas-unitarias.md). | Ejecución desde instalación limpia. |
-| Despliegue y documentación | Estructura simple, README, capturas, uso de IA y guía de despliegue. | URL y SHA verificados; auditoría final pendiente. |
+| Vitest |130 casos en 3 archivos, mocks restaurados, fetch real bloqueado; [matriz de pruebas](pruebas-unitarias.md). | 130/130 aprobados desde instalación limpia. |
+| Despliegue y documentación | Estructura simple, README, capturas, uso de IA y guía de despliegue. | URL, SHA y auditoría final verificados. |
 
 ## Buenas prácticas de la consigna
 
@@ -43,4 +43,4 @@ La ampliación de Miguel incluye acceso por cohorte, cuotas y efectos Matrix. No
 4. Sigue una petición navegador → función → Redis → Gemini → parseo → vista.
 5. Ejecuta npm test y explica un caso de error con mock.
 6. Abre el registro de IA y una corrección basada en evidencia, por ejemplo el parseo inválido o la recuperación 401.
-7. Cuando esté publicado, presenta URL y commit verificados. Atribuye a Codex el desarrollo/pruebas y a Miguel las decisiones y acciones que realizó.
+7. Presenta la URL pública y el commit verificados. Atribuye a Codex el desarrollo/pruebas y a Miguel las decisiones y acciones que realizó.

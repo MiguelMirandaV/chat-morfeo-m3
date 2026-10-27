@@ -214,3 +214,8 @@ Sin cambios funcionales ni dependencias; se conserva la última suite 130/130 de
 ## Paso 12 — Producción HTTPS
 
 Vercel y GitHub conectados, variables Production/Preview configuradas y despliegue real verificado. Se corrigieron exclusiones de subida y márgenes de timeout. 130/130 tests; tres rutas públicas, siete assets coincidentes, siete rutas privadas 404, contratos API, dos turnos Gemini con contexto, Redis 10→12 y nueve combinaciones responsive. [Registro, hallazgos y límites](produccion.md). Paso 12 completo; siguiente 13: instalación limpia y auditoría de entrega.
+
+
+## Paso 13 — Auditoría de entrega
+
+Clon público sin archivos privados, npm ci y 130/130 tests aprobados, incluidos de nuevo con el lockfile final. Examen inicial de 18 commits/192 blobs sin coincidencias de credenciales actuales ni patrón Google; enlaces comprobados y contratos HTTPS correctos. La auditoría encontró un aviso crítico de tar en la CLI: override 7.5.22 validado, 0 críticos y 0 avisos de producción. Permanecen 33 avisos de herramientas documentados. [Informe final](auditoria-final.md). No se consumió Gemini en este paso.

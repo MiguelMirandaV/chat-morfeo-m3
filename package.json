@@ -20,5 +20,8 @@
   },
   "dependencies": {
     "@google/genai": "2.31.0"
+  },
+  "overrides": {
+    "tar": "7.5.22"
   }
 }

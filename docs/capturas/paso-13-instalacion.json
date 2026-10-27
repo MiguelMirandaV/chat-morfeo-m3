@@ -1,0 +1,35 @@
+{
+  "date": "2026-10-27",
+  "source": "Clon HTTPS desde GitHub",
+  "commit": "9f27b3518fe1250d92c09929df17d8f1c0167184",
+  "node": "v24.21.0",
+  "envFilePresent": false,
+  "vercelLocalFilePresent": false,
+  "vercelLinkPresent": false,
+  "npmCi": {
+    "exitCode": 0,
+    "packagesInstalled": 353,
+    "elapsedReportedSeconds": 17
+  },
+  "vitest": {
+    "passed": 130,
+    "failed": 0,
+    "files": 3,
+    "durationMs": 653
+  },
+  "gitChangesAfterInstall": "",
+  "providerRequests": 0,
+  "finalLockfileVerification": {
+    "npmCiExitCode": 0,
+    "packagesInstalled": 352,
+    "elapsedReportedSeconds": 11,
+    "lockSha256": "674562ec660ae6aa3a8881f855c40deafbfac52db66715da4d0cb9a6a623eba9",
+    "packageSha256": "15fc9f4d3007ea74d935d7272e123172b1b86b9dad9ab666c4e9b965bd91591d",
+    "testsPassed": 130,
+    "testsFailed": 0,
+    "files": 3,
+    "success": true,
+    "envFilesCopied": false,
+    "method": "Clon público inicial; parche tar validado y repetición de npm ci con lockfile final, sin secretos."
+  }
+}

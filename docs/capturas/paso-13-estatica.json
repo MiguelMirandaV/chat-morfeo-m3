@@ -1,0 +1,16 @@
+{
+  "date": "2026-10-27",
+  "head": "9f27b3518fe1250d92c09929df17d8f1c0167184",
+  "commitsReviewed": 18,
+  "uniqueBlobsScanned": 192,
+  "privateValueMatches": 0,
+  "googleKeyPatternMatches": 0,
+  "privatePathsInHistory": [],
+  "markdownDocuments": 12,
+  "relativeLinksChecked": 93,
+  "brokenRelativeLinks": [],
+  "runtimeDebugFiles": [],
+  "historyStorageFiles": [],
+  "envExamplePrivateValuesEmpty": true,
+  "lockfileMatchesPackage": true
+}

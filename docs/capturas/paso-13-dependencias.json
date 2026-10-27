@@ -1,0 +1,202 @@
+{
+  "date": "2026-10-27",
+  "production": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 0,
+    "critical": 0,
+    "total": 0
+  },
+  "allDependencies": {
+    "info": 0,
+    "low": 0,
+    "moderate": 12,
+    "high": 21,
+    "critical": 0,
+    "total": 33
+  },
+  "productionAdvisories": [],
+  "devAdvisories": [
+    {
+      "name": "@fastify/busboy",
+      "severity": "high",
+      "isDirect": false
+    },
+    {
+      "name": "@vercel/backends",
+      "severity": "high",
+      "isDirect": false
+    },
+    {
+      "name": "@vercel/blob",
+      "severity": "high",
+      "isDirect": false
+    },
+    {
+      "name": "@vercel/cervel",
+      "severity": "high",
+      "isDirect": false
+    },
+    {
+      "name": "@vercel/cli-auth",
+      "severity": "high",
+      "isDirect": false
+    },
+    {
+      "name": "@vercel/cli-config",
+      "severity": "high",
+      "isDirect": false
+    },
+    {
+      "name": "@vercel/cli-support",
+      "severity": "high",
+      "isDirect": false
+    },
+    {
+      "name": "@vercel/container",
+      "severity": "moderate",
+      "isDirect": false
+    },
+    {
+      "name": "@vercel/elysia",
+      "severity": "moderate",
+      "isDirect": false
+    },
+    {
+      "name": "@vercel/express",
+      "severity": "high",
+      "isDirect": false
+    },
+    {
+      "name": "@vercel/fastify",
+      "severity": "moderate",
+      "isDirect": false
+    },
+    {
+      "name": "@vercel/h3",
+      "severity": "moderate",
+      "isDirect": false
+    },
+    {
+      "name": "@vercel/hono",
+      "severity": "high",
+      "isDirect": false
+    },
+    {
+      "name": "@vercel/hydrogen",
+      "severity": "moderate",
+      "isDirect": false
+    },
+    {
+      "name": "@vercel/koa",
+      "severity": "moderate",
+      "isDirect": false
+    },
+    {
+      "name": "@vercel/nestjs",
+      "severity": "moderate",
+      "isDirect": false
+    },
+    {
+      "name": "@vercel/node",
+      "severity": "high",
+      "isDirect": false
+    },
+    {
+      "name": "@vercel/oidc",
+      "severity": "high",
+      "isDirect": false
+    },
+    {
+      "name": "@vercel/python",
+      "severity": "high",
+      "isDirect": false
+    },
+    {
+      "name": "@vercel/python-analysis",
+      "severity": "high",
+      "isDirect": false
+    },
+    {
+      "name": "@vercel/redwood",
+      "severity": "moderate",
+      "isDirect": false
+    },
+    {
+      "name": "@vercel/remix-builder",
+      "severity": "high",
+      "isDirect": false
+    },
+    {
+      "name": "@vercel/rust",
+      "severity": "moderate",
+      "isDirect": false
+    },
+    {
+      "name": "@vercel/static-build",
+      "severity": "moderate",
+      "isDirect": false
+    },
+    {
+      "name": "@vercel/static-config",
+      "severity": "moderate",
+      "isDirect": false
+    },
+    {
+      "name": "ajv",
+      "severity": "moderate",
+      "isDirect": false
+    },
+    {
+      "name": "js-yaml",
+      "severity": "high",
+      "isDirect": false
+    },
+    {
+      "name": "minimatch",
+      "severity": "high",
+      "isDirect": false
+    },
+    {
+      "name": "path-to-regexp",
+      "severity": "high",
+      "isDirect": false
+    },
+    {
+      "name": "smol-toml",
+      "severity": "high",
+      "isDirect": false
+    },
+    {
+      "name": "undici",
+      "severity": "high",
+      "isDirect": false
+    },
+    {
+      "name": "vercel",
+      "severity": "high",
+      "isDirect": true
+    },
+    {
+      "name": "zod",
+      "severity": "high",
+      "isDirect": false
+    }
+  ],
+  "beforePatch": {
+    "info": 0,
+    "low": 0,
+    "moderate": 12,
+    "high": 21,
+    "critical": 1,
+    "total": 34
+  },
+  "tarPatch": {
+    "from": "7.5.11",
+    "to": "7.5.22",
+    "override": true,
+    "advisoryStillReported": false,
+    "reference": "https://github.com/isaacs/node-tar/security/advisories/GHSA-23hp-3jrh-7fpw"
+  }
+}

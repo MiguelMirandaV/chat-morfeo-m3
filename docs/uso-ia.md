@@ -173,3 +173,8 @@ Se consultaron las ayudas de la CLI instalada y las guías oficiales de Vercel p
 ## 12. Publicación real
 
 Miguel pidió continuar y después solicitó estado por la demora. Codex configuró las cinco variables en Vercel por stdin y comprobó la conexión GitHub/main, sin mostrar valores. La inspección previa detectó .env en la subida CLI: se agregó .vercelignore antes de desplegar. La prueba real detectó timeouts de 16 s; se midieron, se ampliaron plazos y se volvió a comprobar la lógica y dos turnos públicos correctos. Se registran también intentos fallidos, consumo y límites; no se presenta una respuesta simulada como Gemini. La recarga de una pestaña con posible borrador fue rechazada por revisión automática; se usó una pestaña nueva sin perder estado. Evidencia final en produccion.md.
+
+
+## 13. Auditoría final
+
+Miguel pidió continuar. Codex clonó el repositorio público, instaló desde el lockfile sin secretos y ejecutó 130 tests. Revisó la consigna/rúbrica, código, historial Git, enlaces y contratos públicos. Al detectar un aviso crítico de tar en herramientas, consultó el aviso del mantenedor, validó el parche 7.5.22 primero en el clon y después lo aplicó al proyecto. Se repitieron npm ci, tests y empaquetado. Se registraron también los 33 avisos no críticos de herramientas, 0 de producción y los límites de las pruebas. No se generaron nuevas respuestas Gemini. Se completó el informe de entrega sin atribuir una calificación otorgada por Henry.
