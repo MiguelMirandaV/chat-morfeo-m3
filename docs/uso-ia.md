@@ -1,5 +1,36 @@
 # Registro del uso de IA
 
+## Cómo leer este registro
+
+Estado vigente: pasos 1–11 completos en local; publicación y auditoría final pendientes. Las secciones numeradas conservan la cronología: “pendiente” o “se implementará” describe lo que faltaba en aquella etapa, no el estado actual. Consulta [README](../README.md) y [mapa de evidencias](entrega.md) para el estado de entrega.
+
+Miguel definió personaje, requisitos y dirección visual, creó las cuentas y guardó las credenciales. Codex realizó el desarrollo, los retratos, las pruebas y esta documentación. No se atribuyen a Miguel acciones técnicas de Codex.
+
+## Prompts recibidos y efecto en la implementación
+
+Los fragmentos entre comillas son instrucciones reales de Miguel conservadas en esta conversación. La columna de efecto resume decisiones posteriores; no es una transcripción literal de una respuesta de la IA.
+
+| Fragmento de la solicitud | Efecto y evidencia |
+| --- | --- |
+| “Role: eres un senior full stack dev, tech lead, que es mi tutor durante el curso de full stack de henry.” | Plan por etapas, explicaciones de herramientas y código desarrollado por Codex. |
+| “Utiliza la estructura sugerida del proyecto "simple" para desarrollar el proyecto” | Módulos src/app.js, chat.js, utils.js; función api/functions.js; sin framework frontend añadido. |
+| “El personaje con el cual chatearemos es Morfeo de Matrix.” / “Debe haber un límite de 280 caracteres en la respuesta del usuario.” | Ficha de personaje, prompt del servidor y validación de grafemas en cliente/backend. |
+| “Solo agrégale una animación tipo cascada de letras verdes tipo matrix en el "/home ".” | Lluvia decorativa con pausa, limpieza y movimiento reducido. |
+| “Solo corrige el footer agregando mi copyright y link a github.” | Footer con nombre/año y enlace al repositorio. |
+| “todo funciona bien menos las respuestas, Morfeo mi dio la misma respuesta exactamente a dos interacciones” | Se revisó la limitación del mock de aquella fase; después se sustituyó por Gemini y se evaluaron variación/contexto. |
+| “El usuario debe autenticarse para "desbloquear" el chat con Morfeo, debe introducir el número de la cohorte de Henry (solo el número 79 habilita el chat)” | Validación backend y cookie firmada; no se presentó como identidad individual. |
+| “continúa cuando hayas corregido los puntos identificados” | Correcciones de foco, acceso vencido y teclado, con evidencia de navegador y 130 tests aprobados. |
+
+El mensaje ampliado también solicitó 15/min y 500/día, intervención de Smith, retrato 3D, portal por la boca y estética cyberpunk. Su desarrollo y los briefs visuales constan en la sección 8.
+
+### Prompts de la aplicación y de los retratos
+
+- **Chat:** fuente completa y vigente en [MORPHEUS_SYSTEM_PROMPT](../api/functions.js). Personalidad, brevedad, contexto, límites y manejo de intentos de cambio de personaje. [Versiones evaluadas y respuestas reales](evaluacion-prompt.md).
+- **Retratos:** briefs de Morfeo y prompt completo de Smith conservados en la sección 8. Los briefs resumidos están identificados como resúmenes, sin presentarlos como texto literal de una llamada.
+- **Revisión del trabajo generado:** se contrastaron sugerencias con documentación técnica, tests y navegador. Ejemplos concretos: script dev recursivo corregido; clasificación de respuestas ausentes y partes malformadas corregida tras siete regresiones fallidas; recuperación 401 y foco del portal corregidos tras QA. Los resultados y límites constan en pruebas.md.
+
+No se reconstruyen como si fueran literales prompts internos del agente que no se conservaron. La evidencia diferencia solicitudes de Miguel, decisiones de Codex, respuestas del modelo y verificaciones de código.
+
 ## 1. Planificación y alcance
 
 **Solicitud de Miguel:** analizar las lectures, la consigna, la guía y la rúbrica de Henry; proponer un plan con la estructura simple, sin extra credit, y desarrollar el código explicando cada etapa y el flujo de herramientas.
@@ -130,3 +161,10 @@ Se introdujo configuración de Vitest y un setup con fetch bloqueado salvo susti
 ## 10. Revisión UX y correcciones
 
 Miguel pidió continuar cuando se corrigieran los puntos identificados. Codex corrigió el foco del portal, la recuperación del formulario al vencer el acceso y el scroll con teclado. También evitó reconstruir mensajes anteriores ante errores y reescribir textos idénticos cada segundo. Codex verificó los cambios con respuestas/cuotas controladas, documentó veinte comprobaciones y doce combinaciones de viewport/vista y volvió a ejecutar130 tests. No se consumieron Gemini/Redis reales ni se cambiaron dependencias. La preferencia del sistema y un lector de pantalla real no se probaron activamente; los límites se registran en revision-ux.md.
+
+
+## 11. Consolidación de documentación
+
+Miguel pidió continuar. Codex contrastó README y documentos con la consigna/rúbrica conservadas y con el código real. Se completaron clonación, instalación, uso, arquitectura, despliegue, variables y problemas frecuentes; se agregaron capturas identificadas como reales o controladas y un mapa de evidencia. Se sustituyó la ficha de alcance desactualizada por el alcance vigente y se aclaró la cronología de este registro.
+
+Se consultaron las ayudas de la CLI instalada y las guías oficiales de Vercel para Git, configuración, variables y protección. La guía de publicación es preparación; no se afirmó una URL productiva ni acciones remotas no ejecutadas. No se cambió código funcional, no se hicieron nuevas generaciones Gemini ni operaciones Redis. La validación documental se registra en pruebas.md.

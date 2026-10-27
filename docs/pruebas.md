@@ -1,5 +1,7 @@
 # Registro de comprobaciones
 
+Registro cronológico de desarrollo: los estados antiguos corresponden a su fecha. Para el estado vigente consulta [README](../README.md) y [entrega.md](entrega.md).
+
 ## Paso 5 — Chat en memoria y respuestas simuladas
 
 - `npm test`: 31 tests pasando en dos archivos (6 de conteo/validación, 13 de routing y 12 de sesión). El proveedor se inyecta en los tests; la espera simulada utiliza temporizadores falsos.
@@ -190,7 +192,7 @@ Se añadieron14 casos a los116 existentes. La ejecución inicial con siete regre
 
 Se incorporaron vitest.config.js y tests/setup.js para bloquear fetch no sustituido, aislar variables privadas dentro del proceso, restaurar mocks/globals/entorno y limpiar temporizadores. Los casos del acceso en memoria importan un módulo nuevo por prueba. Sin cambios en dependencias ni llamadas reales a proveedores.
 
-Resultado:130/130 en tres archivos; también130/130 con orden mezclado, semilla79. La ejecución final normal volvió a pasar. Se preservaron logs inicial/final y JSON para Miguel. [Matriz y explicación](pruebas-unitarias.md), [resumen de resultados](capturas/paso-9-resultados.json).
+Resultado:130/130 en tres archivos; también130/130 con orden mezclado, semilla 79. La ejecución final normal volvió a pasar. Se preservaron logs inicial/final y JSON para Miguel. [Matriz y explicación](pruebas-unitarias.md), [resumen de resultados](capturas/paso-9-resultados.json).
 
 No se atribuye cobertura visual, evaluación de voz de IA ni producción a esta suite. Paso9 completado; siguiente10: revisión UX/responsive y casos borde en navegador. No se repitió la evaluación real de proveedores porque las correcciones se verificaron con respuestas sustituidas que reproducían los defectos.
 
@@ -198,3 +200,12 @@ No se atribuye cobertura visual, evaluación de voz de IA ni producción a esta 
 ## Paso 10 — UX y casos borde (27 de octubre de 2026)
 
 Se corrigieron foco y modalidad del portal, recuperación del acceso401, scroll de teclado y mutaciones redundantes de textos. Se verificaron20 comprobaciones en navegador y12 combinaciones responsive, usando proveedor/cuotas sustituidos sin consumo externo. Suite posterior:130/130. [Método, evidencias y límites](revision-ux.md). Paso10 completo en local; siguiente11: documentación.
+
+
+## Paso 11 — Documentación consolidada (27 de octubre de 2026)
+
+Se contrastaron la consigna y las ocho categorías de la rúbrica con las instrucciones y el código. README ahora incluye clonación, requisitos, uso, variables, instalación, tests, capturas por tamaño, problemas frecuentes y límites. Se agregaron arquitectura, despliegue y mapa de entrega; se actualizaron alcance y cronología/prompts de IA.
+
+Validación documental: 11 documentos Markdown, 84 enlaces relativos comprobados, 0 destinos ausentes. Las seis variables necesarias coinciden con .env.example y sus cuatro valores privados están vacíos; scripts documentados presentes y engine 24.x. Se consultaron la ayuda de la CLI 65.3.1 instalada y documentación oficial de Vercel. [Resultado estructurado](capturas/paso-11-documentacion.json).
+
+Sin cambios funcionales ni dependencias; se conserva la última suite 130/130 del paso 10, sin repetirla para estas ediciones de texto. No se hicieron llamadas Gemini/Redis. La instalación desde copia limpia y la prueba HTTPS pública permanecen pendientes. Paso 11 documental completo; siguiente 12: configuración remota y publicación real.

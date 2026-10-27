@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-27",
+  "type": "Validación documental local, no instalación limpia ni despliegue",
+  "markdownDocuments": 11,
+  "relativeLinksChecked": 84,
+  "missingRelativeLinks": [],
+  "envVariableNamesComplete": true,
+  "envExampleSecretsEmpty": true,
+  "nodeEngine": "24.x",
+  "documentedScriptsExist": true,
+  "runtimeCodeChanged": false,
+  "realGeminiRequests": 0,
+  "realRedisRequests": 0,
+  "cleanInstallVerified": false,
+  "publicDeploymentVerified": false,
+  "versionableFilesScanned": 78,
+  "privateValuesFound": 0
+}
