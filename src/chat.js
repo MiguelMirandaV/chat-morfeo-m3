@@ -1,3 +1,4 @@
+import { createHistoryStorage, validateStoredHistory } from './history-storage.js';
 import { CHARACTERS, getCharacter, isCharacterId } from './characters.js';
 import { countCharacters, getMessageError, MAX_MESSAGE_LENGTH } from './utils.js';
 
@@ -5,8 +6,8 @@ const requestErrors = {
   NETWORK_ERROR: 'No se pudo conectar. Revisa tu conexión e inténtalo de nuevo.',
   TIMEOUT: 'La respuesta tardó demasiado. Inténtalo de nuevo.',
   INVALID_CHARACTER: 'Elige Morfeo, el Oráculo o Trinity.',
-  INVALID_HISTORY: 'El historial no es válido. Recarga para iniciar otra sesión.',
-  HISTORY_TOO_LARGE: 'La conversación supera 64 KiB. Recarga para iniciar otra sesión.',
+  INVALID_HISTORY: 'El historial no es válido. Borra esta conversación para iniciar otra.',
+  HISTORY_TOO_LARGE: 'La conversación supera 64 KiB. Borra esta conversación para iniciar otra.',
   RATE_LIMITED: 'Se alcanzó el límite de solicitudes por minuto.',
   DAILY_LIMIT: 'Se alcanzó el límite de solicitudes del día.',
   PROVIDER_RATE_LIMITED: 'La cuota del proveedor está ocupada. Espera antes de reintentar.',
@@ -127,15 +128,16 @@ export function mountAccess(form, onUnlocked) {
 }
 
 /** La sesión de conversación es volátil; los contadores y el acceso se comprueban en servidor. */
-export function createChatSession({ respond = requestReply, character = 'morpheus' } = {}) {
+export function createChatSession({ respond = requestReply, character = 'morpheus', initialState } = {}) {
   if (!isCharacterId(character)) throw new TypeError('Personaje no permitido.');
-  let messages = [], draft = '', pending = false, error = '', errorCode = '';
+  let messages = initialState ? initialState.messages.map(message => ({ ...message })) : [];
+  let draft = initialState?.draft ?? '', pending = false, error = '', errorCode = '';
   const listeners = new Set();
   const copyMessages = () => messages.map((message) => ({ ...message }));
   const getState = () => ({ character, messages: copyMessages(), draft, pending, error, errorCode });
   function notify() { for (const listener of listeners) listener(getState()); }
   function setDraft(text) {
-    if (pending || typeof text !== 'string') return;
+    if (pending || typeof text !== 'string' || (text === draft && !error)) return;
     draft = text; error = ''; errorCode = ''; notify();
   }
   async function send() {
@@ -161,31 +163,44 @@ export function createChatSession({ respond = requestReply, character = 'morpheu
 /** Cada conversación posee mensajes, borrador y errores propios. Un envío fija su destino. */
 export function createCharacterSession({ respond = requestReply, initialCharacter = null } = {}) {
   if (initialCharacter !== null && !isCharacterId(initialCharacter)) throw new TypeError('Personaje no permitido.');
-  const conversations = new Map(CHARACTERS.map(({ id }) => [id, createChatSession({ respond, character: id })]));
+  let conversations = new Map(CHARACTERS.map(({ id }) => [id, createChatSession({ respond, character: id })]));
   const listeners = new Set();
-  let character = initialCharacter;
+  let character = initialCharacter, revision = 0, batching = false;
+  let childSubscriptions = [];
   const isPending = () => [...conversations.values()].some(session => session.getState().pending);
   function getState() {
     const snapshots = Object.fromEntries([...conversations].map(([id, session]) => [id, session.getState()]));
     const current = character ? snapshots[character] : { messages: [], draft: '', pending: false, error: '', errorCode: '' };
-    return { ...current, character, pending: Object.values(snapshots).some(session => session.pending), conversations: snapshots };
+    return { ...current, character, revision, pending: Object.values(snapshots).some(session => session.pending), conversations: snapshots };
   }
-  function notify() { for (const listener of listeners) listener(getState()); }
-  for (const session of conversations.values()) session.subscribe(notify);
+  function notify() { if (!batching) for (const listener of listeners) listener(getState()); }
+  function connectChildren() { childSubscriptions = [...conversations.values()].map(session => session.subscribe(notify)); }
+  connectChildren();
+  function restore(value) {
+    if (isPending()) return false;
+    let document;
+    try { document = validateStoredHistory(value); } catch { return false; }
+    batching = true;
+    for (const unsubscribe of childSubscriptions) unsubscribe();
+    conversations = new Map(CHARACTERS.map(({ id }) => [id, createChatSession({ respond, character: id, initialState: document.conversations[id] })]));
+    character = document.character; revision += 1; connectChildren();
+    batching = false; notify(); return true;
+  }
   function selectCharacter(id) {
     if (!isCharacterId(id) || isPending()) return false;
     character = id; notify(); return true;
   }
   return {
-    getState, selectCharacter,
+    getState, selectCharacter, restore,
     setDraft(text) { if (character) conversations.get(character).setDraft(text); },
     send() { return character && !isPending() ? conversations.get(character).send() : Promise.resolve(false); },
     subscribe(listener) { listeners.add(listener); listener(getState()); return () => listeners.delete(listener); },
   };
 }
 const session = createCharacterSession();
+const historyStorage = typeof window === 'undefined' ? null : createHistoryStorage(session);
 
-export function mountChat(root, chatSession = session) {
+export function mountChat(root, chatSession = session, storage = chatSession === session ? historyStorage : null) {
   const log = root.querySelector('.chat-log');
   const empty = log.querySelector('.empty-state').cloneNode(true);
   const status = root.querySelector('.chat-status');
@@ -199,7 +214,10 @@ export function mountChat(root, chatSession = session) {
   const smith = root.querySelector('.smith-intrusion');
   const terminal = root.querySelector('.chat-terminal');
   const picker = root.querySelector('[data-character-picker]');
-  let renderedCharacter;
+  const storageStatus = root.querySelector('[data-storage-status]');
+  const storageActions = root.querySelector('[data-storage-actions]');
+  const dialog = root.querySelector('[data-history-dialog]');
+  let renderedCharacter, renderedRevision, confirmedAction;
   let renderedCount = 0, scrollFrame = 0, focusFrame = 0, lastIntercepted = false;
   let wasAuthenticated = access.authenticated === true;
   let state = chatSession.getState();
@@ -218,6 +236,7 @@ export function mountChat(root, chatSession = session) {
     consoleView.hidden = !authenticated;
     gate.hidden = authenticated;
     if (wasAuthenticated && !authenticated) {
+      if (dialog.open) dialog.close();
       // Espera a que el formulario haya habilitado su input al cambiar la sesión.
       cancelAnimationFrame(focusFrame);
       focusFrame = requestAnimationFrame(() => { if (mounted && access.authenticated !== true) gate.querySelector('input').focus(); });
@@ -228,8 +247,8 @@ export function mountChat(root, chatSession = session) {
     picker.hidden = !authenticated || selected;
     form.hidden = !selected;
     log.hidden = !selected;
-    if (renderedCharacter !== state.character || !authenticated) {
-      log.replaceChildren(); renderedCount = 0; renderedCharacter = state.character;
+    if (renderedCharacter !== state.character || renderedRevision !== state.revision || !authenticated) {
+      log.replaceChildren(); renderedCount = 0; renderedCharacter = state.character; renderedRevision = state.revision;
     }
     const previous = renderedCount;
     const visibleMessages = authenticated && selected ? state.messages : [];
@@ -251,7 +270,8 @@ export function mountChat(root, chatSession = session) {
     writeText(emblem, character?.emblem ?? '');
     input.placeholder = character ? `Escribe a ${character.name}…` : 'Elige un personaje…';
     terminal.setAttribute('aria-label', character ? `Conversación con ${character.name}` : 'Terminal de conversación');
-    if (input.value !== state.draft) input.value = state.draft;
+    if (input.value !== (authenticated ? state.draft : '')) input.value = authenticated ? state.draft : '';
+    renderStorage(authenticated);
     input.readOnly = state.pending;
     const length = countCharacters(state.draft), tooLong = length > MAX_MESSAGE_LENGTH;
     writeText(count, `${length} / ${MAX_MESSAGE_LENGTH}`);
@@ -282,6 +302,46 @@ export function mountChat(root, chatSession = session) {
     root.querySelector('[data-minute-bar]').style.setProperty('--usage', `${quota ? Math.min(100, quota.minuteUsed / quota.minuteLimit * 100) : 0}%`);
     root.querySelector('[data-day-bar]').style.setProperty('--usage', `${quota ? Math.min(100, quota.dayUsed / quota.dayLimit * 100) : 0}%`);
   }
+  function renderStorage(authenticated) {
+    const saved = storage?.getState();
+    storageActions.hidden = !authenticated || !saved;
+    if (!saved) return;
+    writeText(storageStatus, saved.message);
+    storageStatus.dataset.kind = saved.kind;
+    const entries = Object.values(state.conversations ?? {});
+    const anyData = entries.some(entry => entry.messages.length || entry.draft.length);
+    root.querySelector('[data-history-action="current"]').disabled = state.pending || !state.character || !(state.messages.length || state.draft.length) || saved.blocked;
+    root.querySelector('[data-history-action="all"]').disabled = state.pending || (!anyData && !['invalid', 'error'].includes(saved.kind) && !saved.hasSaved) || saved.conflict;
+    root.querySelector('[data-storage-conflict]').hidden = !saved.conflict;
+    for (const choice of root.querySelectorAll('[data-storage-conflict] button')) choice.disabled = state.pending;
+  }
+  function historyAction(event) {
+    const action = event.target.closest('button[data-history-action]')?.dataset.historyAction;
+    if (!action || !storage || access.authenticated !== true || state.pending) return;
+    const descriptions = {
+      current: `Se borrarán los mensajes y el borrador de ${getCharacter(state.character)?.name}. Las otras conversaciones se conservarán.`,
+      all: 'Se borrarán los mensajes y borradores de los tres personajes guardados en este navegador. Las cuotas del canal se conservan.',
+      load: 'Se reemplazará lo que tienes en esta pestaña por el último historial guardado. Los cambios que solo estén aquí se perderán.',
+      keep: 'Se guardará la versión de esta pestaña, reemplazando el historial que guardó la otra pestaña.',
+    };
+    if (!Object.hasOwn(descriptions, action)) return;
+    confirmedAction = action;
+    writeText(dialog.querySelector('h2'), ['current', 'all'].includes(action) ? '¿Borrar el historial?' : '¿Conservar esta versión?');
+    writeText(dialog.querySelector('p'), descriptions[action]);
+    dialog.showModal(); dialog.querySelector('[data-history-cancel]').focus();
+  }
+  function confirmHistory(event) {
+    event.preventDefault();
+    if (access.authenticated !== true || state.pending) { dialog.close(); return; }
+    const success = confirmedAction === 'load' ? storage.loadExternal() : confirmedAction === 'keep' ? storage.keepLocal() : storage.clear(confirmedAction);
+    dialog.close(); confirmedAction = null;
+    if (success) { if (chatSession.getState().character) input.focus(); else picker.querySelector('button').focus(); }
+  }
+  storageActions.addEventListener('click', historyAction);
+  dialog.querySelector('form').addEventListener('submit', confirmHistory);
+  const cancelHistory = () => { confirmedAction = null; dialog.close(); };
+  dialog.querySelector('[data-history-cancel]').addEventListener('click', cancelHistory);
+  dialog.addEventListener('cancel', cancelHistory);
   function handleInput() { chatSession.setDraft(input.value); }
   function handleSubmit(event) { event.preventDefault(); if (button.disabled) return; input.focus({ preventScroll: true }); void chatSession.send(); }
   function chooseCharacter(event) {
@@ -293,6 +353,7 @@ export function mountChat(root, chatSession = session) {
   input.addEventListener('input', handleInput); form.addEventListener('submit', handleSubmit);
   const unsubscribeChat = chatSession.subscribe((next) => { state = next; render(); });
   const unsubscribeAccess = subscribeAccess(render);
+  const unsubscribeStorage = storage?.subscribe(render) ?? (() => {});
   const cleanGate = mountAccess(gate.querySelector('form'), () => {
     if (state.errorCode === 'AUTH_REQUIRED') chatSession.setDraft(state.draft);
     render();
@@ -308,5 +369,5 @@ export function mountChat(root, chatSession = session) {
     }
   }, 1000);
   function authenticatedNow() { return access.authenticated === true; }
-  return () => { mounted = false; clearInterval(tick); unsubscribeChat(); unsubscribeAccess(); cleanGate(); cancelAnimationFrame(scrollFrame); cancelAnimationFrame(focusFrame); input.removeEventListener('input', handleInput); form.removeEventListener('submit', handleSubmit); picker.removeEventListener('click', chooseCharacter); };
+  return () => { mounted = false; clearInterval(tick); unsubscribeChat(); unsubscribeAccess(); unsubscribeStorage(); cleanGate(); if (dialog.open) dialog.close(); storageActions.removeEventListener('click', historyAction); dialog.querySelector('form').removeEventListener('submit', confirmHistory); dialog.querySelector('[data-history-cancel]').removeEventListener('click', cancelHistory); dialog.removeEventListener('cancel', cancelHistory); cancelAnimationFrame(scrollFrame); cancelAnimationFrame(focusFrame); input.removeEventListener('input', handleInput); form.removeEventListener('submit', handleSubmit); picker.removeEventListener('click', chooseCharacter); };
 }

@@ -75,6 +75,11 @@ function renderChatView() {
         <div class="terminal-bar"><span><span class="terminal-square" aria-hidden="true"></span><span data-terminal-name>zion@network:~</span></span><span class="terminal-bar-end">SECURE CHANNEL</span></div>
         <div class="chat-gate" data-chat-gate><span class="gate-symbol" aria-hidden="true">[ × ]</span><p class="eyebrow">IDENTIFICACIÓN REQUERIDA</p><h2>La puerta está cerrada.</h2><p>Introduce el número de tu cohorte de Henry para abrir el canal.</p>${accessForm('chat-cohort')}</div>
         <div class="chat-console" data-chat-console hidden>
+          <div class="history-toolbar" data-storage-actions hidden>
+            <p data-storage-status role="status"></p>
+            <div class="history-buttons"><button type="button" data-history-action="current">Borrar esta conversación</button><button type="button" data-history-action="all">Borrar todos los historiales</button></div>
+            <div class="storage-conflict" data-storage-conflict hidden><button type="button" data-history-action="load">Cargar historial guardado</button><button type="button" data-history-action="keep">Conservar esta pestaña</button></div>
+          </div>
           <section class="character-picker" data-character-picker aria-labelledby="picker-title">
             <p class="eyebrow">CANAL DESBLOQUEADO</p><h2 id="picker-title">¿Con quién quieres hablar?</h2>
             <p>Cada personaje conserva su propia conversación.</p>
@@ -92,7 +97,8 @@ function renderChatView() {
         </div>
       </section>
     </div>
-    <p class="chat-caption">IA generativa · Interpretaciones ficticias de Matrix. Historiales separados en memoria: se borran al recargar.</p>
+    <dialog class="history-dialog" data-history-dialog aria-labelledby="history-dialog-title" aria-describedby="history-dialog-description"><form><h2 id="history-dialog-title">¿Borrar el historial?</h2><p id="history-dialog-description"></p><div><button type="button" data-history-cancel>Cancelar</button><button type="submit">Confirmar</button></div></form></dialog>
+    <p class="chat-caption">IA generativa · Interpretaciones ficticias de Matrix. Historiales guardados en este navegador cuando el almacenamiento está disponible.</p>
   </main>`;
 }
 
