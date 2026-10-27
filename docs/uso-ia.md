@@ -83,3 +83,13 @@
 **Intervención de Miguel:** la bienvenida observada de AI Studio solicita declaraciones personales y aceptación de términos; quedó a su cargo, junto con crear y guardar su clave directamente en el archivo local. Codex no recibió ni mostró una clave, no habilitó facturación y no cambió el chat del mock al proveedor real.
 
 **Verificación:** 83 tests aprobados, incluyendo siete de configuración; exclusión de .env y ejemplo público sin clave. La preparación es revisable; el acceso/cuota y la evaluación del prompt permanecen pendientes de la clave local. Referencias y criterios están en evaluacion-prompt.md.
+
+### Evaluación real y revisión del prompt
+
+**Confirmación de Miguel:** “Clave guardada en .env”. Codex consumió esa variable local para consultar el modelo y evaluar el prompt, sin mostrarla ni versionarla.
+
+**Trabajo realizado:** consulta del modelo (200), lectura de cuota en AI Studio y 20 generaciones REST. El piloto probó identidad y recuerdo de dos datos ficticios; después se probaron las otras entradas previstas. El prompt v1 produjo resultados útiles, pero también una suposición sobre el empleo y respuestas que hablaban de su papel. Codex revisó esas salidas, ajustó el prompt y volvió a ejecutar los casos afectados con v2 y v3.
+
+**Resultado verificable:** v3 en el servidor; 11/6/3 respuestas conservadas por versión con historial, parámetros, longitud y terminación. Se verificaron memoria y respuestas distintas, y se corrigieron las referencias implícitas a ficción y los preámbulos sobre brevedad. Las respuestas son de Gemini; la revisión e implementación son de Codex; la creación y almacenamiento de la clave fueron de Miguel.
+
+**Límites:** no se atribuye una garantía de obediencia o ausencia de repeticiones a esta muestra, y no se presenta la evaluación REST como una integración del chat. No se agregaron pruebas que intenten certificar voz de IA mediante comprobar palabras del prompt. La suite de código permanece en 83 tests; el paso 8 conectará el SDK y verificará el flujo completo.

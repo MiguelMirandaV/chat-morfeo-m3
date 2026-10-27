@@ -1,6 +1,6 @@
 # Paso 1 — Definición de Chat con Morfeo
 
-Estado: definición del producto completada y pasos 2–6 ejecutados: entorno, interfaz, routing, chat y función con simulación. El paso 7 tiene preparados el prompt/configuración; la clave y evaluación real siguen pendientes. Esta ficha conserva los criterios de aceptación del producto; los resultados realmente obtenidos se registran en `pruebas.md`.
+Estado: definición del producto completada y pasos 2–6 ejecutados: entorno, interfaz, routing, chat y función con simulación. El paso 7 quedó completo con clave local, acceso/cuota verificados y evaluación real del prompt; la integración en el chat corresponde al paso 8. Esta ficha conserva los criterios de aceptación del producto; los resultados realmente obtenidos se registran en `pruebas.md`.
 
 ## Decisiones de Miguel
 
@@ -34,7 +34,7 @@ Se crearán respuestas originales. Las frases conocidas de la película no susti
 
 ## Borrador original del system prompt (paso 1)
 
-Este texto conserva la especificación inicial. El prompt v1 preparado en el paso 7 está en MORPHEUS_SYSTEM_PROMPT, dentro de api/functions.js, y es la fuente que utilizará el servidor. Sus casos y estado de evaluación están en [evaluacion-prompt.md](evaluacion-prompt.md); sigue pendiente de probar con el proveedor.
+Este texto conserva la especificación inicial. El prompt v3 evaluado en el paso 7 está en MORPHEUS_SYSTEM_PROMPT, dentro de api/functions.js, y es la fuente que utilizará el servidor. Sus casos y estado de evaluación están en [evaluacion-prompt.md](evaluacion-prompt.md); allí se conservan resultados y límites de la evaluación real.
 
 > Interpreta a Morfeo del universo ficticio de The Matrix (1999). Habla en español natural y trata al usuario de tú. Tu voz es serena, firme, paciente y filosófica. Ayuda a explorar ideas sobre elección, percepción, libertad y aprendizaje con claridad y alguna pregunta breve cuando sea útil.
 >
@@ -155,7 +155,7 @@ Estas son pruebas previstas para los pasos 7, 8 y 10. No se han ejecutado todav�
 
 ## Próximo paso y registro
 
-La carpeta, interfaz, routing, chat en memoria y transporte HTTP con simulación están implementados. Para cerrar el paso 7 falta que Miguel complete la bienvenida de AI Studio, cree/guarde su clave y se comprueben acceso/cuota y respuestas reales al prompt. El paso 8 conectará el proveedor al chat.
+La carpeta, interfaz, routing, chat en memoria y transporte HTTP con simulación están implementados. Miguel completó el acceso y guardó la clave local; Codex verificó modelo/cuota y evaluó el prompt con respuestas reales en el paso 7. El paso 8 conectará el proveedor al chat.
 
 No se necesita conectar PostgreSQL. Vercel está vinculado y el servidor local funciona; Google AI Studio se configurará en la etapa de Gemini. La fecha de entrega sigue pendiente.
 

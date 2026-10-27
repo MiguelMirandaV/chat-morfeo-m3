@@ -4,9 +4,9 @@ Proyecto Integrador del Módulo 3 de Full Stack de Henry. Aplicación en desarro
 
 ## Estado del proyecto
 
-Los pasos 1–6 están completos: definición, entorno, interfaz responsive, routing SPA, chat en memoria y transporte HTTP con una función serverless simulada. Inicio, Chat y Acerca de se renderizan sin recargar, con Atrás/Adelante, carga directa, normalización de rutas y vista interna de no encontrado. Home incluye una cascada de caracteres verdes con pausa. El chat valida el máximo de 280 caracteres, muestra la espera y conserva conversación y borrador entre vistas. Pasan 83 tests unitarios. El proyecto está vinculado a GitHub y al espacio Hobby de Vercel de Miguel.
+Los pasos 1–7 están completos: definición, entorno, interfaz responsive, routing SPA, chat en memoria, transporte HTTP con simulación y preparación/evaluación real del prompt de Gemini. Inicio, Chat y Acerca de se renderizan sin recargar, con Atrás/Adelante, carga directa, normalización de rutas y vista interna de no encontrado. Home incluye una cascada de caracteres verdes con pausa. El chat valida el máximo de 280 caracteres, muestra la espera y conserva conversación y borrador entre vistas. Pasan 83 tests unitarios. El proyecto está vinculado a GitHub y al espacio Hobby de Vercel de Miguel.
 
-El paso 7 tiene preparados el prompt y la configuración; falta guardar la clave local, comprobar acceso/cuota y evaluar el modelo.
+El prompt v3 se evaluó por REST con respuestas reales; acceso y cuota están verificados. El chat continúa usando la simulación hasta conectar el SDK en el paso 8.
 
 El envío utiliza POST /api/functions y permanece en modo de prueba: el servidor devuelve textos predefinidos, con una espera simulada de 1,1 segundos. La simulación prioriza variantes menos usadas y evita repetir la respuesta inmediatamente anterior, incluso al agotar su banco finito de textos. Gemini se integrará en las siguientes etapas. La URL de entrega se documentará después de validar la aplicación completa.
 
@@ -52,15 +52,15 @@ En una copia nueva, crea el archivo local si aún no existe:
 cp -n .env.example .env
 ```
 
-Completa `GEMINI_API_KEY` únicamente en el archivo local. El ejemplo propone `GEMINI_MODEL=gemini-3.5-flash-lite`; la documentación lo publica estable y con nivel gratuito, pero falta comprobar acceso y cuota en el proyecto de AI Studio. En la carpeta de Miguel, `.env` ya fue creado con clave vacía y permisos privados. Conserva su contenido si ya agregaste una clave. `.env` está ignorado por Git y no debe compartirse. `.env.local`, creado por Vercel CLI, se conserva sin editar. La simulación actual no consume Gemini ni cambia de proveedor por el hecho de guardar estas variables.
+Completa `GEMINI_API_KEY` únicamente en el archivo local. El ejemplo propone `GEMINI_MODEL=gemini-3.5-flash-lite`; la documentación lo publica estable y con nivel gratuito. Se comprobaron acceso y Free tier del proyecto; las cuotas vigentes se revisan en AI Studio. En la carpeta de Miguel, `.env` tiene permisos privados y él guardó su clave directamente allí; el valor se conserva exclusivamente local. Conserva su contenido si ya agregaste una clave. `.env` está ignorado por Git y no debe compartirse. `.env.local`, creado por Vercel CLI, se conserva sin editar. La simulación actual no consume Gemini ni cambia de proveedor por el hecho de guardar estas variables.
 
 ## Preparación de Gemini (paso 7)
 
-El prompt único está en `MORPHEUS_SYSTEM_PROMPT`, dentro de api/functions.js. `getGeminiConfig` lee únicamente el entorno del servidor: requiere clave y modelo, limpia espacios de configuración y rechaza un modelo no revisado. Los errores de configuración no incluyen valores sensibles. El handler todavía utiliza el mock; la conexión real se implementará en el paso 8 tras evaluar el prompt.
+El prompt único está en `MORPHEUS_SYSTEM_PROMPT`, dentro de api/functions.js. `getGeminiConfig` lee únicamente el entorno del servidor: requiere clave y modelo, limpia espacios de configuración y rechaza un modelo no revisado. Los errores de configuración no incluyen valores sensibles. El handler todavía utiliza el mock; el prompt ya se evaluó de forma independiente y la conexión real se implementará en el paso 8.
 
-La propuesta usa `gemini-3.5-flash-lite`, salida máxima inicial de 1024 tokens y thinking minimal. No envía temperature/top_p/top_k, obsoletos para esta versión según su [guía específica](https://ai.google.dev/gemini-api/docs/whats-new-gemini-3.6#api-changes-and-parameter-updates). El presupuesto técnico no sustituye la instrucción de responder normalmente en una a tres frases cortas. Modelo y parámetros se confirmarán con acceso real del proyecto.
+La propuesta usa `gemini-3.5-flash-lite`, salida máxima inicial de 1024 tokens y thinking minimal. No envía temperature/top_p/top_k, obsoletos para esta versión según su [guía específica](https://ai.google.dev/gemini-api/docs/whats-new-gemini-3.6#api-changes-and-parameter-updates). El presupuesto técnico no sustituye la instrucción de responder normalmente en una a tres frases cortas. Se confirmó acceso al modelo y las 20 generaciones de evaluación terminaron con STOP (sin corte por el límite de salida).
 
-La [matriz de evaluación](docs/evaluacion-prompt.md) distingue las decisiones preparadas de los resultados todavía pendientes. Incluye identidad, contexto, claridad, brevedad, estabilidad y límites de la ficción. Los tests unitarios no certifican la voz ni la memoria de un proveedor al que todavía no se ha llamado.
+La [matriz de evaluación](docs/evaluacion-prompt.md) registra resultados reales e iteraciones: v1 (11 generaciones), v2 (6) y v3 (3). Todas devolvieron HTTP 200 y 20–57 palabras. Se corrigieron suposiciones no aportadas, el marco ficticio y preámbulos innecesarios. También se registran las limitaciones: no son 20 pruebas de la versión final ni una garantía de conducta futura. Los tests unitarios son independientes de las llamadas reales.
 
 ## Desarrollo local
 

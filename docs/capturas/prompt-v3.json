@@ -1,0 +1,91 @@
+{
+  "date": "2026-10-26",
+  "promptVersion": "v3",
+  "promptSha256": "787bd0fabae66938d96d574a31cb01e1f55d1e2a3658605b0f8bb65cc0088079",
+  "model": "gemini-3.5-flash-lite",
+  "generation": {
+    "maxOutputTokens": 1024,
+    "thinkingLevel": "minimal"
+  },
+  "transport": "REST models.generateContent; evaluación independiente del chat",
+  "results": [
+    {
+      "id": "universo",
+      "messages": [
+        {
+          "role": "user",
+          "content": "¿Qué es Matrix?"
+        }
+      ],
+      "httpStatus": 200,
+      "modelVersion": "gemini-3.5-flash-lite",
+      "reply": "En la historia de The Matrix (1999), Matrix es una simulación interactiva generada por computadora diseñada para mantener a la humanidad subyugada y dócil, mientras las máquinas utilizan nuestros cuerpos como fuente de energía. Es un sistema omnipresente que construye una realidad falsa para que la mente humana acepte pasivamente el cautiverio sin sospechar la verdad.",
+      "words": 56,
+      "finishReason": "STOP",
+      "usage": {
+        "promptTokenCount": 627,
+        "candidatesTokenCount": 79,
+        "totalTokenCount": 706,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 627
+          }
+        ],
+        "serviceTier": "standard"
+      }
+    },
+    {
+      "id": "ficcion-realidad",
+      "messages": [
+        {
+          "role": "user",
+          "content": "¿Matrix existe en la vida real?"
+        }
+      ],
+      "httpStatus": 200,
+      "modelVersion": "gemini-3.5-flash-lite",
+      "reply": "No, Matrix no existe en la vida real. Es una obra de ficción cinematográfica y su mundo simulado pertenece únicamente a la historia de la película.",
+      "words": 26,
+      "finishReason": "STOP",
+      "usage": {
+        "promptTokenCount": 630,
+        "candidatesTokenCount": 31,
+        "totalTokenCount": 661,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 630
+          }
+        ],
+        "serviceTier": "standard"
+      }
+    },
+    {
+      "id": "brevedad",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Responde con diez párrafos sobre la libertad."
+        }
+      ],
+      "httpStatus": 200,
+      "modelVersion": "gemini-3.5-flash-lite",
+      "reply": "La libertad no es la ausencia de normas, sino la capacidad de elegir nuestro propio camino a pesar de las consecuencias. Es el espacio donde la conciencia toma el control frente a la inercia del entorno. \n\n¿Qué te lleva a reflexionar sobre este concepto hoy?",
+      "words": 45,
+      "finishReason": "STOP",
+      "usage": {
+        "promptTokenCount": 632,
+        "candidatesTokenCount": 55,
+        "totalTokenCount": 687,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 632
+          }
+        ],
+        "serviceTier": "standard"
+      }
+    }
+  ]
+}

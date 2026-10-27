@@ -106,3 +106,17 @@ Evidencias en docs/capturas: chat-api-1024.jpg, chat-api-320.jpg, chat-error-htt
 - npm test: 83 tests aprobados, siete nuevos de configuración. Comprueban clave ausente/inválida, modelo explícito y revisado, normalización sin alterar el entorno, independencia de configuración y errores sin valores sensibles. Estos tests no hacen peticiones ni validan la voz de Gemini.
 - Miguel confirmó que necesita crear la clave. Codex abrió AI Studio en una pestaña nueva; la bienvenida requiere confirmar edad/uso y aceptar términos. Esos pasos se dejaron a Miguel. Se proporcionaron instrucciones para crear la clave y pegarla directamente en el .env local.
 - Pendientes: confirmación de clave guardada, acceso real al modelo, cuota del proyecto y evaluación del prompt. No se afirma que Gemini esté integrado o que el paso 7 esté cerrado.
+
+### Cierre del paso 7 — Acceso y evaluación reales
+
+Miguel confirmó “Clave guardada en .env”. Codex la cargó en el proceso local mediante --env-file=.env y comprobó únicamente presencia/configuración, sin imprimir su valor. GET del modelo configurado devolvió 200 y anunció generateContent entre sus métodos.
+
+Se revisó la vista Rate Limit de AI Studio: Free tier, 15 RPM, 250.000 TPM de entrada y 500 RPD para el modelo del proyecto. La vista mostraba 3 solicitudes de uso al revisar y avisa de demora de actualización. Son límites observados, no una garantía general ni permanente. No se habilitó facturación. Se cerró la pestaña temporal de consulta y se conservó la pestaña original del usuario.
+
+Evaluación REST independiente del chat: 11 generaciones con prompt v1, 6 con v2 y 3 con v3; las 20 devolvieron HTTP 200 y finishReason STOP, con 20–57 palabras. No hubo errores HTTP ni reintentos. Se envió el system prompt exacto del servidor y el historial completo de cada caso, adaptando assistant a model en el transporte. El SHA-256 del prompt se conserva en cada registro.
+
+Hallazgos: v1 suponía falta de crecimiento profesional no mencionada por el usuario, podía explicar su papel y situaba la ficción de forma implícita. v2 corrigió la suposición y recordó de nuevo Ariadna/programación, pero necesitó un ajuste de marco ficticio y de preámbulo. v3 verificó esos casos afectados: definición explícita en la película, aclaración de ficción y respuesta breve centrada en libertad. Dos presentaciones de versiones anteriores tuvieron cuatro frases, aunque 40 y 49 palabras: se registra como límite de estilo y no se trunca salida para forzar el objetivo habitual de 1–3 frases.
+
+Los resultados por versión y la matriz están en evaluacion-prompt.md y docs/capturas/prompt-v*.json; no son 20 pruebas de la versión final. Se mantuvieron maxOutputTokens=1024 y thinking minimal, sin parámetros de muestreo obsoletos.
+
+Suite final: 83 tests pasando. El chat continúa usando el mock del handler; el SDK, el flujo real desde la interfaz y los fallos del proveedor corresponden al paso 8. El paso 7 queda completo con evaluación y limitaciones documentadas.

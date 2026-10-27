@@ -1,0 +1,17 @@
+{
+  "date": "2026-10-26",
+  "source": "Google AI Studio, vista Rate Limit; lectura sin cambiar configuración",
+  "model": "gemini-3.5-flash-lite",
+  "tier": "Free tier",
+  "limitsObserved": {
+    "requestsPerMinute": 15,
+    "inputTokensPerMinute": 250000,
+    "requestsPerDay": 500
+  },
+  "usageDisplayedAtObservation": {
+    "requestsPerMinutePeak": 3,
+    "inputTokensPerMinutePeak": "1.59K",
+    "requestsPerDayPeak": 3
+  },
+  "notes": "La vista indica picos de los últimos 28 días y posible demora de actualización. Son límites observados de este proyecto, no una garantía general ni permanente. No se registran clave, correo ni identificador del proyecto."
+}

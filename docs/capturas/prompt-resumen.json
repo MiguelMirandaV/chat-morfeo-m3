@@ -1,0 +1,20 @@
+{
+  "date": "2026-10-26",
+  "provider": "Gemini API",
+  "model": "gemini-3.5-flash-lite",
+  "requests": 20,
+  "http200": 20,
+  "completedStop": 20,
+  "wordRange": [
+    20,
+    57
+  ],
+  "testedVersions": {
+    "v1": 11,
+    "v2": 6,
+    "v3": 3
+  },
+  "currentPromptVersion": "v3",
+  "currentPromptSha256": "787bd0fabae66938d96d574a31cb01e1f55d1e2a3658605b0f8bb65cc0088079",
+  "caveat": "Los casos se distribuyen entre versiones. v2 y v3 repiten casos afectados; no son 20 pruebas de la versión final ni una garantía de comportamiento futuro. El chat todavía usa el mock; esta evaluación fue por REST independiente."
+}
