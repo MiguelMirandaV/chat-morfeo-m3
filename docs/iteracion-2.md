@@ -4,7 +4,7 @@
 
 La versión entregada queda identificada por el tag `m3-v1-entregado`, sobre el commit `7af140e6c5d204968a085140da6ca6e043d1f3ea`. La iteración se desarrolla en `feat/matrix-v2`. `main` continúa representando la versión publicada; la integración se realizará al completar la revisión de Preview.
 
-Este documento describe funcionalidades aprobadas. Su presencia aquí no significa que estén implementadas. En esta etapa solo se preparan la rama, el README y las reglas de producto.
+Este documento describe funcionalidades aprobadas. Su presencia aquí no significa que estén implementadas. Las etapas 1 y 2 están implementadas en la rama: preparación y prototipo de Home. Los personajes, persistencia y Smith 3+2 corresponden a las siguientes etapas.
 
 ## Decisiones aprobadas
 
@@ -83,6 +83,6 @@ Cada etapa tendrá explicación, instrucciones concretas, evidencia y commit. La
 
 Reutilizo el repositorio, el proyecto Vercel y Redis actuales. El desarrollo de Preview comparte las cuotas cuando usa el mismo proyecto de Gemini. No se necesitan otras cuentas para esta preparación.
 
-Mantengo HTML/CSS/JavaScript con módulos ES, Node en Vercel y Vitest. El prototipo gráfico incorporará Three.js con versión fijada y assets locales; ese cambio pertenece a la siguiente etapa. Se conservarán la estructura simple, la exclusión de secretos, los commits y la documentación del uso de IA.
+Mantengo HTML/CSS/JavaScript con módulos ES, Node en Vercel y Vitest. El prototipo gráfico usa Three.js 0.186.1 fijado, con módulos y licencia locales preparados durante el build. [Diseño y verificación de Home](home-3d.md). Se conservarán la estructura simple, la exclusión de secretos, los commits y la documentación del uso de IA.
 
 La calificación final corresponde a Henry. Los criterios de Excelente se verificarán con código, pruebas y evidencia de la versión realmente implementada.

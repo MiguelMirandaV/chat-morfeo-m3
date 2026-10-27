@@ -34,13 +34,15 @@ El desbloqueo se hace antes de este recorrido: `{action:"unlock",cohort:"79"}` o
 
 | Archivo | Funciones y trabajo |
 | --- | --- |
-| `src/app.js` | Vistas, `resolveRoute`, decisiones de navegación, `pushState`/`popstate`, foco, lluvia y portal; limpia los recursos de la vista anterior. |
+| `src/app.js` | Vistas, `resolveRoute`, decisiones de navegación, `pushState`/`popstate`, foco y portal; limpia los recursos de la vista anterior. |
+| `src/matrix-scene.js` | Geometría procedural, atlas de caracteres, lluvia WebGL, fallback 2D, apertura y cámara; libera recursos al desmontar. |
+| `scripts/prepare-assets.js` | Copia los módulos Three.js fijados y su licencia a `src/vendor`, generado e ignorado en Git. |
 | `src/chat.js` | `createChatSession` conserva mensajes/borrador/estado; `postApi` gestiona fetch, JSON y errores; `mountChat`/`mountAccess` conectan estado y DOM. |
 | `src/utils.js` | `countCharacters` con Intl.Segmenter y `getMessageError`; la función backend reutiliza la validación. |
 | `api/functions.js` | `createHandler`, acceso firmado, validación del historial, reserva, adaptador Gemini y parseo. Usa dependencias inyectables para ensayar fallos sin red. |
 | `src/styles.css` | Base móvil y adaptaciones 768/1024, Flexbox/Grid, estados, foco y movimiento reducido. |
 | `tests/` | Casos de lógica y contratos; configuración restaura mocks y bloquea fetch real no sustituido. |
-| `vercel.json` | Estáticos desde `src`; fallback a index para rutas SPA excluyendo API y archivos. |
+| `vercel.json` | Build de módulos gráficos, estáticos desde `src`; fallback a index para rutas SPA excluyendo API y archivos. |
 
 ## Conceptos que debes poder explicar
 

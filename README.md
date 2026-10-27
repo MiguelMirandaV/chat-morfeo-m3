@@ -2,7 +2,7 @@
 
 Creé esta aplicación para conversar en español con una interpretación de Morfeo de *The Matrix (1999)*. Es mi Proyecto Integrador del Módulo 3 de Full Stack de Henry; lo desarrollé con asistencia de Codex.
 
-**[Abrir la aplicación](https://chat-morfeo-m3.vercel.app/home)** · **[Ver el repositorio](https://github.com/MiguelMirandaV/chat-morfeo-m3)**
+**[Abrir la versión entregada](https://chat-morfeo-m3.vercel.app/home)** · **[Ver el repositorio](https://github.com/MiguelMirandaV/chat-morfeo-m3)**
 
 ## Código de acceso
 
@@ -10,13 +10,13 @@ Creé esta aplicación para conversar en español con una interpretación de Mor
 
 Uso este código como una puerta temática compartida. No representa una cuenta personal ni identifica a cada visitante.
 
-![Inicio de Chat con Morfeo](docs/capturas/paso-12-home-1024.jpg)
+![Inicio: rostro de caracteres y lluvia Matrix](docs/capturas/iteracion-2/home-1024.png)
 
 ## Mi propuesta
 
 Elegí a Morfeo por su voz serena y reflexiva, sus preguntas sobre la libertad y su forma de acompañar el aprendizaje. Mi interpretación responde con frases breves, aprovecha el contexto de la conversación y distingue el universo ficticio de Matrix del mundo real.
 
-Diseñé la interfaz como una terminal de Zion: tonos verdes, lluvia de caracteres, retrato CGI y una transición hacia el chat a través de la boca de Morfeo. Incluí pausa, opción de omitir la transición, navegación con teclado y reglas de movimiento reducido.
+Diseñé la interfaz como una terminal de Zion. En esta rama construí una entrada de pantalla completa: lluvia volumétrica y un rostro procedural en 3D formado por caracteres, con una cámara que entra por su boca para abrir el chat. Incluí pausa, opción de omitir la transición, navegación con teclado, movimiento reducido y una alternativa en Canvas 2D cuando WebGL no está disponible. [Explico la escena y sus límites](docs/home-3d.md). La aplicación publicada conserva la versión entregada mientras reviso esta iteración en Preview.
 
 ## Qué puedes hacer
 
@@ -41,12 +41,14 @@ Envío las preguntas a Gemini a través de mi función de servidor. No escribas 
 
 ## Tecnologías y estructura
 
-Utilicé HTML, CSS y JavaScript con módulos ES para la SPA, una función Node en Vercel como backend, el SDK `@google/genai` para Gemini, Redis de Upstash para los contadores y Vitest para las pruebas.
+Utilicé HTML, CSS y JavaScript con módulos ES para la SPA, una función Node en Vercel como backend, el SDK `@google/genai` para Gemini, Redis de Upstash para los contadores, Three.js para el rostro y la lluvia 3D, y Vitest para las pruebas.
 
 ```text
 api/functions.js       Acceso, cuotas, validación, prompt y adaptador Gemini
 src/index.html         Documento inicial
-src/app.js             Vistas, routing, lluvia y transición
+src/app.js             Vistas, routing, foco y transición
+src/matrix-scene.js    Rostro procedural, lluvia 3D, fallback y limpieza
+scripts/prepare-assets.js Copia local de módulos Three.js y licencia
 src/chat.js            Estado, peticiones HTTP y render del chat
 src/utils.js           Conteo y validación de caracteres
 src/styles.css         Estilos responsive y estados visuales
@@ -101,7 +103,7 @@ npm start
 
 Al vincular una copia nueva, selecciona el proyecto correspondiente de tu cuenta. Mi proyecto existente se llama `chat-morfeo-m3`.
 
-Abre [http://127.0.0.1:3000/home](http://127.0.0.1:3000/home) e introduce **79**. `npm start` ejecuta Vercel Dev; Ctrl+C detiene esa instancia. Reinicia después de cambiar `.env` y mantén el mismo host durante la sesión para conservar la cookie.
+Abre [http://127.0.0.1:3000/home](http://127.0.0.1:3000/home) e introduce **79**. `npm start` prepara los módulos gráficos con `npm run build` y ejecuta Vercel Dev; Ctrl+C detiene esa instancia. Reinicia después de cambiar `.env` y mantén el mismo host durante la sesión para conservar la cookie.
 
 Necesito Vercel Dev para ejecutar también la función; un servidor estático como Live Server solo sirve el frontend. Mantengo `.env.local`, gestionado por Vercel, fuera de Git y sin editar manualmente.
 

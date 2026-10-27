@@ -185,3 +185,10 @@ Miguel pidió continuar. Codex clonó el repositorio público, instaló desde el
 Miguel aprobó el plan, eligió historiales separados y sustituyó la regla de Smith por una intervención después de cada tres turnos normales, durante dos turnos con Smith. Codex conservó la versión entregada con un tag, creó la rama feat/matrix-v2 y reescribió el README en primera persona, con el código 79 explícito y sin una bitácora de pasos.
 
 El alcance define los turnos, la acumulación entre personajes, el retorno a la conversación anterior y la independencia respecto de las cuotas. Se mantiene la modalidad local de diálogo de Smith propuesta en el plan aprobado. El código de la aplicación aún conserva el comportamiento de la versión entregada; las nuevas funciones se implementarán en las etapas siguientes. No se instalaron dependencias ni se generaron respuestas Gemini para esta preparación.
+
+
+## Iteración 2 — Prototipo de Inicio
+
+Codex implementó el rostro procedural de caracteres, lluvia volumétrica y transición de mandíbula/cámara usando Three.js 0.186.1. No generó ni utilizó una fotografía para la nueva Home. El chat conserva por ahora su retrato y comportamiento anteriores. La biblioteca y su licencia se copian localmente durante el build.
+
+Se corrigieron durante el desarrollo un error de sintaxis en la función gaussiana, la competencia entre contextos 2D/WebGL del mismo canvas y una primera lluvia demasiado tenue. La revisión de navegador comprobó WebGL real, tamaños 320/768/1024, pausa, transición completa, Escape y desmontaje. Los escenarios sin WebGL y con movimiento reducido se sirvieron con fixtures locales identificados, sin presentarlos como pruebas del proveedor real. Los códigos 78/79 se comprobaron contra la función local. Las 130 pruebas pasan; la auditoría de producción reporta cero avisos. No se generaron respuestas Gemini en esta etapa.
