@@ -2,7 +2,7 @@
 
 ## Cómo leer este registro
 
-Estado vigente: pasos 1–11 completos en local; publicación y auditoría final pendientes. Las secciones numeradas conservan la cronología: “pendiente” o “se implementará” describe lo que faltaba en aquella etapa, no el estado actual. Consulta [README](../README.md) y [mapa de evidencias](entrega.md) para el estado de entrega.
+Conservo el registro de la versión entregada y la preparación de la iteración 2. Cada sección describe lo ocurrido en su etapa; el README resume el producto disponible y el alcance de iteración distingue las funcionalidades aprobadas de las implementadas. Las secciones numeradas conservan la cronología: “pendiente” o “se implementará” describe lo que faltaba en aquella etapa, no el estado actual. Consulta [README](../README.md) y [mapa de evidencias](entrega.md) para el estado de entrega.
 
 Miguel definió personaje, requisitos y dirección visual, creó las cuentas y guardó las credenciales. Codex realizó el desarrollo, los retratos, las pruebas y esta documentación. No se atribuyen a Miguel acciones técnicas de Codex.
 
@@ -178,3 +178,10 @@ Miguel pidió continuar y después solicitó estado por la demora. Codex configu
 ## 13. Auditoría final
 
 Miguel pidió continuar. Codex clonó el repositorio público, instaló desde el lockfile sin secretos y ejecutó 130 tests. Revisó la consigna/rúbrica, código, historial Git, enlaces y contratos públicos. Al detectar un aviso crítico de tar en herramientas, consultó el aviso del mantenedor, validó el parche 7.5.22 primero en el clon y después lo aplicó al proyecto. Se repitieron npm ci, tests y empaquetado. Se registraron también los 33 avisos no críticos de herramientas, 0 de producción y los límites de las pruebas. No se generaron nuevas respuestas Gemini. Se completó el informe de entrega sin atribuir una calificación otorgada por Henry.
+
+
+## Iteración 2 — Preparación y reglas aprobadas
+
+Miguel aprobó el plan, eligió historiales separados y sustituyó la regla de Smith por una intervención después de cada tres turnos normales, durante dos turnos con Smith. Codex conservó la versión entregada con un tag, creó la rama feat/matrix-v2 y reescribió el README en primera persona, con el código 79 explícito y sin una bitácora de pasos.
+
+El alcance define los turnos, la acumulación entre personajes, el retorno a la conversación anterior y la independencia respecto de las cuotas. Se mantiene la modalidad local de diálogo de Smith propuesta en el plan aprobado. El código de la aplicación aún conserva el comportamiento de la versión entregada; las nuevas funciones se implementarán en las etapas siguientes. No se instalaron dependencias ni se generaron respuestas Gemini para esta preparación.

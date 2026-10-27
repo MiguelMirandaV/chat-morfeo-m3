@@ -1,6 +1,6 @@
-# Alcance y decisiones de Chat con Morfeo
+# Alcance de la versión entregada de Chat con Morfeo
 
-Documento vigente al 27 de octubre de 2026. Se conserva la estructura simple del Proyecto Integrador M3: `/api`, `/src`, `/tests` y documentación. El estado de ejecución y publicación está en [README](../README.md); los resultados históricos están en [pruebas.md](pruebas.md).
+Ficha de la versión entregada, conservada en el tag `m3-v1-entregado`. Las ampliaciones aprobadas se definen en [Iteración 2](iteracion-2.md); las exclusiones de esta ficha no limitan esa nueva versión. Se conserva la estructura simple del Proyecto Integrador M3: `/api`, `/src`, `/tests` y documentación. El estado de ejecución y publicación está en [README](../README.md); los resultados históricos están en [pruebas.md](pruebas.md).
 
 ## Personaje y objetivo
 
