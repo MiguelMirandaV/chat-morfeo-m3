@@ -10,7 +10,7 @@ import { getAccessState, postApi, requestReply } from '../src/chat.js';
 const now = Date.parse('2026-10-26T19:00:00Z');
 const environment = { AUTH_SESSION_SECRET: 'a'.repeat(64), GEMINI_API_KEY: 'test-only', GEMINI_MODEL: DEFAULT_GEMINI_MODEL };
 const messages = [{ role: 'user', content: 'Me llamo Ariadna.' }, { role: 'assistant', content: 'Bienvenida.' }, { role: 'user', content: '¿Cómo me llamo?' }];
-const body = { messages: [messages[0]] };
+const body = { character: 'morpheus', messages: [messages[0]] };
 function req(bodyValue = body, headers = {}) { return { method: 'POST', headers: { host: 'localhost:3000', 'content-type': 'application/json', ...headers }, body: bodyValue }; }
 function res() { return { setHeader: vi.fn(), status: vi.fn(function () { return this; }), json: vi.fn(function (body) { this.body = body; return this; }) }; }
 const quotaStore = async (reserve, time) => updateQuota({}, time, reserve);
@@ -259,7 +259,7 @@ describe('acceso y recuperación en el cliente', () => {
   it('pierde el acceso ante 401 y conserva conversación y borrador para volver a entrar', async () => {
     const fetchMock = vi.fn()
       .mockResolvedValueOnce(json({ authenticated: true, quota }))
-      .mockResolvedValueOnce(json({ reply: 'Bienvenida.', quota }))
+      .mockResolvedValueOnce(json({ character: 'morpheus', reply: 'Bienvenida.', quota }))
       .mockResolvedValueOnce(json({ error: { code: 'AUTH_REQUIRED' } }, 401));
     vi.stubGlobal('fetch', fetchMock);
     await client.unlockCohort('79');
@@ -273,7 +273,7 @@ describe('acceso y recuperación en el cliente', () => {
   });
 
   it('muestra la solicitud 15 admitida sin activar Smith antes del primer rechazo', async () => {
-    const fetchMock = vi.fn().mockResolvedValue(json({ reply: 'Sigamos.', quota: { ...quota, minuteUsed: 15, dayUsed: 15, blocked: true } }));
+    const fetchMock = vi.fn().mockResolvedValue(json({ character: 'morpheus', reply: 'Sigamos.', quota: { ...quota, minuteUsed: 15, dayUsed: 15, blocked: true } }));
     vi.stubGlobal('fetch', fetchMock);
     expect(await client.requestReply([messages[0]])).toBe('Sigamos.');
     expect(client.getAccessState()).toMatchObject({ quota: { minuteUsed: 15 }, interceptedUntil: 0 });

@@ -1,14 +1,16 @@
+import { CHARACTERS, getCharacter, isCharacterId } from './characters.js';
 import { countCharacters, getMessageError, MAX_MESSAGE_LENGTH } from './utils.js';
 
 const requestErrors = {
   NETWORK_ERROR: 'No se pudo conectar. Revisa tu conexión e inténtalo de nuevo.',
   TIMEOUT: 'La respuesta tardó demasiado. Inténtalo de nuevo.',
+  INVALID_CHARACTER: 'Elige Morfeo, el Oráculo o Trinity.',
   INVALID_HISTORY: 'El historial no es válido. Recarga para iniciar otra sesión.',
   HISTORY_TOO_LARGE: 'La conversación supera 64 KiB. Recarga para iniciar otra sesión.',
   RATE_LIMITED: 'Se alcanzó el límite de solicitudes por minuto.',
   DAILY_LIMIT: 'Se alcanzó el límite de solicitudes del día.',
   PROVIDER_RATE_LIMITED: 'La cuota del proveedor está ocupada. Espera antes de reintentar.',
-  SERVICE_UNAVAILABLE: 'Se perdió la señal con Morfeo. Inténtalo de nuevo.',
+  SERVICE_UNAVAILABLE: 'Se perdió la señal con el personaje. Inténtalo de nuevo.',
   QUOTA_UNAVAILABLE: 'No se pudo comprobar la disponibilidad del canal.',
   CONFIGURATION_ERROR: 'El canal no está disponible temporalmente.',
   INVALID_RESPONSE: 'La respuesta no llegó correctamente. Inténtalo de nuevo.',
@@ -68,9 +70,10 @@ export async function postApi(payload, { fetchImpl = globalThis.fetch, timeoutMs
     throw new ChatRequestError('NETWORK_ERROR');
   } finally { clearTimeout(timer); }
 }
-export async function requestReply(messages, options) {
-  const data = await postApi({ messages }, options);
-  if (!data || typeof data.reply !== 'string' || !data.reply.trim()) throw new ChatRequestError('INVALID_RESPONSE');
+export async function requestReply(messages, { character = 'morpheus', ...options } = {}) {
+  if (!isCharacterId(character)) throw new ChatRequestError('INVALID_CHARACTER');
+  const data = await postApi({ character, messages }, options);
+  if (!data || data.character !== character || typeof data.reply !== 'string' || !data.reply.trim()) throw new ChatRequestError('INVALID_RESPONSE');
   return data.reply.trim();
 }
 let accessRequest;
@@ -124,11 +127,12 @@ export function mountAccess(form, onUnlocked) {
 }
 
 /** La sesión de conversación es volátil; los contadores y el acceso se comprueban en servidor. */
-export function createChatSession({ respond = requestReply } = {}) {
+export function createChatSession({ respond = requestReply, character = 'morpheus' } = {}) {
+  if (!isCharacterId(character)) throw new TypeError('Personaje no permitido.');
   let messages = [], draft = '', pending = false, error = '', errorCode = '';
   const listeners = new Set();
   const copyMessages = () => messages.map((message) => ({ ...message }));
-  const getState = () => ({ messages: copyMessages(), draft, pending, error, errorCode });
+  const getState = () => ({ character, messages: copyMessages(), draft, pending, error, errorCode });
   function notify() { for (const listener of listeners) listener(getState()); }
   function setDraft(text) {
     if (pending || typeof text !== 'string') return;
@@ -140,7 +144,7 @@ export function createChatSession({ respond = requestReply } = {}) {
     messages.push({ role: 'user', content: submitted });
     draft = ''; error = ''; errorCode = ''; pending = true; notify();
     try {
-      const reply = await respond(copyMessages());
+      const reply = await respond(copyMessages(), { character });
       if (typeof reply !== 'string' || !reply.trim()) throw new Error('Respuesta vacía');
       messages.push({ role: 'assistant', content: reply.trim() });
       return true;
@@ -154,7 +158,32 @@ export function createChatSession({ respond = requestReply } = {}) {
   function subscribe(listener) { listeners.add(listener); listener(getState()); return () => listeners.delete(listener); }
   return { getState, setDraft, send, subscribe };
 }
-const session = createChatSession();
+/** Cada conversación posee mensajes, borrador y errores propios. Un envío fija su destino. */
+export function createCharacterSession({ respond = requestReply, initialCharacter = null } = {}) {
+  if (initialCharacter !== null && !isCharacterId(initialCharacter)) throw new TypeError('Personaje no permitido.');
+  const conversations = new Map(CHARACTERS.map(({ id }) => [id, createChatSession({ respond, character: id })]));
+  const listeners = new Set();
+  let character = initialCharacter;
+  const isPending = () => [...conversations.values()].some(session => session.getState().pending);
+  function getState() {
+    const snapshots = Object.fromEntries([...conversations].map(([id, session]) => [id, session.getState()]));
+    const current = character ? snapshots[character] : { messages: [], draft: '', pending: false, error: '', errorCode: '' };
+    return { ...current, character, pending: Object.values(snapshots).some(session => session.pending), conversations: snapshots };
+  }
+  function notify() { for (const listener of listeners) listener(getState()); }
+  for (const session of conversations.values()) session.subscribe(notify);
+  function selectCharacter(id) {
+    if (!isCharacterId(id) || isPending()) return false;
+    character = id; notify(); return true;
+  }
+  return {
+    getState, selectCharacter,
+    setDraft(text) { if (character) conversations.get(character).setDraft(text); },
+    send() { return character && !isPending() ? conversations.get(character).send() : Promise.resolve(false); },
+    subscribe(listener) { listeners.add(listener); listener(getState()); return () => listeners.delete(listener); },
+  };
+}
+const session = createCharacterSession();
 
 export function mountChat(root, chatSession = session) {
   const log = root.querySelector('.chat-log');
@@ -169,6 +198,8 @@ export function mountChat(root, chatSession = session) {
   const button = form.querySelector('button');
   const smith = root.querySelector('.smith-intrusion');
   const terminal = root.querySelector('.chat-terminal');
+  const picker = root.querySelector('[data-character-picker]');
+  let renderedCharacter;
   let renderedCount = 0, scrollFrame = 0, focusFrame = 0, lastIntercepted = false;
   let wasAuthenticated = access.authenticated === true;
   let state = chatSession.getState();
@@ -176,7 +207,7 @@ export function mountChat(root, chatSession = session) {
   function append({ role, content }) {
     const article = document.createElement('article');
     article.className = `message message--${role === 'user' ? 'user' : 'morpheus'}`;
-    const author = document.createElement('p'); author.className = 'message-author'; author.textContent = role === 'user' ? 'TÚ >' : 'MORFEO >';
+    const author = document.createElement('p'); author.className = 'message-author'; author.textContent = role === 'user' ? 'TÚ >' : `${getCharacter(state.character)?.name.toUpperCase() ?? 'MORFEO'} >`;
     const text = document.createElement('p'); text.className = 'message-content'; text.textContent = content;
     article.append(author, text); log.append(article);
   }
@@ -192,13 +223,34 @@ export function mountChat(root, chatSession = session) {
       focusFrame = requestAnimationFrame(() => { if (mounted && access.authenticated !== true) gate.querySelector('input').focus(); });
     }
     wasAuthenticated = authenticated;
+    const character = getCharacter(state.character);
+    const selected = Boolean(character);
+    picker.hidden = !authenticated || selected;
+    form.hidden = !selected;
+    log.hidden = !selected;
+    if (renderedCharacter !== state.character || !authenticated) {
+      log.replaceChildren(); renderedCount = 0; renderedCharacter = state.character;
+    }
     const previous = renderedCount;
-    while (state.messages.length < renderedCount) { log.lastElementChild?.remove(); renderedCount -= 1; }
-    if (state.messages.length && !renderedCount) log.replaceChildren();
-    for (const message of state.messages.slice(renderedCount)) append(message);
-    renderedCount = state.messages.length;
-    if (!renderedCount && !log.firstElementChild) log.append(empty.cloneNode(true));
+    const visibleMessages = authenticated && selected ? state.messages : [];
+    while (visibleMessages.length < renderedCount) { log.lastElementChild?.remove(); renderedCount -= 1; }
+    if (visibleMessages.length && !renderedCount) log.replaceChildren();
+    for (const message of visibleMessages.slice(renderedCount)) append(message);
+    renderedCount = visibleMessages.length;
+    if (!renderedCount && !log.firstElementChild) {
+      const welcome = empty.cloneNode(true);
+      welcome.querySelector('[data-empty-note]').textContent = character ? character.description : 'Elige un personaje para comenzar.';
+      log.append(welcome);
+    }
     if (renderedCount !== previous) { cancelAnimationFrame(scrollFrame); scrollFrame = requestAnimationFrame(() => { log.scrollTop = log.scrollHeight; }); }
+    writeText(root.querySelector('[data-channel-name]'), character ? `CONEXIÓN CON ${character.name.toUpperCase()}` : 'ELIGE TU CONEXIÓN');
+    writeText(root.querySelector('[data-terminal-name]'), `${character?.terminal ?? 'zion'}@zion:~`);
+    writeText(root.querySelector('[data-character-note]'), character ? `${character.description} / ${character.voice}` : 'Elige a quien te acompañará.');
+    root.querySelector('[data-character-portrait]').hidden = character?.id !== 'morpheus';
+    const emblem = root.querySelector('[data-character-emblem]'); emblem.hidden = !selected || character.id === 'morpheus';
+    writeText(emblem, character?.emblem ?? '');
+    input.placeholder = character ? `Escribe a ${character.name}…` : 'Elige un personaje…';
+    terminal.setAttribute('aria-label', character ? `Conversación con ${character.name}` : 'Terminal de conversación');
     if (input.value !== state.draft) input.value = state.draft;
     input.readOnly = state.pending;
     const length = countCharacters(state.draft), tooLong = length > MAX_MESSAGE_LENGTH;
@@ -208,11 +260,11 @@ export function mountChat(root, chatSession = session) {
     fieldError.hidden = !tooLong;
     writeText(fieldError, tooLong ? getMessageError(state.draft) : '');
     const intercepted = access.interceptedUntil > Date.now();
-    button.disabled = !authenticated || state.pending || intercepted || Boolean(getMessageError(state.draft));
+    button.disabled = !authenticated || !selected || state.pending || intercepted || Boolean(getMessageError(state.draft));
     writeText(button, state.pending ? 'TRANSMITIENDO…' : intercepted ? 'CANAL BLOQUEADO' : state.error ? 'REINTENTAR ↗' : 'ENVIAR ↗');
     status.classList.toggle('chat-status--loading', state.pending);
     status.classList.toggle('chat-status--error', Boolean(state.error));
-    const statusText = state.pending ? 'Morfeo está escribiendo…' : intercepted ? 'SEÑAL INTERCEPTADA · Tu mensaje está a salvo.' : state.error || 'CANAL ABIERTO · Morfeo está al otro lado.';
+    const statusText = !selected ? 'CANAL ABIERTO · Selecciona un personaje para comenzar.' : state.pending ? `${character.name} está escribiendo…` : intercepted ? 'SEÑAL INTERCEPTADA · Tu mensaje está a salvo.' : state.error || `CANAL ABIERTO · ${character.name} está al otro lado.`;
     if (status.textContent !== statusText) status.textContent = statusText;
     smith.hidden = !intercepted;
     terminal.classList.toggle('is-intercepted', intercepted);
@@ -232,12 +284,19 @@ export function mountChat(root, chatSession = session) {
   }
   function handleInput() { chatSession.setDraft(input.value); }
   function handleSubmit(event) { event.preventDefault(); if (button.disabled) return; input.focus({ preventScroll: true }); void chatSession.send(); }
+  function chooseCharacter(event) {
+    const choice = event.target.closest('button[data-character]');
+    if (!choice || access.authenticated !== true) return;
+    if (chatSession.selectCharacter(choice.dataset.character)) input.focus();
+  }
+  picker.addEventListener('click', chooseCharacter);
   input.addEventListener('input', handleInput); form.addEventListener('submit', handleSubmit);
   const unsubscribeChat = chatSession.subscribe((next) => { state = next; render(); });
   const unsubscribeAccess = subscribeAccess(render);
   const cleanGate = mountAccess(gate.querySelector('form'), () => {
     if (state.errorCode === 'AUTH_REQUIRED') chatSession.setDraft(state.draft);
-    render(); input.focus();
+    render();
+    if (state.character) input.focus(); else picker.querySelector('button').focus();
   });
   const tick = setInterval(() => {
     render();
@@ -249,5 +308,5 @@ export function mountChat(root, chatSession = session) {
     }
   }, 1000);
   function authenticatedNow() { return access.authenticated === true; }
-  return () => { mounted = false; clearInterval(tick); unsubscribeChat(); unsubscribeAccess(); cleanGate(); cancelAnimationFrame(scrollFrame); cancelAnimationFrame(focusFrame); input.removeEventListener('input', handleInput); form.removeEventListener('submit', handleSubmit); };
+  return () => { mounted = false; clearInterval(tick); unsubscribeChat(); unsubscribeAccess(); cleanGate(); cancelAnimationFrame(scrollFrame); cancelAnimationFrame(focusFrame); input.removeEventListener('input', handleInput); form.removeEventListener('submit', handleSubmit); picker.removeEventListener('click', chooseCharacter); };
 }

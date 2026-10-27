@@ -296,3 +296,15 @@ body[data-page="home"] { background: #000402; --accent: #68ff99; }
   .is-entering .home-console { transition: none; }
   .mouth-portal::after { animation: none; }
 }
+
+/* La elección inicial pertenece al canal autenticado. */
+.character-picker { padding: 2rem 1.2rem; margin: auto 0; }
+.character-picker h2 { margin-top: .7rem; font-size: clamp(1.1rem, 3vw, 1.55rem); }
+.character-picker > p:not(.eyebrow) { margin-top: .85rem; font-size: .72rem; line-height: 1.8; color: var(--muted); }
+.character-options { display: grid; gap: .8rem; margin-top: 1.4rem; }
+.character-options button { display: grid; grid-template-columns: 2rem 1fr; gap: .4rem .75rem; text-align: left; padding: 1rem; background: #0a1709; border: 1px solid var(--border); color: var(--text); }
+.character-options button:hover { border-color: var(--accent); background: #12250d; }
+.character-options button > span { grid-row: span 2; align-self: center; font-size: 1.6rem; color: var(--accent); }
+.character-options strong { font-size: .85rem; }
+.character-options small { color: var(--muted); font-size: .65rem; line-height: 1.6; }
+.character-emblem { padding: 2rem 0; text-align: center; font-size: 4rem; color: var(--accent); border-bottom: 1px solid var(--border); margin-bottom: 1rem; }

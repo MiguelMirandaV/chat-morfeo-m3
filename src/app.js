@@ -1,6 +1,7 @@
 import { MAX_MESSAGE_LENGTH } from './utils.js';
 import { mountChat, mountAccess } from './chat.js';
 import { mountMatrixScene } from './matrix-scene.js';
+import { CHARACTERS } from './characters.js';
 
 const arrow = '<span aria-hidden="true">↗</span>';
 
@@ -60,21 +61,26 @@ function renderHomeView() {
 
 function renderChatView() {
   return `<main id="main-content" class="chat-view page-width" tabindex="-1">
-    <div class="page-heading"><div><p class="eyebrow">ZION / CANAL PRIVADO</p><h1>Más allá del código<span class="text-accent">_</span></h1></div><p class="heading-aside">CONEXIÓN CON MORFEO<br>COHORTE HENRY 79</p></div>
+    <div class="page-heading"><div><p class="eyebrow">ZION / CANAL PRIVADO</p><h1>Más allá del código<span class="text-accent">_</span></h1></div><p class="heading-aside"><span data-channel-name>ELIGE TU CONEXIÓN</span><br>COHORTE HENRY 79</p></div>
     <div class="chat-layout">
       <aside class="signal-panel" aria-label="Estado y solicitudes de esta app">
-        <div class="signal-portrait"><img src="/assets/morpheus-closed.png" alt="Morfeo" width="1024" height="1024"><span>MORPHEUS / 01</span></div>
-        <p class="eyebrow">SOLICITUDES DE ESTA APP</p>
+        <div class="signal-portrait" data-character-portrait><img src="/assets/morpheus-closed.png" alt="Morfeo" width="1024" height="1024"><span>MORPHEUS / 01</span></div>
+        <div class="character-emblem" data-character-emblem hidden aria-hidden="true"></div><p class="eyebrow">SOLICITUDES DE ESTA APP</p>
         <div class="quota-item"><p>ÚLTIMO MINUTO <strong data-minute-quota>— / 15</strong></p><div class="quota-bar" data-minute-bar></div></div>
         <div class="quota-item"><p>HOY <strong data-day-quota>— / 500</strong></p><div class="quota-bar" data-day-bar></div></div>
         <p class="quota-note">Contador compartido. El día reinicia a medianoche del Pacífico. Google puede aplicar otros límites.</p>
-        <div class="signal-quote">“Free your mind.”<span>— MORPHEUS</span></div>
+        <div class="signal-quote" data-character-note>Elige a quien te acompañará.</div>
       </aside>
-      <section class="terminal chat-terminal" aria-label="Conversación con Morfeo">
-        <div class="terminal-bar"><span><span class="terminal-square" aria-hidden="true"></span>morpheus@zion:~</span><span class="terminal-bar-end">SECURE CHANNEL</span></div>
+      <section class="terminal chat-terminal" aria-label="Terminal de conversación">
+        <div class="terminal-bar"><span><span class="terminal-square" aria-hidden="true"></span><span data-terminal-name>zion@network:~</span></span><span class="terminal-bar-end">SECURE CHANNEL</span></div>
         <div class="chat-gate" data-chat-gate><span class="gate-symbol" aria-hidden="true">[ × ]</span><p class="eyebrow">IDENTIFICACIÓN REQUERIDA</p><h2>La puerta está cerrada.</h2><p>Introduce el número de tu cohorte de Henry para abrir el canal.</p>${accessForm('chat-cohort')}</div>
         <div class="chat-console" data-chat-console hidden>
-          <div class="chat-log" role="log" tabindex="0" aria-label="Mensajes de la conversación" aria-live="polite" aria-relevant="additions text"><div class="empty-state"><span class="empty-symbol" aria-hidden="true">&gt;_</span><h2>Te estaba esperando.</h2><p>Hay una diferencia entre conocer el camino<br>y recorrerlo. Haz tu primera pregunta.</p></div></div>
+          <section class="character-picker" data-character-picker aria-labelledby="picker-title">
+            <p class="eyebrow">CANAL DESBLOQUEADO</p><h2 id="picker-title">¿Con quién quieres hablar?</h2>
+            <p>Cada personaje conserva su propia conversación.</p>
+            <div class="character-options">${CHARACTERS.map(character => `<button type="button" data-character="${character.id}"><span aria-hidden="true">${character.emblem}</span><strong>${character.name}</strong><small>${character.description}</small></button>`).join('')}</div>
+          </section>
+          <div class="chat-log" role="log" tabindex="0" aria-label="Mensajes de la conversación" aria-live="polite" aria-relevant="additions text"><div class="empty-state"><span class="empty-symbol" aria-hidden="true">&gt;_</span><h2>El canal está abierto.</h2><p data-empty-note>Haz tu primera pregunta.</p></div></div>
           <div class="smith-intrusion" hidden><img class="smith-face" loading="lazy" src="/assets/agent-smith.png" alt="" width="1024" height="1024"><div><p class="eyebrow">INTRUSIÓN DETECTADA / AGENTE SMITH</p><h2>Señor Anderson…</h2><p>El canal ha alcanzado su límite.<br>Recuperación en <strong data-smith-countdown>60 s</strong>.</p><small>Efecto visual de la historia. Tu mensaje sigue en el campo.</small></div></div>
           <p class="chat-status" role="status">CONECTANDO…</p>
           <form class="composer" aria-label="Escribir un mensaje">
@@ -86,7 +92,7 @@ function renderChatView() {
         </div>
       </section>
     </div>
-    <p class="chat-caption">IA generativa · Interpretación ficticia de Morfeo. Historial en memoria: se borra al recargar.</p>
+    <p class="chat-caption">IA generativa · Interpretaciones ficticias de Matrix. Historiales separados en memoria: se borran al recargar.</p>
   </main>`;
 }
 
