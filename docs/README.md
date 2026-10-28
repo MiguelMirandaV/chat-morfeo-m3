@@ -1,5 +1,9 @@
 # Documentación de Chat con Morfeo
 
+## Próxima iteración
+
+[Iteración 3: alcance aprobado](iteracion-3.md) y [cuestionario de Smith](preguntas-smith.md). La preparación está en desarrollo; los documentos de entrega siguientes describen la versión publicada de la iteración 2.
+
 ## Uso y entrega vigentes
 
 - [README del producto](../README.md): acceso **79**, uso, instalación y estructura.
