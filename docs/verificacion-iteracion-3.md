@@ -22,3 +22,20 @@ El banco de diez preguntas está en [preguntas de Smith](preguntas-smith.md); la
 La captura ilustra la integración funcional del cuestionario con la presentación anterior. La simplificación de terminal y la escena de Smith a gran escala siguen en sus pasos respectivos. No se presenta esta imagen como la interfaz final ni como una prueba móvil.
 
 Los casos de migración y borrado utilizaron almacenamiento ficticio en Vitest; no se borraron conversaciones del usuario. La coordinación de localStorage detecta conflictos conocidos y no ofrece transacciones entre pestañas. No se consumió cuota real para comprobar errores o el cuestionario.
+
+## Terminal simplificada
+
+El paso 4 mantiene las **270 pruebas en ocho archivos** y el build aprobados. Cambia la presentación y los controles de historial, conservando la lógica del cuestionario y los contratos de servidor.
+
+- Terminal de una columna, emblemas para todos los personajes y ausencia de fotografías en Chat.
+- Contadores de solicitudes, progreso de Smith y caracteres; los estados normales redundantes quedan ocultos y los avisos accionables permanecen.
+- Historial en un desplegable con Escape, confirmación de borrado y recuperación del foco al cancelar.
+- Fallo de respuesta simulado, borrador conservado, reintento y cambio confirmado a Trinity.
+- Cuota agotada y localStorage bloqueado comprobados mediante escenarios locales; ningún servicio remoto fue utilizado.
+- Escritorio de 1280 px y viewports CSS embebidos de 320 y 768 px sin overflow horizontal. A 320 px, el botón Enviar de 44 px queda dentro del área visible. La herramienta no aplicó el ajuste directo de viewport; los tamaños se midieron en los marcos. No es una prueba con teclado físico móvil.
+
+[Registro y límites de QA](capturas/iteracion-3/terminal-local.json).
+
+![Terminal con datos ficticios y API local simulada](capturas/iteracion-3/terminal-escritorio.png)
+
+[Captura de los viewports embebidos](capturas/iteracion-3/terminal-responsive.png). El rostro invasivo de Smith sigue pendiente de su paso visual.

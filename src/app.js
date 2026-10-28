@@ -22,13 +22,13 @@ function header(activePage) {
     </header>`;
 }
 
-function footer() {
+function footer(activePage) {
   return `
     <footer class="site-footer">
       <span>© 2026 Miguel Miranda</span>
-      <span class="footer-context">PROYECTO ACADÉMICO / HENRY M3</span>
+      ${activePage === 'chat' ? '' : '<span class="footer-context">PROYECTO ACADÉMICO / HENRY M3</span>'}
       <div class="footer-links">
-        <a href="/about">Acerca del proyecto ${arrow}</a>
+        ${activePage === 'chat' ? '' : `<a href="/about">Acerca del proyecto ${arrow}</a>`}
         <a href="https://github.com/MiguelMirandaV/chat-morfeo-m3" target="_blank" rel="noopener noreferrer" aria-label="GitHub del proyecto (abre en otra pestaña)">GitHub ${arrow}</a>
       </div>
     </footer>`;
@@ -61,29 +61,25 @@ function renderHomeView() {
 
 function renderChatView() {
   return `<main id="main-content" class="chat-view page-width" tabindex="-1">
-    <div class="page-heading"><div><p class="eyebrow">ZION / CANAL PRIVADO</p><h1>Más allá del código<span class="text-accent">_</span></h1></div><p class="heading-aside"><span data-channel-name>ELIGE TU CONEXIÓN</span><br>COHORTE HENRY 79</p></div>
-    <div class="chat-layout">
-      <aside class="signal-panel" aria-label="Estado y solicitudes de esta app">
-        <div class="signal-portrait" data-character-portrait><img src="/assets/morpheus-closed.png" alt="Morfeo" width="1024" height="1024"><span>MORPHEUS / 01</span></div>
-        <div class="character-emblem" data-character-emblem hidden aria-hidden="true"></div><p class="eyebrow">SOLICITUDES DE ESTA APP</p>
-        <div class="quota-item"><p>ÚLTIMO MINUTO <strong data-minute-quota>— / 15</strong></p><div class="quota-bar" data-minute-bar></div></div>
-        <div class="quota-item"><p>HOY <strong data-day-quota>— / 500</strong></p><div class="quota-bar" data-day-bar></div></div>
-        <p class="quota-note">Contador compartido. El día reinicia a medianoche del Pacífico. Google puede aplicar otros límites.</p>
-        <div class="signal-quote" data-character-note>Elige a quien te acompañará.</div>
-      </aside>
-      <section class="terminal chat-terminal" aria-label="Terminal de conversación">
-        <div class="terminal-bar"><span><span class="terminal-square" aria-hidden="true"></span><span data-terminal-name>zion@network:~</span></span><span class="terminal-bar-end">SECURE CHANNEL</span></div>
-        <div class="chat-gate" data-chat-gate><span class="gate-symbol" aria-hidden="true">[ × ]</span><p class="eyebrow">IDENTIFICACIÓN REQUERIDA</p><h2>La puerta está cerrada.</h2><p>Introduce el número de tu cohorte de Henry para abrir el canal.</p>${accessForm('chat-cohort')}</div>
+    <h1 class="sr-only">Terminal de conversación</h1>
+    <section class="terminal chat-terminal" aria-label="Terminal de conversación">
+      <div class="terminal-bar"><span class="terminal-identity"><span class="character-emblem" data-character-emblem hidden aria-hidden="true"></span><span data-channel-name>CANAL CERRADO</span></span><span class="terminal-bar-end" data-terminal-name>zion@network:~</span></div>
+      <div class="terminal-metrics" data-terminal-metrics hidden aria-label="Contadores del canal">
+        <p class="quota-readout"><span>MINUTO <strong data-minute-quota>— / 15</strong></span><span>DÍA <strong data-day-quota>— / 500</strong></span></p>
+        <p class="quota-legend">Solicitudes compartidas · minuto móvil.</p>
+        <p class="story-progress" data-story-progress></p>
+      </div>
+        <div class="chat-gate" data-chat-gate><span class="gate-symbol" aria-hidden="true">[ × ]</span><p class="eyebrow">IDENTIFICACIÓN REQUERIDA</p><h2>La puerta está cerrada.</h2><p>Introduce el código 79 para abrir el canal.</p>${accessForm('chat-cohort')}</div>
         <div class="chat-console" data-chat-console hidden>
           <div class="history-toolbar" data-storage-actions hidden>
-            <p data-storage-status role="status"></p>
-            <div class="history-buttons"><button type="button" data-history-action="current">Borrar esta conversación</button><button type="button" data-history-action="all">Borrar todos los historiales</button></div>
+            <div class="history-line"><p data-storage-status role="status"></p>
+              <details class="history-menu" data-history-menu><summary>Historial</summary><div class="history-menu-panel"><button type="button" data-history-action="current">Borrar esta conversación</button><button type="button" data-history-action="all">Borrar todos los historiales</button></div></details>
+            </div>
             <div class="storage-conflict" data-storage-conflict hidden><button type="button" data-history-action="load">Cargar historial guardado</button><button type="button" data-history-action="keep">Conservar esta pestaña</button></div>
           </div>
           <section class="character-picker" data-character-picker aria-labelledby="picker-title">
-            <p class="eyebrow">CANAL DESBLOQUEADO</p><h2 id="picker-title">¿Con quién quieres hablar?</h2>
-            <p>Cada personaje conserva su propia conversación.</p>
-            <div class="character-options">${CHARACTERS.map(character => `<button type="button" data-character="${character.id}"><span aria-hidden="true">${character.emblem}</span><strong>${character.name}</strong><small>${character.description}</small></button>`).join('')}</div>
+            <h2 id="picker-title">¿Con quién quieres hablar?</h2>
+            <div class="character-options">${CHARACTERS.map(character => `<button type="button" data-character="${character.id}"><span aria-hidden="true">${character.emblem}</span><strong>${character.name}</strong></button>`).join('')}</div>
           </section>
           <div class="chat-log" role="log" tabindex="0" aria-label="Mensajes de la conversación" aria-live="polite" aria-relevant="additions text"><div class="empty-state"><span class="empty-symbol" aria-hidden="true">&gt;_</span><h2>El canal está abierto.</h2><p data-empty-note>Haz tu primera pregunta.</p></div></div>
           <section class="smith-intrusion" aria-label="Intervención de Smith" hidden>
@@ -93,21 +89,19 @@ function renderChatView() {
               <details data-last-normal><summary>Tu última respuesta está guardada</summary><p></p></details>
             </div>
           </section>
-          <p class="story-progress" data-story-progress></p><p class="story-storage" data-story-storage role="status"></p>
-          <p class="quota-wait" data-quota-wait role="status" hidden>Gemini está en pausa por cuota. Recuperación en <strong data-quota-countdown></strong>. Tu borrador se conserva.</p>
+          <p class="story-storage" data-story-storage role="status" hidden></p>
+          <p class="quota-wait" data-quota-wait role="status" hidden>Límite de solicitudes. Reintenta en <strong data-quota-countdown></strong>. Tu borrador se conserva.</p>
           <p class="chat-status" role="status">CONECTANDO…</p>
           <form class="composer" aria-label="Escribir un mensaje">
             <div class="composer-top"><label for="message-input">TU MENSAJE &gt;</label><output id="character-count" for="message-input" aria-label="Caracteres escritos">0 / ${MAX_MESSAGE_LENGTH}</output></div>
-            <textarea id="message-input" name="message" rows="3" placeholder="Escribe a Morfeo…" aria-describedby="message-help message-error" spellcheck="true"></textarea>
+            <textarea id="message-input" name="message" rows="2" placeholder="Escribe a Morfeo…" aria-describedby="message-help message-error" spellcheck="true"></textarea>
             <p id="message-error" class="input-error" role="status" hidden></p>
-            <div class="composer-bottom"><p id="message-help">Máximo ${MAX_MESSAGE_LENGTH} caracteres.<br>Enter envía · Shift+Enter agrega una línea.<br><span data-transfer-help>Para cambiar: /hablar trinity</span></p><button class="button button-primary" type="submit" disabled>ENVIAR ↗</button></div>
+            <div class="composer-bottom"><p id="message-help">Enter envía · Shift+Enter agrega una línea.<br><span data-transfer-help>Cambiar: /hablar trinity</span></p><button class="button button-primary" type="submit" disabled>ENVIAR ↗</button></div>
           </form>
         </div>
-      </section>
-    </div>
+    </section>
     <dialog class="history-dialog" data-history-dialog aria-labelledby="history-dialog-title" aria-describedby="history-dialog-description"><form><h2 id="history-dialog-title">¿Borrar el historial?</h2><p id="history-dialog-description"></p><div><button type="button" data-history-cancel>Cancelar</button><button type="submit">Confirmar</button></div></form></dialog>
     <dialog class="history-dialog" data-transfer-dialog aria-labelledby="transfer-title" aria-describedby="transfer-description"><form><p class="eyebrow">ENRUTAMIENTO / ZION</p><h2 id="transfer-title">¿Cambiar de personaje?</h2><p id="transfer-description"></p><div><button type="button" data-transfer-cancel>Cancelar</button><button type="submit">Cambiar canal ↗</button></div></form></dialog>
-    <p class="chat-caption">IA generativa · Interpretaciones ficticias de Matrix. Historiales guardados en este navegador cuando el almacenamiento está disponible.</p>
   </main>`;
 }
 
@@ -125,7 +119,7 @@ function renderAboutView() {
       <div class="about-details about-details--wide">
         <section class="detail-section" aria-labelledby="project-title"><span class="detail-number" aria-hidden="true">01</span><div><h2 id="project-title">Mi terminal de aprendizaje</h2><p>Creé esta experiencia para el Proyecto Integrador del Módulo 3 de Full Stack de Henry, con asistencia de Codex. Me inspiré en <cite>The Matrix (1999)</cite> para explorar una SPA responsive e inteligencia artificial. Los personajes son interpretaciones ficticias.</p></div></section>
         <section class="detail-section" aria-labelledby="tech-title"><span class="detail-number" aria-hidden="true">02</span><div><h2 id="tech-title">Una voz, un contexto</h2><p>Cada personaje tiene sus propias instrucciones en el servidor. Para cambiar, pídeselo desde la conversación: «Quiero hablar con Trinity» o <code>/hablar trinity</code>. Confirma el cambio para recuperar su historial. La petición de cambio no consume Gemini.</p><ul class="tech-list" aria-label="Tecnologías"><li>JavaScript</li><li>Three.js</li><li>Gemini</li><li>Redis</li><li>Vercel</li></ul></div></section>
-        <section class="detail-section" aria-labelledby="session-title"><span class="detail-number" aria-hidden="true">03</span><div><h2 id="session-title">Tu señal permanece</h2><p>Guardo mensajes y borradores separados en este navegador cuando localStorage está disponible. Puedes borrarlos con confirmación. Enter envía; Shift+Enter agrega una línea. Cada mensaje admite 280 caracteres. El código 79 abre un acceso compartido; no identifica personas. Después de tres intercambios completos con cada personaje, Smith interviene una sola vez. Un acierto en su cuestionario del M3 recupera la conversación; los errores avanzan por diez preguntas de dos opciones. El progreso se guarda aparte del historial y no consume solicitudes de IA. Las claves y los contadores de solicitudes permanecen en el servidor.</p><a class="text-link" href="/chat">Entrar a la terminal ${arrow}</a></div></section>
+        <section class="detail-section" aria-labelledby="session-title"><span class="detail-number" aria-hidden="true">03</span><div><h2 id="session-title">Tu señal permanece</h2><p>Guardo mensajes y borradores separados en este navegador cuando localStorage está disponible. Puedes borrarlos con confirmación. Enter envía; Shift+Enter agrega una línea. Cada mensaje admite 280 caracteres. El código 79 abre un acceso compartido; no identifica personas. Después de tres intercambios completos con cada personaje, Smith interviene una sola vez. Un acierto en su cuestionario del M3 recupera la conversación; los errores avanzan por diez preguntas de dos opciones. El progreso se guarda aparte del historial y no consume solicitudes de IA. Las claves y los contadores de solicitudes permanecen en el servidor. Las cuotas son compartidas: 15 solicitudes por minuto móvil y 500 por día, con reinicio diario a medianoche del Pacífico; el proveedor puede aplicar otros límites.</p><a class="text-link" href="/chat">Entrar a la terminal ${arrow}</a></div></section>
       </div>
     </main>`;
 }
@@ -218,7 +212,7 @@ function renderRoute({ moveFocus = false } = {}) {
   document.title = route.title;
   document.body.dataset.page = route.page;
   renderedLocation = `${route.path}${window.location.search}`;
-  document.querySelector('#app').innerHTML = `${header(route.page)}${route.render()}${footer()}`;
+  document.querySelector('#app').innerHTML = `${header(route.page)}${route.render()}${footer(route.page)}`;
   if (route.page === 'home') {
     homeScene = mountMatrixScene(document.querySelector('.matrix-scene'), document.querySelector('.motion-control'));
     const cleanAccess = mountAccess(document.querySelector('.access-form'), () => enterPortal('/chat'));

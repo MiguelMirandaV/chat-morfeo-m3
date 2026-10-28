@@ -1,5 +1,13 @@
 # Terminal: transferencias y teclado
 
+## Interfaz de conversación
+
+La vista usa una sola terminal sin panel lateral ni fotografías. El encabezado identifica la voz con su emblema: M para Morfeo, ◎ para el Oráculo y △ para Trinity. Las etiquetas de autor distinguen mensajes sin depender solo del color. Los contadores de solicitudes y el progreso de Smith tienen una explicación breve; el contador del campo conserva el máximo de 280 grafemas.
+
+Las acciones de borrado se abren desde **Historial** y mantienen su diálogo de confirmación. Escape cierra el desplegable; cancelar un borrado devuelve el foco a Historial. Los conflictos siguen ofreciendo sus dos opciones fuera del desplegable. Los estados de carga, error, espera por cuota y fallo de guardado aparecen cuando corresponden; no hay avisos permanentes de canal abierto o progreso guardado de Smith.
+
+La información de proyecto, proveedor y límites técnicos permanece en Acerca de y en la documentación. El pie del chat conserva copyright y GitHub; Inicio y Acerca de mantienen su presentación. La navegación SPA y las tres rutas siguen disponibles.
+
 ## Uso
 
 Desbloqueo con **79** y elijo mi primera conexión. Para cambiar de personaje escribo una petición directa, por ejemplo:

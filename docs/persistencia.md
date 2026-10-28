@@ -30,6 +30,8 @@ Recuperar el borrador no recupera una respuesta del servidor que nunca llegó al
 
 ## Borrado con confirmación
 
+Las dos acciones están dentro del desplegable **Historial**. El indicador de guardado permanece visible; los avisos de fallo o conflicto muestran su mensaje completo. Escape cierra el desplegable y conserva el foco en su control.
+
 - **Borrar esta conversación:** elimina mensajes y borrador del personaje activo; conserva las otras conversaciones y la selección.
 - **Borrar todos los historiales:** elimina la clave de conversaciones y vuelve a la selección inicial, salvo que Smith controle la terminal: en ese caso conserva su intervención y personaje de retorno.
 - Ambas acciones muestran un diálogo con alcance explícito y Cancelar como foco inicial. Escape cancela. [Referencia del diálogo modal](https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement/showModal).

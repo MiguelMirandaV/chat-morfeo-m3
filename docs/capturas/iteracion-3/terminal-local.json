@@ -1,0 +1,54 @@
+{
+  "scope": "Paso 4: terminal simplificada en feat/matrix-v3; frontend real y API local simulada",
+  "realGemini": 0,
+  "realRedis": 0,
+  "unitTests": 270,
+  "testFiles": 8,
+  "build": "passed",
+  "directDesktop": {
+    "viewportWidth": 1280,
+    "documentScrollWidth": 1280,
+    "morpheusEmblem": "M",
+    "chatImageCount": 0,
+    "providerOrProjectCopyInChat": false
+  },
+  "responsive": {
+    "method": "Marcos HTML del mismo origen con viewports CSS independientes; no emulación de dispositivo físico.",
+    "viewports": [
+      {
+        "width": 320,
+        "height": 640,
+        "documentScrollWidth": 320,
+        "sendButtonBottom": 592.515625,
+        "sendButtonHeight": 44
+      },
+      {
+        "width": 768,
+        "height": 820,
+        "documentScrollWidth": 768
+      }
+    ],
+    "note": "La API de tamaño del navegador devolvió éxito pero mantuvo 1280x720. Se restauró su ajuste y se usó el contenedor de QA para medir anchos reales."
+  },
+  "observed": [
+    "Morfeo usa M y Trinity usa △; ninguna fotografía se renderiza en Chat.",
+    "Historial abre las dos acciones; borrar esta conversación exige confirmación. Cancelar conserva los mensajes y devuelve foco a Historial.",
+    "Escape cierra el desplegable y conserva su foco.",
+    "Cuota simulada 15/15 muestra espera y envío bloqueado; no se reactiva Smith ya superado.",
+    "Al bloquear localStorage se mantienen avisos completos y se puede conversar en memoria.",
+    "Un fallo 503 simulado conserva el borrador y permite reintento; el éxito suma solo un intercambio.",
+    "Enter procesa el comando de transferencia; confirmar cambia a Trinity y conserva el historial de Morfeo.",
+    "La pestaña directa final y el recorrido de fallo/reintento no registraron errores ni avisos de consola."
+  ],
+  "toolingObservation": "Al salir del contenedor con iframes se observó un error MutationObserver sin archivo de origen. El código de la aplicación no utiliza MutationObserver y el error no se reprodujo en una pestaña directa nueva; no se estableció su causa.",
+  "sourceSha256": {
+    "src/app.js": "bffdb94ce5a8f722aa7cbf211aa74f98245f4b75e5240872c4dfd9adca50d4ac",
+    "src/chat.js": "cb80668d67371501dfff327fe7de64b54660647e84c2a52b2206919ab9d3a6bc",
+    "src/styles.css": "9e4cac28e743f597453e25a04fe56f5e3f1ddd2bd2759339a5c6b8ecc26ebe24"
+  },
+  "limits": [
+    "La revisión no utilizó teclado móvil físico ni demuestra todos los dispositivos.",
+    "No se borraron historiales para probar: se abrió y canceló el diálogo; el borrado efectivo sigue cubierto con almacenamiento sustituido.",
+    "Las capturas identifican explícitamente la API de QA; no corresponden a producción."
+  ]
+}

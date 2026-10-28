@@ -27,6 +27,7 @@ Diseñé la interfaz como una terminal de Zion. Construí una entrada de pantall
 - Conversar mediante Gemini, enviando el historial completo del personaje elegido en cada petición. Los borradores y errores también se mantienen separados.
 - Enviar con **Enter** o el botón; agregar líneas con **Shift+Enter**.
 - Escribir hasta **280 caracteres visibles**, incluidos espacios, saltos y emojis compuestos. El texto pegado que excede el límite se conserva para corregirlo.
+- Conversar en una terminal de una columna, con emblemas cifrados para los tres personajes y contadores breves.
 - Ver el estado de escritura y recuperar el borrador si una respuesta falla.
 - Recuperar conversaciones y borradores al recargar; borrar una conversación o todas, con confirmación.
 - Resolver cambios detectados desde otra pestaña antes de sobrescribir un historial.
@@ -44,7 +45,7 @@ Guardo historiales y borradores por personaje en localStorage; se recuperan al v
 4. Espera la respuesta. Ante un fallo, revisa el mensaje de estado y reintenta con el borrador conservado.
 5. Puedes navegar o recargar y recuperar lo guardado en ese mismo navegador y sitio. Un envío interrumpido vuelve como borrador; no se reenvía automáticamente.
 6. Después de tres intercambios completos con un personaje, responde una pregunta de Smith. Un acierto recupera tu conversación y evita nuevas interrupciones para ese personaje. Si fallas, aparece la siguiente; después de la décima vuelve a la primera. El cuestionario es local y no consume solicitudes de IA.
-7. Usa **Borrar esta conversación** o **Borrar todos los historiales** y confirma si quieres eliminarlos. El borrado conserva el progreso de Smith y las cuotas.
+7. Abre **Historial**, elige **Borrar esta conversación** o **Borrar todos los historiales** y confirma si quieres eliminarlos. El borrado conserva el progreso de Smith y las cuotas.
 
 Envío las preguntas a Gemini a través de mi función de servidor. No escribas contraseñas ni claves en la conversación.
 
