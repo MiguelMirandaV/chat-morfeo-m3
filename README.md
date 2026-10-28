@@ -135,7 +135,7 @@ npm run test:watch
 
 Incluí **275 pruebas en ocho archivos** para validar caracteres, navegación, historiales separados, identidad, estados, errores, transporte, acceso, cuotas, cuestionario de Smith y contratos de Gemini. Uso mocks para que la suite no consuma Gemini ni Redis reales y restauro el entorno entre pruebas.
 
-[Personajes y contrato](docs/personajes.md) · [Detalle de las pruebas](docs/pruebas-unitarias.md) · [Comprobaciones y límites](docs/pruebas.md).
+[Personajes y contrato](docs/personajes.md) · [Detalle de las pruebas](docs/pruebas-unitarias.md) · [Comprobaciones y límites](docs/verificacion-iteracion-3.md).
 
 ## Acceso, datos y cuotas
 
@@ -157,15 +157,15 @@ Conecto el repositorio con Vercel y publico desde `main`. Mantengo la raíz del 
 
 Configura en Production y Preview las cinco variables de servidor de la tabla, excluyendo `QUOTA_DRIVER`. Uso la misma base Redis cuando ambos entornos consumen el mismo proyecto de Gemini. Cada cambio de variables requiere un despliegue nuevo.
 
-[Guía de despliegue](docs/despliegue.md) · [Publicación de esta iteración](docs/publicacion-iteracion-2.md).
+[Guía de despliegue](docs/despliegue.md) · [Publicación de esta iteración](docs/publicacion-iteracion-3.md).
 
 ## Capturas
 
-| Personajes en Acerca de | Terminal bajo la intervención de Smith |
+| Terminal de conversación | Intervención de Smith |
 | --- | --- |
-| ![Tres personajes](docs/capturas/iteracion-2/acerca-de-1024.png) | ![Smith en producción: diálogo local](docs/capturas/iteracion-2/produccion/smith.jpg) |
+| ![Terminal simplificada](docs/capturas/iteracion-3/terminal-escritorio.png) | ![Smith y cuestionario](docs/capturas/iteracion-3/smith-invasivo.png) |
 
-Las capturas ilustran la versión pública anterior, donde Smith usaba diálogo local; [la verificación pública](docs/publicacion-iteracion-2.md) y [la evaluación de voces con Gemini](docs/evaluacion-personajes.md) tienen sus registros propios.
+Estas dos capturas proceden de la revisión local con API simulada. La imagen de Inicio conserva el diseño publicado anterior, sin cambios en esta iteración. Distingo las comprobaciones locales de la [verificación del despliegue](docs/publicacion-iteracion-3.md) y de la [evaluación real de voces](docs/evaluacion-personajes.md).
 
 ## Límites y mantenimiento
 
@@ -181,9 +181,9 @@ Desarrollé este proyecto con asistencia de Codex para el código, los retratos,
 
 - [Índice de documentación](docs/README.md).
 - [Alcance funcional](docs/alcance.md) y [mapa de objetivos y rúbrica](docs/entrega.md).
-- [Verificación y límites](docs/verificacion-iteracion-2.md).
+- [Verificación y límites](docs/verificacion-iteracion-3.md).
 - [Personajes y evaluación real](docs/evaluacion-personajes.md).
 - [Arquitectura](docs/arquitectura.md), [historiales](docs/persistencia.md) y [Smith](docs/smith.md).
-- [Publicación](docs/publicacion-iteracion-2.md) y [guía de despliegue](docs/despliegue.md).
+- [Publicación](docs/publicacion-iteracion-3.md) y [guía de despliegue](docs/despliegue.md).
 
 © 2026 Miguel Miranda. Mi interpretación de Matrix es un proyecto académico; no es un producto oficial de la franquicia.

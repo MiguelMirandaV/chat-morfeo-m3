@@ -1,6 +1,6 @@
 # Desplegar Chat con Morfeo en Vercel
 
-Esta guía reproduce la configuración del repositorio. El estado de publicación de la iteración está en [publicacion-iteracion-2.md](publicacion-iteracion-2.md).
+Esta guía reproduce la configuración del repositorio. El estado de publicación de la iteración está en [publicacion-iteracion-3.md](publicacion-iteracion-3.md).
 
 ## 1. Comprobar el repositorio
 
@@ -12,7 +12,7 @@ git log -1 --oneline
 npm test
 ```
 
-Espera **258 tests aprobados**. Durante la revisión publico los commits en `feat/matrix-v2`, que genera Preview. La integración a `main` corresponde al cierre de publicación. Antes de subir, revisa rama, diff y commit. `.env`, `.env.local`, `.data/`, `node_modules/` y `.vercel/` no se versionan. El repositorio a conectar es [MiguelMirandaV/chat-morfeo-m3](https://github.com/MiguelMirandaV/chat-morfeo-m3).
+Espera **275 tests aprobados**. Durante la revisión publico los commits en `feat/matrix-v3`, que genera Preview. La integración a `main` corresponde al cierre de publicación. Antes de subir, revisa rama, diff y commit. `.env`, `.env.local`, `.data/`, `node_modules/` y `.vercel/` no se versionan. El repositorio a conectar es [MiguelMirandaV/chat-morfeo-m3](https://github.com/MiguelMirandaV/chat-morfeo-m3).
 
 ## 2. Usar el proyecto de Vercel
 
@@ -58,7 +58,7 @@ En el paso 12, la primera inspección sin subida mostró el .env local incluido.
 
 ## 5. Crear el despliegue
 
-Con las variables guardadas, utiliza el flujo Git del proyecto: `feat/matrix-v2` genera Preview y la integración revisada a `main` genera Production. Comprueba qué commit representa cada despliegue antes de volver a desplegar. Comprueba que el despliegue nuevo corresponda al commit que vas a entregar. La alternativa CLI, desde una carpeta ya vinculada, es:
+Con las variables guardadas, utiliza el flujo Git del proyecto: `feat/matrix-v3` genera Preview y la integración revisada a `main` genera Production. Comprueba qué commit representa cada despliegue antes de volver a desplegar. Comprueba que el despliegue nuevo corresponda al commit que vas a entregar. La alternativa CLI, desde una carpeta ya vinculada, es:
 
 ```bash
 npm exec -- vercel deploy --prod
@@ -76,7 +76,7 @@ Para la evaluación, la URL debe abrir sin una cuenta de Vercel. Comprueba el **
 4. Envía una pregunta genérica y luego una que requiera recordar un dato ficticio del primer turno. Comprueba ambos resultados y el incremento del contador. No uses datos personales para esta prueba.
 5. En Network revisa `POST /api/functions`: contiene character/messages y recibe character/reply/quota, sin GEMINI_API_KEY ni el secreto de sesión. El navegador recibe la cookie automáticamente; no pegues sus valores en evidencia.
 6. Comprueba que solicitudes a archivos privados o de configuración no entreguen su contenido. Un alias de API puede ejecutarse; importa el contenido y el tipo de respuesta, no asumir que todo alias tiene que dar 404.
-7. Revisa 320/768/1024 y la consola. Smith aparece después de tres turnos completos, independientemente de la cuota; sus dos respuestas son locales. Los casos de cuota agotada se ensayaron con escenarios controlados, sin provocar 16 generaciones reales.
+7. Revisa 320/768/1024 y la consola. Smith aparece una sola vez por personaje después de tres intercambios completos. Una pregunta correcta recupera el canal; el cuestionario no llama a la API. Los casos de cuota agotada se ensayaron con escenarios controlados, sin provocar 16 generaciones reales.
 8. Registra fecha, dominio, SHA del commit desplegado, pruebas y capturas. Actualiza el enlace de la aplicación en README y entrega.md con el dominio verificado.
 
 La publicación queda comprobada cuando el dominio público sirve el commit integrado, las rutas SPA y la función real funcionan bajo HTTPS, y se registra la evidencia correspondiente. No reutilizo los resultados de producción de la primera entrega como si certificaran esta iteración.

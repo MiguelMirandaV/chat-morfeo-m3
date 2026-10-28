@@ -33,9 +33,9 @@ La persistencia amplía expresamente el comportamiento mínimo del M3 que conser
 
 ## Ampliaciones propias
 
-Smith aparece cada **tres turnos normales completos**, acumulados entre personajes, y responde durante **dos interacciones locales**. Después devuelve el canal anterior, conservando su contexto. Su rostro de caracteres, lluvia y cambio de terminal son una escena ficticia identificada como tal. No requiere agotar cuota ni realiza generaciones de Gemini.
+Smith aparece **una sola vez por personaje**, después de tres intercambios completos con ese personaje. Su rostro de caracteres invade la pantalla y presenta una pregunta del M3 con dos opciones. Un error avanza a la siguiente de las diez preguntas, en ciclo; un acierto devuelve la conversación y evita nuevas intervenciones en ese canal. El cuestionario es local y no consume Gemini ni modifica las cuotas.
 
-El progreso se guarda en una clave independiente. Borrar historiales, cambiar de personaje o recibir un error no reinicia la cadencia. Durante Smith no se procesan transferencias. La despedida permite volver con un botón o tras doce segundos disponibles; la lectura abierta, un diálogo o una pestaña oculta pausan el plazo.
+Guardo contadores, pregunta pendiente y retos superados en una clave independiente. Borrar historiales conserva ese progreso. Durante Smith no se procesan transferencias. La escena permite pausa, respeta movimiento reducido y conserva el cuestionario si falla Canvas; no hay retorno por temporizador. La terminal normal usa emblemas, mensajes y controles esenciales, sin fotografías ni explicaciones del proyecto.
 
 ## Acceso, datos y cuotas
 
@@ -47,8 +47,8 @@ localStorage pertenece al origen y no sincroniza dispositivos. Sus fallos, regis
 
 ## Evidencia y límites
 
-[Entrega y rúbrica](entrega.md) relaciona los ocho objetivos con el código y las verificaciones. [Verificación de esta iteración](verificacion-iteracion-2.md) distingue tests, escenarios simulados y generaciones reales. La publicación pública está documentada con su commit y resultados; [estado de publicación](publicacion-iteracion-2.md).
+[Entrega y rúbrica](entrega.md) relaciona los ocho objetivos con el código y las verificaciones. [Verificación de esta iteración](verificacion-iteracion-3.md) distingue tests, escenarios simulados y generaciones reales. La publicación pública está documentada con su commit y resultados; [estado de publicación](publicacion-iteracion-3.md).
 
 La calificación corresponde a Henry. Los prompts pueden fallar o repetirse, los servicios pueden no estar disponibles y la revisión de tamaños concretos no certifica todos los dispositivos. El rostro es procedural, sin garantía de semejanza fotorrealista con un actor.
 
-[Alcance histórico de la primera entrega](alcance-v1.md) · [Decisiones y etapas aprobadas](iteracion-2.md).
+[Alcance histórico de la primera entrega](alcance-v1.md) · [Decisiones y etapas aprobadas](iteracion-3.md).
