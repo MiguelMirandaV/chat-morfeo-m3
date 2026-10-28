@@ -344,3 +344,35 @@ body[data-page="home"] { background: #000402; --accent: #68ff99; }
 .about-details--wide { max-width: 58rem; margin-inline: auto; }
 @media (min-width: 768px) { .character-gallery { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; } .character-card-body { padding: 1.1rem; } .character-card-body h2 { font-size: 1.5rem; } }
 @media (min-width: 1024px) { .character-card-body { padding: 1.7rem; } .character-card-body h2 { font-size: 1.9rem; } }
+
+/* Intervención narrativa 3+2; la espera por cuota tiene su propio aviso. */
+.story-progress, .story-storage, .quota-wait { margin: 0; padding: .5rem 1rem; font-size: .63rem; line-height: 1.6; overflow-wrap: anywhere; }
+.story-progress { color: #91d7a7; border-top: 1px solid #183b25; }
+.story-storage { color: #75937e; padding-top: 0; }
+.story-storage[data-kind="memory"], .story-storage[data-kind="conflict"], .quota-wait { color: #ffcf91; }
+.quota-wait { background: #211606; border-block: 1px solid #6c5426; }
+.smith-intrusion { padding: .7rem; gap: 1rem; color: #c6ffdc; border-color: #14da77; background: linear-gradient(110deg,#001d0f,#020b07 75%); }
+.smith-intrusion .eyebrow { color: #65ffae; }
+.smith-intrusion small { color: #91c2a4; margin-top: .3rem; font-size: .6rem; }
+.smith-signal { position: relative; flex: 0 0 40%; max-width: 15rem; min-width: 0; }
+.smith-signal canvas { display: block; width: 100%; height: 10rem; }
+.smith-signal button, [data-smith-return] { font: inherit; font-size: .62rem; background: #062d1a; color: #c8ffdd; border: 1px solid #2c9f61; padding: .5rem; cursor: pointer; }
+.smith-signal button { display: block; margin: .35rem auto 0; }
+.smith-fallback { display: none; font-size: .6rem; color: #69ffae; }
+.smith-signal canvas[hidden] + .smith-fallback { display: block; }
+.smith-brief { min-width: 0; flex: 1; }
+.smith-brief h2 { color: #d7ffe6; }
+.smith-brief details { font-size: .6rem; margin-top: .5rem; }
+.smith-brief summary { cursor: pointer; color: #b5edc7; }
+.smith-brief details p { max-height: 5rem; overflow-y: auto; overflow-wrap: anywhere; }
+[data-smith-return] { margin-top: .5rem; }
+.is-intercepted { border-color: #38ef86; box-shadow: 0 0 35px #16ee5d20; }
+.is-intercepted .terminal-bar { color: #91ffbd; background: #05351e; }
+@media (min-width: 768px) { .chat-terminal { height: auto; min-height: 44rem; } .chat-log { min-height: 10rem; max-height: 28rem; } }
+@media (prefers-reduced-motion: reduce) { .smith-glitch .chat-log { animation: none; } }
+@media (max-width: 480px) {
+  .smith-intrusion { flex-direction: column; align-items: stretch; }
+  .smith-signal { flex-basis: auto; max-width: none; }
+  .smith-signal canvas { height: 11rem; }
+  .smith-brief h2 { font-size: 1rem; }
+}

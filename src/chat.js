@@ -1,3 +1,5 @@
+import { emptyStory, validateStory, smithReply, createStoryStorage } from './smith-story.js';
+import { mountSmithScene } from './smith-scene.js';
 import { parseCharacterRequest, getComposerKeyAction } from './chat-controls.js';
 import { createHistoryStorage, validateStoredHistory } from './history-storage.js';
 import { CHARACTERS, getCharacter, isCharacterId } from './characters.js';
@@ -40,7 +42,7 @@ export function subscribeAccess(listener) { accessListeners.add(listener); liste
 function updateQuota(quota, intercepted = false) {
   if (quota && Number.isFinite(quota.minuteUsed) && Number.isFinite(quota.dayUsed)) {
     access.quota = quota;
-    if (intercepted) access.interceptedUntil = quota.retryAt || Date.now() + 60_000;
+    if (intercepted || quota.blocked) access.interceptedUntil = quota.retryAt || Date.now() + 60_000;
     else if (!quota.blocked) access.interceptedUntil = 0;
     publishAccess();
   }
@@ -141,7 +143,7 @@ export function createChatSession({ respond = requestReply, character = 'morpheu
     if (pending || typeof text !== 'string' || (text === draft && !error)) return;
     draft = text; error = ''; errorCode = ''; notify();
   }
-  async function send() {
+  async function send(onCompleted = () => {}) {
     if (pending || getMessageError(draft)) return false;
     const submitted = draft;
     messages.push({ role: 'user', content: submitted });
@@ -150,6 +152,7 @@ export function createChatSession({ respond = requestReply, character = 'morpheu
       const reply = await respond(copyMessages(), { character });
       if (typeof reply !== 'string' || !reply.trim()) throw new Error('Respuesta vacía');
       messages.push({ role: 'assistant', content: reply.trim() });
+      onCompleted();
       return true;
     } catch (cause) {
       messages.pop(); draft = submitted;
@@ -168,11 +171,13 @@ export function createCharacterSession({ respond = requestReply, initialCharacte
   const listeners = new Set();
   let character = initialCharacter, revision = 0, batching = false, transfer = null, controlMessage = '';
   let childSubscriptions = [];
+  let story = emptyStory(), storyBlocked = false;
   const isPending = () => [...conversations.values()].some(session => session.getState().pending);
   function getState() {
     const snapshots = Object.fromEntries([...conversations].map(([id, session]) => [id, session.getState()]));
-    const current = character ? snapshots[character] : { messages: [], draft: '', pending: false, error: '', errorCode: '' };
-    return { ...current, character, revision, transfer: transfer ? { from: transfer.from, to: transfer.to } : null, controlMessage, pending: Object.values(snapshots).some(session => session.pending), conversations: snapshots };
+    const normal = character ? snapshots[character] : { messages: [], draft: '', pending: false, error: '', errorCode: '' };
+    const current = story.normalTurns === 3 ? { messages: story.messages.map(message => ({ ...message })), draft: story.draft, error: '', errorCode: '' } : normal;
+    return { ...current, character, revision, story: { ...story, messages: story.messages.map(message => ({ ...message })) }, storyBlocked, smithActive: story.normalTurns === 3, transfer: transfer ? { from: transfer.from, to: transfer.to } : null, controlMessage, pending: Object.values(snapshots).some(session => session.pending), conversations: snapshots };
   }
   function notify() { if (!batching) for (const listener of listeners) listener(getState()); }
   function connectChildren() { childSubscriptions = [...conversations.values()].map(session => session.subscribe(notify)); }
@@ -184,31 +189,63 @@ export function createCharacterSession({ respond = requestReply, initialCharacte
     batching = true;
     for (const unsubscribe of childSubscriptions) unsubscribe();
     conversations = new Map(CHARACTERS.map(({ id }) => [id, createChatSession({ respond, character: id, initialState: document.conversations[id] })]));
-    character = document.character; transfer = null; controlMessage = ''; revision += 1; connectChildren();
+    character = story.normalTurns === 3 ? story.returnCharacter : document.character; transfer = null; controlMessage = ''; revision += 1; connectChildren();
     batching = false; notify(); return true;
   }
   function selectCharacter(id) {
-    if (!isCharacterId(id) || isPending() || transfer) return false;
+    if (!isCharacterId(id) || isPending() || transfer || story.normalTurns === 3 || storyBlocked) return false;
     character = id; controlMessage = ''; notify(); return true;
   }
   return {
     getState, selectCharacter, restore,
+    restoreStory(value) {
+      if (isPending()) return false;
+      let restored;
+      try { restored = validateStory(value); } catch { return false; }
+      story = restored; storyBlocked = false; transfer = null;
+      if (story.normalTurns === 3) character = story.returnCharacter;
+      revision += 1; notify(); return true;
+    },
+    blockStory(blocked) { storyBlocked = Boolean(blocked); notify(); },
+    finishSmith() {
+      if (storyBlocked || story.normalTurns !== 3 || story.messages.length !== 4) return false;
+      character = story.returnCharacter; story = emptyStory(); revision += 1;
+      controlMessage = `Señal recuperada. ${getCharacter(character).name} sigue al otro lado.`;
+      notify(); return true;
+    },
     setDraft(text) {
-      if (character && !transfer && !isPending()) { controlMessage = ''; conversations.get(character).setDraft(text); }
+      if (storyBlocked || isPending() || transfer || typeof text !== 'string') return;
+      if (story.normalTurns === 3) {
+        if (story.messages.length < 4) { story.draft = text; controlMessage = ''; notify(); }
+      } else if (character) { controlMessage = ''; conversations.get(character).setDraft(text); }
     },
     async send() {
-      if (!character || isPending() || transfer) return false;
+      if (storyBlocked || !character || isPending() || transfer) return false;
+      if (story.normalTurns === 3) {
+        if (story.messages.length === 4 || getMessageError(story.draft)) return false;
+        if (parseCharacterRequest(story.draft)) { controlMessage = 'Smith controla la señal. Completa sus dos interacciones antes de cambiar de personaje.'; notify(); return false; }
+        const text = story.draft;
+        story.messages.push({ role: 'user', content: text }, { role: 'assistant', content: smithReply(text, story.messages.length / 2 + 1) });
+        story.draft = ''; controlMessage = ''; notify(); return true;
+      }
       const draft = conversations.get(character).getState().draft;
       if (getMessageError(draft)) return false;
       const request = parseCharacterRequest(draft);
-      if (!request) { controlMessage = ''; return conversations.get(character).send(); }
+      if (!request) {
+        controlMessage = '';
+        // Cuenta dentro del cierre del turno, antes de notificar pending=false y permitir otro envío.
+        return conversations.get(character).send(() => {
+          story.normalTurns += 1;
+          if (story.normalTurns === 3) { story.returnCharacter = character; revision += 1; }
+        });
+      }
       if (request.type === 'help') controlMessage = 'Usa /hablar morfeo, /hablar oráculo o /hablar trinity.';
       else if (request.target === character) controlMessage = `Ya estás hablando con ${getCharacter(character).name}.`;
       else { transfer = { from: character, to: request.target, draft, revision }; controlMessage = 'Confirma el cambio de canal.'; }
       notify(); return false;
     },
     confirmTransfer() {
-      if (!transfer || isPending() || transfer.from !== character || transfer.revision !== revision || conversations.get(character).getState().draft !== transfer.draft) return false;
+      if (storyBlocked || story.normalTurns === 3 || !transfer || isPending() || transfer.from !== character || transfer.revision !== revision || conversations.get(character).getState().draft !== transfer.draft) return false;
       const target = transfer.to;
       batching = true;
       conversations.get(character).setDraft('');
@@ -224,6 +261,7 @@ export function createCharacterSession({ respond = requestReply, initialCharacte
 }
 const session = createCharacterSession();
 const historyStorage = typeof window === 'undefined' ? null : createHistoryStorage(session);
+const storyStorage = typeof window === 'undefined' ? null : createStoryStorage(session);
 
 export function mountChat(root, chatSession = session, storage = chatSession === session ? historyStorage : null) {
   const log = root.querySelector('.chat-log');
@@ -245,6 +283,9 @@ export function mountChat(root, chatSession = session, storage = chatSession ===
   const transferDialog = root.querySelector('[data-transfer-dialog]');
   let composing = false, compositionEndedAt = -Infinity;
   let renderedCharacter, renderedRevision, confirmedAction;
+  let returnTimer = 0;
+  const narrativeStorage = chatSession === session ? storyStorage : null;
+  const smithScene = mountSmithScene(root.querySelector('[data-smith-canvas]'), root.querySelector('[data-smith-pause]'));
   let renderedCount = 0, scrollFrame = 0, focusFrame = 0, lastIntercepted = false;
   let wasAuthenticated = access.authenticated === true;
   let state = chatSession.getState();
@@ -252,7 +293,7 @@ export function mountChat(root, chatSession = session, storage = chatSession ===
   function append({ role, content }) {
     const article = document.createElement('article');
     article.className = `message message--${role === 'user' ? 'user' : 'morpheus'}`;
-    const author = document.createElement('p'); author.className = 'message-author'; author.textContent = role === 'user' ? 'TÚ >' : `${getCharacter(state.character)?.name.toUpperCase() ?? 'MORFEO'} >`;
+    const author = document.createElement('p'); author.className = 'message-author'; author.textContent = role === 'user' ? 'TÚ >' : `${state.smithActive ? 'AGENTE SMITH' : getCharacter(state.character)?.name.toUpperCase() ?? 'MORFEO'} >`;
     const text = document.createElement('p'); text.className = 'message-content'; text.textContent = content;
     article.append(author, text); log.append(article);
   }
@@ -270,13 +311,15 @@ export function mountChat(root, chatSession = session, storage = chatSession ===
       focusFrame = requestAnimationFrame(() => { if (mounted && access.authenticated !== true) gate.querySelector('input').focus(); });
     }
     wasAuthenticated = authenticated;
-    const character = getCharacter(state.character);
+    const character = state.smithActive ? { id: 'smith', name: 'Smith', terminal: 'agent_smith', emblem: '[ S ]', description: 'La señal está bajo control del sistema.', voice: 'Diálogo local · 2 interacciones' } : getCharacter(state.character);
+    const displayKey = state.smithActive ? 'smith' : state.character;
+    const completeSmith = state.smithActive && state.story.messages.length === 4;
     const selected = Boolean(character);
     picker.hidden = !authenticated || selected;
     form.hidden = !selected;
     log.hidden = !selected;
-    if (renderedCharacter !== state.character || renderedRevision !== state.revision || !authenticated) {
-      log.replaceChildren(); renderedCount = 0; renderedCharacter = state.character; renderedRevision = state.revision;
+    if (renderedCharacter !== displayKey || renderedRevision !== state.revision || !authenticated) {
+      log.replaceChildren(); renderedCount = 0; renderedCharacter = displayKey; renderedRevision = state.revision;
     }
     const previous = renderedCount;
     const visibleMessages = authenticated && selected ? state.messages : [];
@@ -286,7 +329,8 @@ export function mountChat(root, chatSession = session, storage = chatSession ===
     renderedCount = visibleMessages.length;
     if (!renderedCount && !log.firstElementChild) {
       const welcome = empty.cloneNode(true);
-      welcome.querySelector('[data-empty-note]').textContent = character ? character.description : 'Elige un personaje para comenzar.';
+      welcome.querySelector('h2').textContent = state.smithActive ? 'He encontrado su señal.' : 'El canal está abierto.';
+      welcome.querySelector('[data-empty-note]').textContent = state.smithActive ? 'Dos intervenciones conmigo. Después podrá recuperar su conversación.' : character ? character.description : 'Elige un personaje para comenzar.';
       log.append(welcome);
     }
     if (renderedCount !== previous) { cancelAnimationFrame(scrollFrame); scrollFrame = requestAnimationFrame(() => { log.scrollTop = log.scrollHeight; }); }
@@ -296,11 +340,12 @@ export function mountChat(root, chatSession = session, storage = chatSession ===
     root.querySelector('[data-character-portrait]').hidden = character?.id !== 'morpheus';
     const emblem = root.querySelector('[data-character-emblem]'); emblem.hidden = !selected || character.id === 'morpheus';
     writeText(emblem, character?.emblem ?? '');
+    writeText(root.querySelector('[data-transfer-help]'), state.smithActive ? 'Cambiar de personaje estará disponible al recuperar la señal.' : 'Para cambiar: /hablar trinity');
     input.placeholder = character ? `Escribe a ${character.name}…` : 'Elige un personaje…';
     terminal.setAttribute('aria-label', character ? `Conversación con ${character.name}` : 'Terminal de conversación');
     if (input.value !== (authenticated ? state.draft : '')) input.value = authenticated ? state.draft : '';
     renderStorage(authenticated);
-    input.readOnly = state.pending || Boolean(state.transfer);
+    input.readOnly = state.pending || Boolean(state.transfer) || completeSmith || state.storyBlocked;
     if (authenticated && state.transfer) {
       writeText(transferDialog.querySelector('#transfer-description'), `Origen: ${getCharacter(state.transfer.from).name}. Destino: ${getCharacter(state.transfer.to).name}. Recuperarás el historial y borrador de ese personaje. La solicitud de cambio no se envía a Gemini.`);
       if (!transferDialog.open) { transferDialog.showModal(); transferDialog.querySelector('[data-transfer-cancel]').focus(); }
@@ -313,22 +358,33 @@ export function mountChat(root, chatSession = session, storage = chatSession ===
     writeText(fieldError, tooLong ? getMessageError(state.draft) : '');
     const intercepted = access.interceptedUntil > Date.now();
     const isControl = Boolean(parseCharacterRequest(state.draft));
-    button.disabled = !authenticated || !selected || state.pending || Boolean(state.transfer) || (intercepted && !isControl) || Boolean(getMessageError(state.draft));
-    writeText(button, state.pending ? 'TRANSMITIENDO…' : isControl ? 'SOLICITAR CAMBIO ↗' : intercepted ? 'CANAL BLOQUEADO' : state.error ? 'REINTENTAR ↗' : 'ENVIAR ↗');
+    button.disabled = !authenticated || !selected || state.pending || completeSmith || state.storyBlocked || Boolean(state.transfer) || (intercepted && !isControl && !state.smithActive) || Boolean(getMessageError(state.draft));
+    writeText(button, completeSmith ? 'RESTAURANDO SEÑAL…' : state.storyBlocked ? 'CICLO EN OTRA PESTAÑA' : state.pending ? 'TRANSMITIENDO…' : isControl && !state.smithActive ? 'SOLICITAR CAMBIO ↗' : intercepted && !state.smithActive ? 'CANAL BLOQUEADO' : state.error ? 'REINTENTAR ↗' : 'ENVIAR ↗');
     status.classList.toggle('chat-status--loading', state.pending);
     status.classList.toggle('chat-status--error', Boolean(state.error && !state.controlMessage));
-    const statusText = state.controlMessage || (!selected ? 'CANAL ABIERTO · Selecciona un personaje para comenzar.' : state.pending ? `${character.name} está escribiendo…` : intercepted ? 'SEÑAL INTERCEPTADA · Tu mensaje está a salvo.' : state.error || `CANAL ABIERTO · ${character.name} está al otro lado.`);
+    const statusText = state.storyBlocked ? 'Otra pestaña actualizó el ciclo. Recarga para continuar.' : completeSmith ? 'Smith se retira. Restableciendo tu conversación…' : state.smithActive ? state.controlMessage || 'SMITH / CANAL LOCAL · Escribe para recuperar la señal.' : state.controlMessage || (!selected ? 'CANAL ABIERTO · Selecciona un personaje para comenzar.' : state.pending ? `${character.name} está escribiendo…` : intercepted ? 'SEÑAL INTERCEPTADA · Tu mensaje está a salvo.' : state.error || `CANAL ABIERTO · ${character.name} está al otro lado.`);
     if (status.textContent !== statusText) status.textContent = statusText;
-    smith.hidden = !intercepted;
-    terminal.classList.toggle('is-intercepted', intercepted);
-    if (intercepted && !lastIntercepted) {
-      terminal.classList.remove('smith-glitch');
-      void terminal.offsetWidth;
-      terminal.classList.add('smith-glitch');
+    smith.hidden = !authenticated || !state.smithActive;
+    smithScene.setActive(authenticated && state.smithActive);
+    terminal.classList.toggle('is-intercepted', authenticated && state.smithActive);
+    if (state.smithActive && !lastIntercepted && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      terminal.classList.remove('smith-glitch'); void terminal.offsetWidth; terminal.classList.add('smith-glitch');
     }
-    lastIntercepted = intercepted;
+    lastIntercepted = state.smithActive;
+    const smithTurns = state.story.messages.length / 2;
+    writeText(root.querySelector('[data-smith-progress]'), `Interacciones con Smith: ${smithTurns} / 2`);
+    writeText(root.querySelector('[data-story-progress]'), state.smithActive ? 'CANAL INTERCEPTADO · Tu conversación anterior se conserva.' : `Ciclo narrativo: ${state.story.normalTurns} / 3 turnos completos antes de Smith.`);
+    const lastNormal = state.conversations[state.character]?.messages.at(-1);
+    const details = root.querySelector('[data-last-normal]');
+    details.hidden = !lastNormal;
+    writeText(details.querySelector('p'), lastNormal?.role === 'assistant' ? lastNormal.content : '');
+    const recover = root.querySelector('[data-smith-return]'); recover.hidden = !completeSmith; recover.disabled = state.storyBlocked;
+    if (authenticated && completeSmith && !state.storyBlocked) {
+      if (!returnTimer) returnTimer = setTimeout(recoverSignal, 12000);
+    } else { clearTimeout(returnTimer); returnTimer = 0; }
     const seconds = Math.max(0, Math.ceil((access.interceptedUntil - Date.now()) / 1000));
-    writeText(root.querySelector('[data-smith-countdown]'), seconds >= 3600 ? `${Math.ceil(seconds / 3600)} h` : seconds >= 60 ? `${Math.ceil(seconds / 60)} min` : `${seconds} s`);
+    root.querySelector('[data-quota-wait]').hidden = !authenticated || !intercepted;
+    writeText(root.querySelector('[data-quota-countdown]'), seconds >= 3600 ? `${Math.ceil(seconds / 3600)} h` : seconds >= 60 ? `${Math.ceil(seconds / 60)} min` : `${seconds} s`);
     const quota = access.quota;
     writeText(root.querySelector('[data-minute-quota]'), quota ? `${quota.minuteUsed} / ${quota.minuteLimit}` : '— / 15');
     writeText(root.querySelector('[data-day-quota]'), quota ? `${quota.dayUsed} / ${quota.dayLimit}` : '— / 500');
@@ -343,7 +399,8 @@ export function mountChat(root, chatSession = session, storage = chatSession ===
     storageStatus.dataset.kind = saved.kind;
     const entries = Object.values(state.conversations ?? {});
     const anyData = entries.some(entry => entry.messages.length || entry.draft.length);
-    root.querySelector('[data-history-action="current"]').disabled = state.pending || !state.character || !(state.messages.length || state.draft.length) || saved.blocked;
+    const currentConversation = state.conversations[state.character];
+    root.querySelector('[data-history-action="current"]').disabled = state.pending || !state.character || !(currentConversation?.messages.length || currentConversation?.draft.length) || saved.blocked;
     root.querySelector('[data-history-action="all"]').disabled = state.pending || (!anyData && !['invalid', 'error'].includes(saved.kind) && !saved.hasSaved) || saved.conflict;
     root.querySelector('[data-storage-conflict]').hidden = !saved.conflict;
     for (const choice of root.querySelectorAll('[data-storage-conflict] button')) choice.disabled = state.pending;
@@ -353,7 +410,7 @@ export function mountChat(root, chatSession = session, storage = chatSession ===
     if (!action || !storage || access.authenticated !== true || state.pending || state.transfer) return;
     const descriptions = {
       current: `Se borrarán los mensajes y el borrador de ${getCharacter(state.character)?.name}. Las otras conversaciones se conservarán.`,
-      all: 'Se borrarán los mensajes y borradores de los tres personajes guardados en este navegador. Las cuotas del canal se conservan.',
+      all: 'Se borrarán los mensajes y borradores de los tres personajes guardados en este navegador. Las cuotas y el ciclo de Smith se conservan.',
       load: 'Se reemplazará lo que tienes en esta pestaña por el último historial guardado. Los cambios que solo estén aquí se perderán.',
       keep: 'Se guardará la versión de esta pestaña, reemplazando el historial que guardó la otra pestaña.',
     };
@@ -375,6 +432,13 @@ export function mountChat(root, chatSession = session, storage = chatSession ===
   const cancelHistory = () => { confirmedAction = null; dialog.close(); };
   dialog.querySelector('[data-history-cancel]').addEventListener('click', cancelHistory);
   dialog.addEventListener('cancel', cancelHistory);
+  function recoverSignal() {
+    clearTimeout(returnTimer); returnTimer = 0;
+    if (!mounted || access.authenticated !== true) return;
+    const restoreFocus = input === document.activeElement || root.querySelector('[data-smith-return]') === document.activeElement;
+    if (chatSession.finishSmith() && restoreFocus) input.focus();
+  }
+  root.querySelector('[data-smith-return]').addEventListener('click', recoverSignal);
   function handleInput() { chatSession.setDraft(input.value); }
   function handleKey(event) {
     const action = getComposerKeyAction(event, { composing, justComposed: performance.now() - compositionEndedAt < 80 });
@@ -407,6 +471,10 @@ export function mountChat(root, chatSession = session, storage = chatSession ===
   const unsubscribeChat = chatSession.subscribe((next) => { state = next; render(); });
   const unsubscribeAccess = subscribeAccess(render);
   const unsubscribeStorage = storage?.subscribe(render) ?? (() => {});
+  const unsubscribeStory = narrativeStorage?.subscribe(saved => {
+    writeText(root.querySelector('[data-story-storage]'), saved.message);
+    root.querySelector('[data-story-storage]').dataset.kind = saved.kind;
+  }) ?? (() => {});
   const cleanGate = mountAccess(gate.querySelector('form'), () => {
     if (state.errorCode === 'AUTH_REQUIRED') chatSession.setDraft(state.draft);
     render();
@@ -422,7 +490,7 @@ export function mountChat(root, chatSession = session, storage = chatSession ===
     }
   }, 1000);
   function authenticatedNow() { return access.authenticated === true; }
-  return () => { mounted = false; chatSession.cancelTransfer(); if (transferDialog.open) transferDialog.close();
+  return () => { mounted = false; clearTimeout(returnTimer); smithScene.dispose(); unsubscribeStory(); root.querySelector('[data-smith-return]').removeEventListener('click', recoverSignal); chatSession.cancelTransfer(); if (transferDialog.open) transferDialog.close();
     transferDialog.removeEventListener('cancel', cancelTransfer);
     transferDialog.querySelector('[data-transfer-cancel]').removeEventListener('click', cancelTransfer);
     transferDialog.querySelector('form').removeEventListener('submit', confirmTransfer);

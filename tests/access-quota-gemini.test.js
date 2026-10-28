@@ -272,11 +272,11 @@ describe('acceso y recuperación en el cliente', () => {
       messages: [{ role: 'user', content: 'Hola' }, { role: 'assistant', content: 'Bienvenida.' }] });
   });
 
-  it('muestra la solicitud 15 admitida sin activar Smith antes del primer rechazo', async () => {
+  it('conserva la respuesta 15 admitida y anuncia la espera para la siguiente solicitud', async () => {
     const fetchMock = vi.fn().mockResolvedValue(json({ character: 'morpheus', reply: 'Sigamos.', quota: { ...quota, minuteUsed: 15, dayUsed: 15, blocked: true } }));
     vi.stubGlobal('fetch', fetchMock);
     expect(await client.requestReply([messages[0]])).toBe('Sigamos.');
-    expect(client.getAccessState()).toMatchObject({ quota: { minuteUsed: 15 }, interceptedUntil: 0 });
+    expect(client.getAccessState()).toMatchObject({ quota: { minuteUsed: 15 }, interceptedUntil: quota.retryAt });
   });
 
   it('mantiene el bloqueo diario tras un minuto sin reenviar mensajes automáticamente', async () => {
