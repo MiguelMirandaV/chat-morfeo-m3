@@ -33,3 +33,5 @@ El bucle se limita a 20 fps y a una densidad de píxeles de 1.5. Se pausa al ocu
 254 tests en ocho archivos, con mocks de proveedor y almacenamiento. La lógica cubre el ciclo repetido, aislamiento del contexto, bloqueo de transferencias bajo Smith, errores, recarga, borrado y conflictos. La escena se prueba con un contexto sustituido para movimiento reducido, pausa, visibilidad y retirada de recursos.
 
 En navegador local con API simulada se verificaron 0/3 → 3/3 → Smith 0/2 → recarga 1/2 → 2/2 → retorno al contexto original. Otro escenario agotó la cuota simulada al tercer turno: Smith respondió localmente y devolvió Trinity con el bloqueo intacto. Las capturas corresponden a escenarios simulados. No se usaron nuevas generaciones reales de Gemini en este paso.
+
+Capturas de QA simulado: [Smith a 320 px](capturas/iteracion-2/smith-320.jpg) · [Smith a 1024 px](capturas/iteracion-2/smith-1024.jpg).
