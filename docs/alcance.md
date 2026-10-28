@@ -47,7 +47,7 @@ localStorage pertenece al origen y no sincroniza dispositivos. Sus fallos, regis
 
 ## Evidencia y límites
 
-[Entrega y rúbrica](entrega.md) relaciona los ocho objetivos con el código y las verificaciones. [Verificación de esta iteración](verificacion-iteracion-2.md) distingue tests, escenarios simulados y generaciones reales. La publicación pública se documentará con su propio commit y resultados; [estado de publicación](publicacion-iteracion-2.md).
+[Entrega y rúbrica](entrega.md) relaciona los ocho objetivos con el código y las verificaciones. [Verificación de esta iteración](verificacion-iteracion-2.md) distingue tests, escenarios simulados y generaciones reales. La publicación pública está documentada con su commit y resultados; [estado de publicación](publicacion-iteracion-2.md).
 
 La calificación corresponde a Henry. Los prompts pueden fallar o repetirse, los servicios pueden no estar disponibles y la revisión de tamaños concretos no certifica todos los dispositivos. El rostro es procedural, sin garantía de semejanza fotorrealista con un actor.
 

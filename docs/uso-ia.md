@@ -238,3 +238,11 @@ Ocho respuestas aceptadas; memoria de nombre/interés correcta para los tres per
 Con asistencia de Codex consolidé el README en primera persona, con acceso 79, funciones vigentes, capturas actuales y enlace de Preview identificable. Actualicé alcance, mapa de objetivos/rúbrica, arquitectura, persistencia y despliegue; este último ahora refleja npm run build y Three.js. Separé los resultados históricos de la primera entrega de la evidencia de esta iteración, sin convertir cifras antiguas en verificaciones nuevas.
 
 Agregué un índice documental, una síntesis de verificación y el documento de publicación con el cierre de producción aún pendiente. Corregí que borrar todos los historiales conserva a Smith si está activo y documenté su clave separada. La revisión de esta etapa comprueba enlaces locales y coherencia con la configuración; no genera nuevas respuestas ni afirma una nueva auditoría de vulnerabilidades.
+
+## Iteración 2 — Integración y publicación
+
+Con la Preview aprobada y el plan autorizado, integré el pull request #1 a main tras comprobar rama limpia, Vercel satisfactorio, 258 tests y build. Conservé el tag de la primera entrega. Vercel publicó el merge funcional c6659ecc8f4e33d09b0a610aa0aaa26e03164bcf en Production.
+
+La revisión pública completó 36 comprobaciones HTTPS, incluida igualdad de archivos por hash, privados 404, acceso/cookie y rechazo de entradas inválidas. Dos generaciones reales de Morfeo verificaron contexto por HTTP. En el navegador, tres del Oráculo comprobaron identidad y memoria y activaron Smith; sus dos respuestas locales, recarga 1/2 y retorno automático conservaron el historial. Los cambios de canal y la recarga final mantuvieron seis mensajes. El contador diario pasó de 72 a 77 y no aumentó con Smith.
+
+Actualicé README y documentos al dominio público y conservé la evidencia con datos ficticios. Los intentos de accionar el botón de retorno durante la despedida coincidieron con el cambio de estado del temporizador; se confirmó el retorno automático, sin presentarlos como una comprobación nueva del botón en producción. No se borraron conversaciones anteriores, no se cambiaron credenciales y no se provocó agotamiento real de cuota. [Registro de publicación](publicacion-iteracion-2.md).

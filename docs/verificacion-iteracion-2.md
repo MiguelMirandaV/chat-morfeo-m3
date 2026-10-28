@@ -46,7 +46,7 @@ Las capturas se hicieron localmente y en diferentes momentos de la iteración. A
 
 La etapa inicial de personajes incluyó tres respuestas reales desde la UI local. La evaluación final agregó **ocho generaciones** contra el handler real con acceso firmado, Redis y SDK. Comprueba nombre/interés, voz y límites; incluye un ajuste de identidad del Oráculo y su repetición. [Método, textos, hashes y límites](evaluacion-personajes.md).
 
-Miguel confirmó el funcionamiento de la Preview tras el ciclo Smith. Los estados Ready se comprobaron con Vercel CLI. Esa confirmación y los ensayos locales no sustituyen la verificación del dominio público de esta iteración, que se registrará en [publicación](publicacion-iteracion-2.md).
+Miguel confirmó el funcionamiento de la Preview tras el ciclo Smith. Los estados Ready se comprobaron con Vercel CLI. La verificación pública posterior completó 36 comprobaciones HTTPS y un ciclo real de navegador con retorno de Smith, transferencias y recarga; añadió cinco generaciones de Gemini. Sus resultados y límites están en [publicación](publicacion-iteracion-2.md).
 
 ## Qué debe permanecer explícito
 

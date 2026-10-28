@@ -2,17 +2,17 @@
 
 ## Punto de partida y control de versiones
 
-La versión entregada queda identificada por el tag `m3-v1-entregado`, sobre el commit `7af140e6c5d204968a085140da6ca6e043d1f3ea`. La iteración se desarrolla en `feat/matrix-v2`. `main` continúa representando la versión publicada; la integración se realizará al completar la revisión de Preview.
+La versión entregada queda identificada por el tag `m3-v1-entregado`, sobre el commit `7af140e6c5d204968a085140da6ca6e043d1f3ea`. La iteración se desarrolló en `feat/matrix-v2` y se integró a `main` mediante el pull request #1. La versión pública y su verificación están en [publicación](publicacion-iteracion-2.md).
 
-Este documento describe funcionalidades aprobadas. Su presencia aquí no significa que estén implementadas. Las etapas 1–9 están implementadas en la rama: preparación, Home, personajes, persistencia, cambio solicitado con confirmación, teclado, tarjetas de Acerca de y Smith 3+2 con progreso independiente. La integración incorpora pausa del retorno durante lectura/diálogos/ocultamiento, foco recuperable y menos trabajo periódico. La verificación incluye 258 pruebas y una muestra real de voces/contexto con corrección de identidad del Oráculo. La documentación vigente está consolidada y distingue sus registros históricos. La siguiente etapa es integrar y verificar esta versión en producción.
+Este documento conserva el alcance aprobado y relaciona su ejecución con los informes de verificación. Las etapas 1–10 están completadas en la rama: preparación, Home, personajes, persistencia, cambio solicitado con confirmación, teclado, tarjetas de Acerca de y Smith 3+2 con progreso independiente. La integración incorpora pausa del retorno durante lectura/diálogos/ocultamiento, foco recuperable y menos trabajo periódico. La verificación incluye 258 pruebas y una muestra real de voces/contexto con corrección de identidad del Oráculo. La documentación vigente está consolidada y distingue sus registros históricos. La publicación en producción quedó verificada con su commit y resultados propios.
 
 ## Decisiones aprobadas
 
 - Código de acceso **79**, validado en servidor antes de mostrar el chat o una conversación guardada.
-- Tres personajes: Morfeo, el Oráculo y Trinity; cada uno tendrá su prompt de servidor e historial independiente.
+- Tres personajes: Morfeo, el Oráculo y Trinity; cada uno tiene su prompt de servidor e historial independiente.
 - Persistencia de conversaciones y borradores en localStorage, indicador real de guardado y borrado de una conversación o de todas, con confirmación.
 - Inicio de pantalla completa: lluvia intensa y rostro tridimensional de Morfeo formado por caracteres, con deformación, movimiento y apertura de boca hacia el chat.
-- Inicio, Chat y Acerca de conservan sus rutas SPA. Acerca de tendrá tarjetas de los tres personajes.
+- Inicio, Chat y Acerca de conservan sus rutas SPA. Acerca de presenta tarjetas de los tres personajes.
 - Tras desbloquear, la terminal preguntará con quién quieres hablar. Para transferirse a otro personaje se solicitará desde la conversación, con confirmación.
 - Enter envía; Shift+Enter agrega una línea. Se conserva el botón y el máximo de 280 grafemas, con composición IME y bloqueo de doble envío.
 - README en primera persona, centrado en producto, uso e instalación. Bitácora, decisiones y pruebas quedan en sus documentos correspondientes.

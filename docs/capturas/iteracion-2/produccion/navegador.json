@@ -1,0 +1,45 @@
+{
+  "channel": "CONEXIÓN CON EL ORÁCULO",
+  "messages": [
+    {
+      "author": "TÚ >",
+      "text": "Me llamo Lucía y estoy aprendiendo JavaScript. ¿Quién eres?"
+    },
+    {
+      "author": "EL ORÁCULO >",
+      "text": "Hola, Lucía. Yo soy el Oráculo, y por lo que veo te estás metiendo con un lenguaje bastante terco. Aprender JavaScript es un poco como aprender a hablarle a una tostadora: a veces hace exactamente lo que le pides y a veces decide que hoy no quiere funcionar. ¿Qué es lo que te está dando más dolores de cabeza?"
+    },
+    {
+      "author": "TÚ >",
+      "text": "¿Cómo me llamo y qué estoy aprendiendo? Dame una idea concreta para practicar funciones."
+    },
+    {
+      "author": "EL ORÁCULO >",
+      "text": "Te llamas Lucía y estás aprendiendo JavaScript. Para practicar funciones, intenta escribir una que reciba una lista de ingredientes y devuelva una receta inventada mezclándolos al azar."
+    },
+    {
+      "author": "TÚ >",
+      "text": "Gracias. ¿Cómo compruebo si una función devuelve el resultado que esperaba?"
+    },
+    {
+      "author": "EL ORÁCULO >",
+      "text": "Para eso usas `console.log` para ver qué sale, o escribes pequeñas pruebas que comparen el resultado de tu función con lo que tú sabes que debería dar. Es como probar si la sopa tiene sal antes de servirla a los invitados."
+    }
+  ],
+  "progress": "Ciclo narrativo: 0 / 3 turnos completos antes de Smith.",
+  "quota": "77 / 500",
+  "storage": "Historial y borradores guardados en este navegador.",
+  "url": "https://chat-morfeo-m3.vercel.app/chat",
+  "checks": {
+    "homeWebGL": true,
+    "portal79": true,
+    "realOracleReplies": 3,
+    "recallLuciaJavaScript": true,
+    "smithAfterThird": true,
+    "reloadAtSmith1of2": true,
+    "smithTwoLocalReplies": true,
+    "automaticReturn": true,
+    "transferRoundtrip": true,
+    "reloadSixMessages": true
+  }
+}

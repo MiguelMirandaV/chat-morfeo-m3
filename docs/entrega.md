@@ -3,10 +3,10 @@
 Desarrollé Chat con Morfeo como Proyecto Integrador M3 de Henry, con asistencia de Codex. Esta guía describe la iteración con persistencia, tres personajes, teclado y Smith 3+2. El código de acceso es **79**.
 
 - [Repositorio](https://github.com/MiguelMirandaV/chat-morfeo-m3).
-- [Preview de revisión](https://chat-morfeo-m3-git-feat-matrix-v2-miguel-miranda-v.vercel.app/home); puede requerir mi sesión Vercel.
+- [Aplicación pública](https://chat-morfeo-m3.vercel.app/home), código **79**, sin cuenta Vercel.
 - [Instalación y uso](../README.md), [alcance](alcance.md), [verificación](verificacion-iteracion-2.md) y [publicación](publicacion-iteracion-2.md).
 
-La Preview fue confirmada funcional por Miguel. La integración y verificación de esta iteración en el dominio público corresponden al paso de publicación. La [evidencia de producción anterior](produccion.md) está identificada como histórica.
+La Preview fue confirmada funcional por Miguel. Integré el pull request #1 y comprobé la nueva producción con 36 verificaciones HTTPS y un ciclo completo en navegador. [Registro público vigente](publicacion-iteracion-2.md). La [evidencia de producción anterior](produccion.md) permanece como registro histórico.
 
 ## Ocho objetivos del M3
 
@@ -32,7 +32,7 @@ La Preview fue confirmada funcional por Miguel. La integración y verificación 
 | Seguridad y serverless | Acceso y cuotas de servidor, contrato validado antes de reservar, render de texto y exclusión de archivos privados. |
 | Chat y UX | 280 grafemas, estados y scroll; historiales separados, transferencias confirmadas y Smith local 3+2. |
 | Tests | 258 pruebas en ocho archivos, sin servicios reales; ocho generaciones reales documentadas aparte. |
-| Despliegue/documentación | Rama GitHub, Previews Ready, README y documentación actualizados; verificación pública de la iteración al publicar. |
+| Despliegue/documentación | Rama GitHub, Previews Ready, README y documentación actualizados; verificación pública documentada. |
 
 ## Buenas prácticas
 
@@ -49,6 +49,6 @@ La regla mínima de historial en sesión fue ampliada por el extra credit aproba
 5. Sigue una pregunta: navegador → función → Redis → Gemini → respuesta validada → vista.
 6. Ejecuta npm test y explica un caso de error o restauración con mock.
 7. Presenta la corrección del Oráculo basada en respuestas reales y reconoce los límites observados.
-8. Muestra el commit y despliegue públicos verificados al completar la publicación. Explica mi dirección del producto y el trabajo realizado con asistencia de Codex.
+8. Muestra el commit y despliegue públicos verificados en el informe de publicación. Explica mi dirección del producto y el trabajo realizado con asistencia de Codex.
 
 La rúbrica orienta la evidencia; Henry decide la calificación.

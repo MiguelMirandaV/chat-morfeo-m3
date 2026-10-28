@@ -2,7 +2,7 @@
 
 Creé esta aplicación para conversar en español con interpretaciones de Morfeo, el Oráculo y Trinity de *The Matrix (1999)*. Es mi Proyecto Integrador del Módulo 3 de Full Stack de Henry; lo desarrollé con asistencia de Codex.
 
-**[Probar la aplicación en Preview](https://chat-morfeo-m3-git-feat-matrix-v2-miguel-miranda-v.vercel.app/home)** · **[Ver el repositorio](https://github.com/MiguelMirandaV/chat-morfeo-m3)**
+**[Abrir la aplicación](https://chat-morfeo-m3.vercel.app/home)** · **[Ver el repositorio](https://github.com/MiguelMirandaV/chat-morfeo-m3)**
 
 ## Código de acceso
 
@@ -10,7 +10,7 @@ Creé esta aplicación para conversar en español con interpretaciones de Morfeo
 
 Uso este código como una puerta temática compartida. No representa una cuenta personal ni identifica a cada visitante.
 
-![Inicio: rostro de caracteres y lluvia Matrix](docs/capturas/iteracion-2/home-1024.png)
+![Inicio: rostro de caracteres y lluvia Matrix](docs/capturas/iteracion-2/produccion/home.jpg)
 
 ## Mi propuesta
 
@@ -88,7 +88,7 @@ Utilizo **Node.js 24.x**, npm, Git y Vercel CLI local al proyecto. Necesitas una
 En una carpeta nueva:
 
 ```bash
-git clone --branch feat/matrix-v2 https://github.com/MiguelMirandaV/chat-morfeo-m3.git
+git clone https://github.com/MiguelMirandaV/chat-morfeo-m3.git
 cd chat-morfeo-m3
 npm ci
 cp -n .env.example .env
@@ -159,9 +159,9 @@ Configura en Production y Preview las cinco variables de servidor de la tabla, e
 
 | Personajes en Acerca de | Terminal bajo la intervención de Smith |
 | --- | --- |
-| ![Tres personajes](docs/capturas/iteracion-2/acerca-de-1024.png) | ![Smith: escena de QA con respuestas simuladas](docs/capturas/iteracion-2/smith-1024.jpg) |
+| ![Tres personajes](docs/capturas/iteracion-2/acerca-de-1024.png) | ![Smith en producción: diálogo local](docs/capturas/iteracion-2/produccion/smith.jpg) |
 
-Las capturas ilustran la interfaz. La escena de Smith se revisó con datos simulados; [las generaciones reales](docs/evaluacion-personajes.md) tienen sus registros propios.
+Las capturas ilustran la interfaz publicada. Smith usa diálogo local; [la verificación pública](docs/publicacion-iteracion-2.md) y [la evaluación de voces con Gemini](docs/evaluacion-personajes.md) tienen sus registros propios.
 
 ## Límites y mantenimiento
 

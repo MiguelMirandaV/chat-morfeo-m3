@@ -1,0 +1,273 @@
+{
+  "startedAt": "2026-10-28T01:47:00.876Z",
+  "timeZone": "America/Bogota",
+  "base": "https://chat-morfeo-m3.vercel.app",
+  "checks": [
+    {
+      "name": "asset:characters.js",
+      "passed": true,
+      "status": 200,
+      "sha256": "8fbef1951f5cbdcdfd273e6096cac6fa459e77214d8c24212c5850c9d13b36f9"
+    },
+    {
+      "name": "asset:index.html",
+      "passed": true,
+      "status": 200,
+      "sha256": "b414c840e32b866c6bfa0ba51b102c997fbc1a5d4b45fdc1d16701c81d34020d"
+    },
+    {
+      "name": "asset:smith-scene.js",
+      "passed": true,
+      "status": 200,
+      "sha256": "5e1010ef91de770e2642f9e0b1a89fa648a2d1ceb967b6efa3067b93e9a1f655"
+    },
+    {
+      "name": "asset:chat-controls.js",
+      "passed": true,
+      "status": 200,
+      "sha256": "746644e133e283bb16b454d1ec1181fb4369e1c55d796f012a19b2b6ee4af767"
+    },
+    {
+      "name": "asset:assets/morpheus-signal.svg",
+      "passed": true,
+      "status": 200,
+      "sha256": "803879bd898fbffa85e69b0e00f2c7f3bf4a9b605a5a14ae862960312e278b9f"
+    },
+    {
+      "name": "asset:history-storage.js",
+      "passed": true,
+      "status": 200,
+      "sha256": "b69c2389edc74f60a6d785f9107d0d90d1ee59e718ee39d49c782fe0b0a38742"
+    },
+    {
+      "name": "asset:smith-story.js",
+      "passed": true,
+      "status": 200,
+      "sha256": "c0e8b2280d0c91b84799710f9a3062526061acf07213f3ec0d5289a040064910"
+    },
+    {
+      "name": "asset:assets/oracle-signal.svg",
+      "passed": true,
+      "status": 200,
+      "sha256": "d577ff4278f47aea2ea620f10006c0cd78a1514184e77c8e7643fe0e11bc66b0"
+    },
+    {
+      "name": "asset:vendor/three/LICENSE.txt",
+      "passed": true,
+      "status": 200,
+      "sha256": "8b378ebe60e2fe500158cb0ac71cb5e8b7d92953c2abcc63a0eb90499653b5bc"
+    },
+    {
+      "name": "asset:assets/trinity-signal.svg",
+      "passed": true,
+      "status": 200,
+      "sha256": "bf7d457cddc251ae42651d9e4960db320cc03c98d8cb875ec8ae04a2bd9cffc6"
+    },
+    {
+      "name": "asset:app.js",
+      "passed": true,
+      "status": 200,
+      "sha256": "2964ba809a3db882b909938d79366350b6f11d3480a99d20bbbc8741ff5cfd4c"
+    },
+    {
+      "name": "asset:styles.css",
+      "passed": true,
+      "status": 200,
+      "sha256": "f7b55db480e9f6ab5f4d4ccdb0b85376d5c55ca9b7bd6ef0afb66636e917b5e3"
+    },
+    {
+      "name": "asset:matrix-scene.js",
+      "passed": true,
+      "status": 200,
+      "sha256": "bde54cf9ca0282a2e1503b6ee1ac253b26180565989ce1d7e9f8dda2f63769a5"
+    },
+    {
+      "name": "asset:chat.js",
+      "passed": true,
+      "status": 200,
+      "sha256": "97c93831639a1144e21309e193d49529b8198f32d74c7b648a1884ed510189a6"
+    },
+    {
+      "name": "asset:vendor/three/three.module.js",
+      "passed": true,
+      "status": 200,
+      "sha256": "9052042d676cb0fdc1ddfefe193053f34b7ac0513a616fdac4535d49987812ea"
+    },
+    {
+      "name": "asset:vendor/three/three.core.js",
+      "passed": true,
+      "status": 200,
+      "sha256": "9edde002b066a9a05676a6127f67735b62baf399bdea529f2f7e31657da769e6"
+    },
+    {
+      "name": "route:/chat",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "route:/about",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "private:/.env",
+      "passed": true,
+      "status": 404
+    },
+    {
+      "name": "private:/.env.local",
+      "passed": true,
+      "status": 404
+    },
+    {
+      "name": "private:/.data/quota.json",
+      "passed": true,
+      "status": 404
+    },
+    {
+      "name": "private:/.git/config",
+      "passed": true,
+      "status": 404
+    },
+    {
+      "name": "private:/package.json",
+      "passed": true,
+      "status": 404
+    },
+    {
+      "name": "private:/vercel.json",
+      "passed": true,
+      "status": 404
+    },
+    {
+      "name": "private:/docs/README.md",
+      "passed": true,
+      "status": 404
+    },
+    {
+      "name": "generation_requires_access",
+      "passed": true,
+      "status": 401,
+      "code": "AUTH_REQUIRED"
+    },
+    {
+      "name": "cohort_78_rejected",
+      "passed": true,
+      "status": 403
+    },
+    {
+      "name": "cohort_79_accepted",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "cookie_attributes",
+      "passed": true,
+      "httpOnly": true,
+      "sameSiteStrict": true,
+      "secure": true
+    },
+    {
+      "name": "281_rejected",
+      "passed": true,
+      "status": 400,
+      "code": "INVALID_MESSAGE"
+    },
+    {
+      "name": "invalid_character_rejected",
+      "passed": true,
+      "status": 400
+    },
+    {
+      "name": "foreign_origin_rejected",
+      "passed": true,
+      "status": 403
+    },
+    {
+      "name": "validation_did_not_reserve_quota",
+      "passed": true
+    },
+    {
+      "name": "real_reply_1",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "real_reply_2",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "name": "context_recalled",
+      "passed": true
+    }
+  ],
+  "realGenerations": 2,
+  "quotaBefore": {
+    "minuteUsed": 0,
+    "minuteLimit": 15,
+    "dayUsed": 72,
+    "dayLimit": 500,
+    "minuteResetAt": 1793152083147,
+    "dayResetAt": 1793170800000,
+    "blocked": false,
+    "retryAt": 1793152083147,
+    "scope": "app"
+  },
+  "quotaAfterValidation": {
+    "minuteUsed": 0,
+    "minuteLimit": 15,
+    "dayUsed": 72,
+    "dayLimit": 500,
+    "minuteResetAt": 1793152083683,
+    "dayResetAt": 1793170800000,
+    "blocked": false,
+    "retryAt": 1793152083683,
+    "scope": "app"
+  },
+  "conversation": [
+    {
+      "input": "Me llamo Ada y estoy aprendiendo JavaScript. ¿Quién eres?",
+      "reply": "Hola, Ada. En la historia de The Matrix (1999), yo soy Morfeo, alguien que busca despertar a quienes desean ver la verdad detrás de las ilusiones. Veo que estás explorando JavaScript, un lenguaje que te permite construir mundos y dar lógica a entornos digitales. ¿Qué es lo que más te atrae de programar?",
+      "quota": {
+        "minuteUsed": 1,
+        "minuteLimit": 15,
+        "dayUsed": 73,
+        "dayLimit": 500,
+        "minuteResetAt": 1793152083806,
+        "dayResetAt": 1793170800000,
+        "blocked": false,
+        "retryAt": 1793152083806,
+        "scope": "app"
+      }
+    },
+    {
+      "input": "¿Cómo me llamo y qué estoy aprendiendo? Dame un consejo breve para entender funciones.",
+      "reply": "Te llamas Ada y estás aprendiendo JavaScript. Para entender las funciones, imagínalas como pequeñas herramientas que guardan una serie de instrucciones para usarlas tantas veces como necesites sin tener que repetir el código. \n\n¿Qué tarea te gustaría que una función realizara por ti ahora mismo?",
+      "quota": {
+        "minuteUsed": 2,
+        "minuteLimit": 15,
+        "dayUsed": 74,
+        "dayLimit": 500,
+        "minuteResetAt": 1793152083806,
+        "dayResetAt": 1793170800000,
+        "blocked": false,
+        "retryAt": 1793152083806,
+        "scope": "app"
+      }
+    }
+  ],
+  "quotaAfter": {
+    "minuteUsed": 2,
+    "minuteLimit": 15,
+    "dayUsed": 74,
+    "dayLimit": 500,
+    "minuteResetAt": 1793152083806,
+    "dayResetAt": 1793170800000,
+    "blocked": false,
+    "retryAt": 1793152083806,
+    "scope": "app"
+  },
+  "completed": true,
+  "finishedAt": "2026-10-28T01:47:05.587Z"
+}
