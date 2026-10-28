@@ -16,7 +16,7 @@ La Preview fue confirmada funcional por Miguel. Integré el pull request #1 y co
 | 2. SPA con History API | [Router](../src/app.js), Home/Chat/About, pushState/popstate, [tests](../tests/app.test.js) y reglas de Vercel. |
 | 3. Promises, async/await y Fetch | [postApi y sesiones](../src/chat.js), espera/error, finally y borrador; [tests de sesión/transporte](../tests/utils.test.js). |
 | 4. JSON y separación de responsabilidades | [Backend](../api/functions.js): validateHistory, toGeminiContents y parseGeminiReply; render separado en mountChat. |
-| 5. Prompting y criterio ante la IA | [Prompts de servidor](../api/functions.js), [evaluación y corrección del Oráculo](evaluacion-personajes.md), [registro de IA](uso-ia.md). |
+| 5. Prompting y criterio ante la IA | [Prompts de servidor](../api/functions.js), [evaluación y corrección del Oráculo](evaluacion-personajes.md), [cómo utilicé la IA](uso-ia.md). |
 | 6. APIs de IA, roles, tokens y cuotas | Historial completo propio, assistant → model, systemInstruction, presupuesto de salida y reserva; [arquitectura](arquitectura.md). |
 | 7. Secretos y función proxy | Variables privadas, cookie firmada, validación y Redis; [.env.example](../.env.example), [.vercelignore](../.vercelignore), [tests](../tests/access-quota-gemini.test.js). |
 | 8. Vitest, mocks, GitHub y Vercel | 258 casos en ocho archivos, [pruebas](pruebas-unitarias.md), [despliegue](despliegue.md) y [cierre de publicación](publicacion-iteracion-2.md). |

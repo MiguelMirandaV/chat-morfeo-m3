@@ -173,7 +173,7 @@ Las capturas ilustran la interfaz publicada. Smith usa diálogo local; [la verif
 
 ## Documentación y asistencia de IA
 
-Desarrollé este proyecto con asistencia de Codex para el código, los retratos, las pruebas y la documentación. Definí el personaje, la dirección visual y los requisitos, y configuré mis cuentas y credenciales. Registro las solicitudes, decisiones y comprobaciones en [uso de IA](docs/uso-ia.md).
+Desarrollé este proyecto con asistencia de Codex para el código, los retratos, las pruebas y la documentación. Definí el personaje, la dirección visual y los requisitos, y configuré mis cuentas y credenciales. En [cómo utilicé la IA](docs/uso-ia.md) explico mi proceso con ejemplos de prompts, respuestas y decisiones.
 
 - [Índice de documentación](docs/README.md).
 - [Alcance funcional](docs/alcance.md) y [mapa de objetivos y rúbrica](docs/entrega.md).
