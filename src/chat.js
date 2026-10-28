@@ -1,6 +1,6 @@
 import { emptyStory, validateStory, smithReply, createStoryStorage } from './smith-story.js';
 import { mountSmithScene } from './smith-scene.js';
-import { parseCharacterRequest, getComposerKeyAction } from './chat-controls.js';
+import { parseCharacterRequest, getComposerKeyAction, canRestoreSignal, createReturnTimer } from './chat-controls.js';
 import { createHistoryStorage, validateStoredHistory } from './history-storage.js';
 import { CHARACTERS, getCharacter, isCharacterId } from './characters.js';
 import { countCharacters, getMessageError, MAX_MESSAGE_LENGTH } from './utils.js';
@@ -283,7 +283,7 @@ export function mountChat(root, chatSession = session, storage = chatSession ===
   const transferDialog = root.querySelector('[data-transfer-dialog]');
   let composing = false, compositionEndedAt = -Infinity;
   let renderedCharacter, renderedRevision, confirmedAction;
-  let returnTimer = 0;
+  const returnTimer = createReturnTimer(recoverSignal);
   const narrativeStorage = chatSession === session ? storyStorage : null;
   const smithScene = mountSmithScene(root.querySelector('[data-smith-canvas]'), root.querySelector('[data-smith-pause]'));
   let renderedCount = 0, scrollFrame = 0, focusFrame = 0, lastIntercepted = false;
@@ -379,9 +379,7 @@ export function mountChat(root, chatSession = session, storage = chatSession ===
     details.hidden = !lastNormal;
     writeText(details.querySelector('p'), lastNormal?.role === 'assistant' ? lastNormal.content : '');
     const recover = root.querySelector('[data-smith-return]'); recover.hidden = !completeSmith; recover.disabled = state.storyBlocked;
-    if (authenticated && completeSmith && !state.storyBlocked) {
-      if (!returnTimer) returnTimer = setTimeout(recoverSignal, 12000);
-    } else { clearTimeout(returnTimer); returnTimer = 0; }
+    syncReturnTimer();
     const seconds = Math.max(0, Math.ceil((access.interceptedUntil - Date.now()) / 1000));
     root.querySelector('[data-quota-wait]').hidden = !authenticated || !intercepted;
     writeText(root.querySelector('[data-quota-countdown]'), seconds >= 3600 ? `${Math.ceil(seconds / 3600)} h` : seconds >= 60 ? `${Math.ceil(seconds / 60)} min` : `${seconds} s`);
@@ -418,7 +416,7 @@ export function mountChat(root, chatSession = session, storage = chatSession ===
     confirmedAction = action;
     writeText(dialog.querySelector('h2'), ['current', 'all'].includes(action) ? '¿Borrar el historial?' : '¿Conservar esta versión?');
     writeText(dialog.querySelector('p'), descriptions[action]);
-    dialog.showModal(); dialog.querySelector('[data-history-cancel]').focus();
+    dialog.showModal(); syncReturnTimer(); dialog.querySelector('[data-history-cancel]').focus();
   }
   function confirmHistory(event) {
     event.preventDefault();
@@ -432,13 +430,28 @@ export function mountChat(root, chatSession = session, storage = chatSession ===
   const cancelHistory = () => { confirmedAction = null; dialog.close(); };
   dialog.querySelector('[data-history-cancel]').addEventListener('click', cancelHistory);
   dialog.addEventListener('cancel', cancelHistory);
+  function syncReturnTimer() {
+    returnTimer.update(canRestoreSignal({
+      authenticated: access.authenticated === true,
+      complete: state.smithActive && state.story.messages.length === 4,
+      blocked: state.storyBlocked,
+      hidden: document.hidden,
+      dialogOpen: dialog.open || transferDialog.open,
+      reading: root.querySelector('[data-last-normal]').open,
+    }));
+  }
+  function resumeView() { if (mounted) render(); }
   function recoverSignal() {
-    clearTimeout(returnTimer); returnTimer = 0;
+    returnTimer.update(false);
     if (!mounted || access.authenticated !== true) return;
-    const restoreFocus = input === document.activeElement || root.querySelector('[data-smith-return]') === document.activeElement;
+    const restoreFocus = input === document.activeElement || smith.contains(document.activeElement);
     if (chatSession.finishSmith() && restoreFocus) input.focus();
   }
   root.querySelector('[data-smith-return]').addEventListener('click', recoverSignal);
+  document.addEventListener('visibilitychange', resumeView);
+  dialog.addEventListener('close', syncReturnTimer);
+  transferDialog.addEventListener('close', syncReturnTimer);
+  root.querySelector('[data-last-normal]').addEventListener('toggle', syncReturnTimer);
   function handleInput() { chatSession.setDraft(input.value); }
   function handleKey(event) {
     const action = getComposerKeyAction(event, { composing, justComposed: performance.now() - compositionEndedAt < 80 });
@@ -481,7 +494,8 @@ export function mountChat(root, chatSession = session, storage = chatSession ===
     if (state.character) input.focus(); else picker.querySelector('button').focus();
   });
   const tick = setInterval(() => {
-    render();
+    if (document.hidden) return;
+    if (access.interceptedUntil) render();
     const quota = access.quota;
     const expired = (access.interceptedUntil && access.interceptedUntil <= Date.now()) || (quota?.minuteUsed > 0 && quota.minuteResetAt <= Date.now());
     if (authenticatedNow() && expired && !refreshing && Date.now() - refreshedAt > 5000) {
@@ -490,7 +504,12 @@ export function mountChat(root, chatSession = session, storage = chatSession ===
     }
   }, 1000);
   function authenticatedNow() { return access.authenticated === true; }
-  return () => { mounted = false; clearTimeout(returnTimer); smithScene.dispose(); unsubscribeStory(); root.querySelector('[data-smith-return]').removeEventListener('click', recoverSignal); chatSession.cancelTransfer(); if (transferDialog.open) transferDialog.close();
+  return () => { mounted = false; returnTimer.dispose();
+    document.removeEventListener('visibilitychange', resumeView);
+    dialog.removeEventListener('close', syncReturnTimer);
+    transferDialog.removeEventListener('close', syncReturnTimer);
+    root.querySelector('[data-last-normal]').removeEventListener('toggle', syncReturnTimer);
+    smithScene.dispose(); unsubscribeStory(); root.querySelector('[data-smith-return]').removeEventListener('click', recoverSignal); chatSession.cancelTransfer(); if (transferDialog.open) transferDialog.close();
     transferDialog.removeEventListener('cancel', cancelTransfer);
     transferDialog.querySelector('[data-transfer-cancel]').removeEventListener('click', cancelTransfer);
     transferDialog.querySelector('form').removeEventListener('submit', confirmTransfer);

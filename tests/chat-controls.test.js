@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { parseCharacterRequest, getComposerKeyAction } from '../src/chat-controls.js';
+import { parseCharacterRequest, getComposerKeyAction, createReturnTimer, canRestoreSignal } from '../src/chat-controls.js';
 import { createCharacterSession } from '../src/chat.js';
 import { emptyHistory, snapshotForStorage } from '../src/history-storage.js';
 
@@ -83,5 +83,30 @@ describe('teclado del compositor', () => {
     expect(getComposerKeyAction({ key: 'Enter' }, { composing: true })).toBeNull();
     expect(getComposerKeyAction({ key: 'Enter' }, { justComposed: true })).toBe('ignore');
     expect(getComposerKeyAction({ key: 'a' })).toBeNull();
+  });
+});
+
+// El retorno es un plazo de lectura, independiente del contador narrativo y las cuotas.
+describe('retorno de Smith durante navegación y lectura', () => {
+  it('requiere una vista autenticada, completa, visible y disponible', () => {
+    const ready = { authenticated:true, complete:true, blocked:false, hidden:false, dialogOpen:false, reading:false };
+    expect(canRestoreSignal(ready)).toBe(true);
+    for (const key of ['authenticated','complete']) expect(canRestoreSignal({...ready,[key]:false})).toBe(false);
+    for (const key of ['blocked','hidden','dialogOpen','reading']) expect(canRestoreSignal({...ready,[key]:true})).toBe(false);
+  });
+  it('no reinicia el plazo en cada render y solo retorna una vez', () => {
+    vi.useFakeTimers(); const callback=vi.fn(),timer=createReturnTimer(callback);
+    timer.update(true); vi.advanceTimersByTime(11000); timer.update(true); vi.advanceTimersByTime(1000);
+    expect(callback).toHaveBeenCalledTimes(1);timer.dispose();
+  });
+  it('pausa al ocultar o abrir un diálogo y concede doce segundos al volver', () => {
+    vi.useFakeTimers(); const callback=vi.fn(),timer=createReturnTimer(callback);
+    timer.update(true);vi.advanceTimersByTime(11000);timer.update(false);vi.advanceTimersByTime(20000);
+    expect(callback).not.toHaveBeenCalled();timer.update(true);vi.advanceTimersByTime(11999);expect(callback).not.toHaveBeenCalled();
+    vi.advanceTimersByTime(1);expect(callback).toHaveBeenCalledTimes(1);timer.dispose();
+  });
+  it('desmontar cancela un retorno pendiente y evita rearmarlo', () => {
+    vi.useFakeTimers();const callback=vi.fn(),timer=createReturnTimer(callback);
+    timer.update(true);timer.dispose();timer.update(true);vi.advanceTimersByTime(30000);expect(callback).not.toHaveBeenCalled();
   });
 });

@@ -17,3 +17,22 @@ export function getComposerKeyAction(event, { composing = false, justComposed = 
   if (event.isComposing || composing || event.keyCode === 229) return null;
   return event.repeat || justComposed ? 'ignore' : 'submit';
 }
+
+/** No retira una escena mientras se está leyendo o atendiendo otro diálogo. */
+export function canRestoreSignal({ authenticated, complete, blocked, hidden, dialogOpen, reading }) {
+  return authenticated && complete && !blocked && !hidden && !dialogOpen && !reading;
+}
+
+/** El plazo se reinicia completo al volver a una vista disponible. */
+export function createReturnTimer(onReturn, { delay = 12000, schedule = setTimeout, cancel = clearTimeout } = {}) {
+  let timer = null, disposed = false;
+  function stop() { if (timer !== null) cancel(timer); timer = null; }
+  return {
+    update(enabled) {
+      if (disposed) return;
+      if (!enabled) { stop(); return; }
+      if (timer === null) timer = schedule(() => { timer = null; if (!disposed) onReturn(); }, delay);
+    },
+    dispose() { disposed = true; stop(); },
+  };
+}
