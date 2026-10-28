@@ -1,6 +1,6 @@
 # Registro de comprobaciones
 
-Registro cronológico de desarrollo: los estados antiguos corresponden a su fecha. Para el estado vigente consulta [README](../README.md) y [entrega.md](entrega.md).
+Registro histórico de la primera entrega: los estados antiguos corresponden a su fecha. La verificación vigente está en [Iteración 2](verificacion-iteracion-2.md). Para el estado vigente consulta [README](../README.md) y [entrega.md](entrega.md).
 
 ## Paso 5 — Chat en memoria y respuestas simuladas
 

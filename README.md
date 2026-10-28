@@ -1,85 +1,113 @@
 # Chat con Morfeo
 
-Proyecto Integrador M3 de Full Stack de Henry. SPA en español para conversar con una interpretación ficticia de Morfeo de *The Matrix (1999)*.
+Creé esta aplicación para conversar en español con interpretaciones de Morfeo, el Oráculo y Trinity de *The Matrix (1999)*. Es mi Proyecto Integrador del Módulo 3 de Full Stack de Henry; lo desarrollé con asistencia de Codex.
 
-## Estado
+**[Probar la aplicación en Preview](https://chat-morfeo-m3-git-feat-matrix-v2-miguel-miranda-v.vercel.app/home)** · **[Ver el repositorio](https://github.com/MiguelMirandaV/chat-morfeo-m3)**
 
-Pasos 1–13 completos, con Gemini y Redis reales en local y producción. Se incorporó la ampliación solicitada por Miguel: entrada cyberpunk, retrato CGI, transición por la boca, acceso por cohorte y cuotas con intervención de Smith. **Redis de Upstash conectado y verificado el 27 de octubre de 2026.** Revisión UX local completada. Documentación consolidada. Aplicación publicada y verificada bajo HTTPS. Auditoría final completada; instalación limpia y 130 tests verificados. [Informe de cierre](docs/auditoria-final.md).
+## Código de acceso
 
-**Repositorio:** [MiguelMirandaV/chat-morfeo-m3](https://github.com/MiguelMirandaV/chat-morfeo-m3).
+**El código para abrir el chat es `79`.** Introdúcelo en el campo de cohorte de Henry y pulsa **Desbloquear**.
 
-**Aplicación pública:** [chat-morfeo-m3.vercel.app](https://chat-morfeo-m3.vercel.app/home), verificada el 27 de octubre de 2026. Introduce la cohorte **79** para abrir el chat.
+Uso este código como una puerta temática compartida. No representa una cuenta personal ni identifica a cada visitante.
 
-![Inicio en escritorio](docs/capturas/paso-8-home-1024.jpg)
+![Inicio: rostro de caracteres y lluvia Matrix](docs/capturas/iteracion-2/home-1024.png)
 
-## El personaje
+## Mi propuesta
 
-Morfeo es el mentor de Neo y capitán de la Nabucodonosor en *The Matrix (1999)*. Esta interpretación habla en español, con calma y firmeza, y explora elección, percepción, libertad y aprendizaje. Atiende la última pregunta y los datos aportados en el historial, con respuestas originales normalmente de una a tres frases. No presupone que el usuario sea Neo ni que pueda observar su equipo. [Ficha y alcance](docs/alcance.md) · [Evaluación del prompt](docs/evaluacion-prompt.md).
+Elegí a Morfeo por su voz serena y reflexiva, sus preguntas sobre la libertad y su forma de acompañar el aprendizaje. Cada personaje tiene instrucciones propias de voz y conserva su conversación independiente. Las respuestas aprovechan el contexto y distinguen el universo ficticio de Matrix del mundo real.
 
-## Cómo usarlo
+Diseñé la interfaz como una terminal de Zion. Construí una entrada de pantalla completa: lluvia volumétrica y un rostro procedural en 3D formado por caracteres, con una cámara que entra por su boca para abrir el chat. Incluí pausa, opción de omitir la transición, navegación con teclado, movimiento reducido y una alternativa en Canvas 2D cuando WebGL no está disponible. [Explico la escena y sus límites](docs/home-3d.md).
 
-1. Abre `/home` e introduce la cohorte **79** para desbloquear el canal.
-2. Entra al chat; puedes omitir la transición con el botón o Escape.
-3. Escribe hasta 280 caracteres y pulsa **Enviar**. Enter agrega un salto de línea.
-4. Mientras responde, espera al indicador. Ante un fallo, el borrador se restaura para reintentar.
-5. Puedes ir a Acerca de y volver sin perder la conversación. Recargar inicia una conversación vacía.
+## Qué puedes hacer
 
-Las preguntas se envían al proveedor Gemini. No escribas contraseñas ni claves en el chat.
+- Navegar por **Inicio**, **Chat** y **Acerca de** sin recargar la página; usar Atrás y Adelante.
+- Elegir a **Morfeo, el Oráculo o Trinity** después de desbloquear el canal y solicitar un cambio desde la conversación, con confirmación.
+- Conversar mediante Gemini, enviando el historial completo del personaje elegido en cada petición. Los borradores y errores también se mantienen separados.
+- Enviar con **Enter** o el botón; agregar líneas con **Shift+Enter**.
+- Escribir hasta **280 caracteres visibles**, incluidos espacios, saltos y emojis compuestos. El texto pegado que excede el límite se conserva para corregirlo.
+- Ver el estado de escritura y recuperar el borrador si una respuesta falla.
+- Recuperar conversaciones y borradores al recargar; borrar una conversación o todas, con confirmación.
+- Resolver cambios detectados desde otra pestaña antes de sobrescribir un historial.
+- Consultar las solicitudes compartidas de la app: **15 en una ventana móvil de 60 segundos y 500 al día**.
+- Vivir la intervención de **Smith cada tres turnos completos**: dos interacciones locales y regreso al personaje anterior, conservando su contexto.
+- Recuperar el progreso del ciclo al recargar; pausar la lluvia de Smith.
 
-## Funciones
+Guardo historiales y borradores por personaje en localStorage; se recuperan al volver al mismo sitio. El indicador muestra si el navegador pudo guardarlos. Para cambiar, escribe **«Quiero hablar con Trinity»** o **`/hablar trinity`** y confirma. Acerca de presenta las tres voces con retratos vectoriales originales. [Explico el funcionamiento y los límites](docs/alcance.md).
 
-- `/home`, `/chat`, `/about`: History API, Atrás/Adelante, carga directa y fallback de Vercel.
-- Home con lluvia de código intensa, pausa, CRT y retrato 3D renderizado. La transición abre la boca y acerca la cámara hasta entrar en la terminal; se puede omitir con el botón o Escape. Movimiento reducido evita la transición.
-- Acceso con cohorte **79**, validada en servidor. Cookie firmada, HttpOnly, SameSite=Strict y Secure bajo HTTPS; expira a las ocho horas. Es una puerta con código compartido, sin identidad individual.
-- Gemini real mediante el SDK oficial `@google/genai`; API key y system prompt exclusivamente en servidor.
-- Historial completo en cada solicitud. Se conserva en memoria al navegar y se borra al recargar. No se guarda en Redis, archivos ni localStorage.
-- Máximo **280 grafemas** por mensaje, contando espacios/saltos y emojis compuestos. No trunca el texto pegado; Enter inserta una línea.
-- Indicador estático, bloqueo de envíos simultáneos, scroll del historial y recuperación del borrador ante errores.
-- Límite compartido de **15 solicitudes en 60 segundos móviles y 500 al día**. La reserva ocurre antes de llamar a Gemini, también si falla. La siguiente solicitud se rechaza con 429/Retry-After y activa Smith. Al terminar la espera, se comprueba la cuota y se permite reintentar.
-- Footer © 2026 Miguel Miranda y [GitHub](https://github.com/MiguelMirandaV/chat-morfeo-m3).
+## Cómo usar la aplicación
 
-El contador representa solicitudes **de esta app**, no toda la actividad del proyecto de Google. Google aplica sus propias cuotas por proyecto, incluyendo tokens y llamadas externas. El día reinicia a medianoche del Pacífico, con cambio de horario contemplado. [Límites de Gemini](https://ai.google.dev/gemini-api/docs/rate-limits).
+1. Abre la aplicación e introduce **79**.
+2. Entra al canal; puedes omitir la transición con el botón o Escape.
+3. Elige a **Morfeo, el Oráculo o Trinity**, escribe una pregunta y presiona **Enter** o pulsa **Enviar**. Usa **Shift+Enter** para agregar una línea.
+4. Espera la respuesta. Ante un fallo, revisa el mensaje de estado y reintenta con el borrador conservado.
+5. Puedes navegar o recargar y recuperar lo guardado en ese mismo navegador y sitio. Un envío interrumpido vuelve como borrador; no se reenvía automáticamente.
+6. Después de tres turnos completos, conversa dos veces con Smith. Su diálogo es local y no consume Gemini. La conexión vuelve automáticamente tras 12 segundos, o antes con **Recuperar conexión**. Si estás leyendo la respuesta guardada, atendiendo un diálogo o tienes la pestaña oculta, la espera se pausa.
+7. Usa **Borrar esta conversación** o **Borrar todos los historiales** y confirma si quieres eliminarlos. El borrado no reinicia el ciclo narrativo ni las cuotas.
 
-## Instalación y ejecución
+Envío las preguntas a Gemini a través de mi función de servidor. No escribas contraseñas ni claves en la conversación.
+
+## Tecnologías y estructura
+
+Utilicé HTML, CSS y JavaScript con módulos ES para la SPA, una función Node en Vercel como backend, el SDK `@google/genai` para Gemini, Redis de Upstash para los contadores, Three.js para el rostro y la lluvia 3D, y Vitest para las pruebas.
+
+```text
+api/functions.js       Acceso, cuotas, validación, tres prompts y adaptador Gemini
+src/index.html         Documento inicial
+src/app.js             Vistas, routing, foco y transición
+src/matrix-scene.js    Rostro procedural, lluvia 3D, fallback y limpieza
+scripts/prepare-assets.js Copia local de módulos Three.js y licencia
+scripts/evaluate-characters.js Evaluación real optativa con control de cuota
+src/chat.js            Conversaciones separadas, peticiones HTTP y render del chat
+src/smith-story.js     Ciclo 3+2, respuestas locales y persistencia independiente
+src/smith-scene.js     Rostro de caracteres, lluvia y pausa de Smith
+src/chat-controls.js   Peticiones de cambio y reglas del teclado
+src/characters.js      Identificadores y metadatos públicos de personajes
+src/history-storage.js Validación, guardado, restauración y conflictos de localStorage
+src/utils.js           Conteo y validación de caracteres
+src/styles.css         Estilos responsive y estados visuales
+src/assets/            Retratos de la interfaz
+tests/                 Pruebas unitarias y contratos con mocks
+docs/                  Arquitectura, decisiones, verificaciones y capturas
+.env.example           Variables necesarias sin credenciales reales
+.vercelignore          Exclusión de archivos privados en la subida
+vercel.json            Función, estáticos y fallback de rutas SPA
+```
+
+[Explico el flujo de una petición y las responsabilidades de cada archivo](docs/arquitectura.md).
+
+[Evalué las tres voces con Gemini real](docs/evaluacion-personajes.md): recordaron los datos de sus conversaciones y revisé los límites de cada personaje. La evaluación incluye la corrección de identidad del Oráculo y sus resultados completos.
+
+## Ejecutar en tu equipo
 
 ### Requisitos
 
-- [Node.js](https://nodejs.org/en/download) 24.x con npm y [Git](https://git-scm.com/downloads).
-- Un editor, por ejemplo [VS Code](https://code.visualstudio.com/).
-- Cuenta de Vercel para ejecutar la función con su CLI.
-- Clave propia de [Google AI Studio](https://aistudio.google.com/api-keys), con acceso al modelo configurado.
-- Redis REST de Upstash para publicación y para compartir las cuotas con otras instancias.
+Utilizo **Node.js 24.x**, npm, Git y Vercel CLI local al proyecto. Necesitas una cuenta de Vercel, una clave de Google AI Studio con acceso al modelo configurado y las credenciales REST de Redis para compartir contadores.
 
-Entorno local verificado: Node 24.21.0, npm 11.19.0, Vercel CLI 65.3.1. El SDK y las herramientas están fijados en `package-lock.json`; no hace falta instalarlos globalmente.
+### Instalar
 
-### Desde una copia nueva
+En una carpeta nueva:
 
 ```bash
-git clone https://github.com/MiguelMirandaV/chat-morfeo-m3.git
+git clone --branch feat/matrix-v2 https://github.com/MiguelMirandaV/chat-morfeo-m3.git
 cd chat-morfeo-m3
-```
-
-En VS Code: **Archivo → Abrir carpeta** y elige la carpeta clonada; abre **Terminal → Nueva terminal**. Los comandos siguientes se ejecutan en esa raíz, donde está `package.json`.
-
-Si ya tienes el proyecto preparado, omite el clon y conserva tu `.env`.
-
-```bash
 npm ci
 cp -n .env.example .env
 ```
 
-Completa `.env` en VS Code. Si ya existe, conserva sus valores. No compartas el archivo ni pegues secretos en el chat. [`.env.example`](.env.example) declara todas las variables necesarias; sus secretos están vacíos.
+Abre la carpeta en VS Code y completa `.env`. Si ya existe, conserva sus valores.
 
-| Variable del servidor | Uso |
+| Variable de servidor | Contenido |
 | --- | --- |
-| `GEMINI_API_KEY` | Clave de Google AI Studio. |
-| `GEMINI_MODEL` | `gemini-3.5-flash-lite`, verificado con llamadas reales. |
+| `GEMINI_API_KEY` | Clave privada de Google AI Studio. |
+| `GEMINI_MODEL` | `gemini-3.5-flash-lite`. |
 | `AUTH_SESSION_SECRET` | Secreto aleatorio privado de al menos 32 caracteres. |
-| `QUOTA_DRIVER` | `local` permite archivo privado solo en desarrollo. |
-| `UPSTASH_REDIS_REST_URL` | URL HTTPS de tu base Redis, requerida en Vercel. |
-| `UPSTASH_REDIS_REST_TOKEN` | Token REST con escritura, requerido en Vercel. |
+| `UPSTASH_REDIS_REST_URL` | URL REST HTTPS de la base Upstash. |
+| `UPSTASH_REDIS_REST_TOKEN` | Token REST privado con escritura. |
+| `QUOTA_DRIVER` | `local` permite un archivo privado únicamente en desarrollo sin Redis. |
 
-Para generar el secreto en una copia nueva: `node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"` y guárdalo directamente en `.env`. No vuelvas a generar el secreto existente sin motivo: invalidaría las sesiones abiertas.
+Para una instalación propia, genera un secreto nuevo con Node y guárdalo en tu `.env`: `node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"`. Conserva un secreto existente si quieres mantener válidas sus sesiones. No subas el archivo a Git ni compartas sus valores.
+
+### Iniciar
 
 ```bash
 npm run vercel:login
@@ -88,145 +116,70 @@ npm exec -- vercel link
 npm start
 ```
 
-En una copia nueva, `vercel link` asocia la carpeta al proyecto de tu cuenta. Para Miguel, selecciona el proyecto existente `chat-morfeo-m3`; no crees otro si ya está vinculado. `.vercel/` contiene esa asociación local y está ignorada por Git. Otra persona deberá usar un proyecto propio con sus credenciales.
+Al vincular una copia nueva, selecciona el proyecto correspondiente de tu cuenta. Mi proyecto existente se llama `chat-morfeo-m3`.
 
-Abre [la home local](http://127.0.0.1:3000/home), introduce **79** y desbloquea. `npm start` ejecuta `vercel dev` sobre 127.0.0.1:3000; detén con Ctrl+C. Reinicia tras cambiar `.env`. `.env.local`, gestionado por Vercel, se conserva sin editar. No se utiliza un script `dev` que invoque recursivamente Vercel.
+Abre [http://127.0.0.1:3000/home](http://127.0.0.1:3000/home) e introduce **79**. `npm start` prepara los módulos gráficos con `npm run build` y ejecuta Vercel Dev; Ctrl+C detiene esa instancia. Reinicia después de cambiar `.env` y mantén el mismo host durante la sesión para conservar la cookie.
 
-Un servidor estático o Live Server no ejecuta `/api/functions`: utiliza `npm start` para el flujo completo. Usa el mismo host durante la sesión (`127.0.0.1`, no alternarlo con `localhost`), porque las cookies pertenecen a su host.
+Necesito Vercel Dev para ejecutar también la función; un servidor estático como Live Server solo sirve el frontend. Mantengo `.env.local`, gestionado por Vercel, fuera de Git y sin editar manualmente.
 
-## Contadores locales y Redis
-
-En desarrollo, sin credenciales Redis y con `QUOTA_DRIVER=local`, se utiliza `.data/quota.json`, ignorado por Git y privado. El archivo contiene fecha, cantidad y tiempos de solicitudes; un bloqueo entre procesos y escritura atómica evitan reservas simultáneas incorrectas. Reiniciar el servidor no reinicia el contador.
-
-En Vercel, el archivo local **no está permitido**. Debes configurar una base persistente de Upstash: URL REST y token privado. El servidor ejecuta un script Lua atómico con ventana móvil y contador diario, con expiraciones. No requiere SDK adicional. [Configuración y pasos](docs/redis.md).
-
-Si faltan las credenciales o no se puede comprobar la cuota, se bloquea el canal sin llamar al proveedor. El acceso compartido por cohorte y las cuotas no constituyen un sistema general contra abuso o cuentas individuales. Preview y producción deben compartir la misma base si usan el mismo proyecto de Google; el desarrollo con archivo local no suma sus solicitudes a Redis.
-
-Si ambas credenciales Redis están configuradas, tienen prioridad sobre `QUOTA_DRIVER=local`. El archivo es solo una alternativa de desarrollo en una copia sin Redis; el entorno local de Miguel ya utiliza Redis real.
-
-## Arquitectura simple
-
-```text
-api/functions.js       Handler, acceso, cuotas, prompt y adaptador Gemini
-src/index.html         Documento inicial
-src/app.js             Vistas, History API, lluvia y transición
-src/chat.js            Estado volátil, fetching y render del chat/acceso
-src/utils.js           Conteo y validación de grafemas
-src/styles.css         CSS mobile-first, 768/1024 y movimiento reducido
-src/assets/            Retratos generados para esta interfaz
-tests/                 Vitest: lógica, transporte, acceso, cuotas y proveedor
-docs/                  Alcance, pruebas, uso de IA y capturas
-.env.example           Nombres y ejemplos sin secretos
-vercel.json            Estáticos desde src y función desde api
-.vercelignore          Excluye credenciales y datos locales de la subida
-```
-
-Sin React, Express ni PostgreSQL. Redis persiste exclusivamente contadores; Smith es un estado visual, no un segundo personaje conversacional. [Flujo de datos y explicación del código](docs/arquitectura.md).
-
-## API
-
-Un endpoint: `POST /api/functions`, con `Content-Type: application/json` y sin caché.
-
-```json
-{"action":"session"}
-```
-
-Devuelve `{authenticated, quota}`. Sin sesión no consulta el contador. Para abrir la sesión:
-
-```json
-{"action":"unlock","cohort":"79"}
-```
-
-Devuelve `{authenticated:true, quota}` y emite la cookie. Después, el navegador la adjunta automáticamente:
-
-```json
-{"messages":[{"role":"user","content":"Hola, Morfeo"}]}
-```
-
-Éxito: `{reply, quota}`. Error: `{error:{code,message}, quota?}`. El historial alterna user/assistant, empieza y termina en user y no admite campos extra ni instrucciones system del cliente. Máximo de entrada: 64 KiB; se rechaza íntegro, sin recortar turnos.
-
-| HTTP | Situación |
-| --- | --- |
-| 400 / 413 / 415 | Entrada, tamaño o tipo de contenido incorrectos. |
-| 401 / 403 | Sesión requerida, cohorte incorrecta u origen ajeno. |
-| 405 | Método distinto de POST. |
-| 422 | Generación bloqueada. |
-| 429 | Límite local, diario o del proveedor; incluye Retry-After. |
-| 502 | Texto vacío, inválido o truncado. |
-| 503 / 504 | Configuración, cuota/proveedor no disponibles o timeout. |
-
-El SDK tiene un solo intento, timeout de 30 s y AbortController; el frontend espera hasta 40 s y la función tiene un máximo de 60 s. No hay reenvíos automáticos. Un aborto local no garantiza cancelar el cómputo remoto, por lo que la reserva no se devuelve. Los mensajes usan `textContent`, no HTML del usuario. Los detalles internos y secretos no se devuelven al cliente.
-
-## Modelo y prompt
-
-`gemini-3.5-flash-lite`, 1024 tokens de salida y thinking minimal; se omiten los parámetros de muestreo obsoletos para esa versión. El prompt v3 está en `MORPHEUS_SYSTEM_PROMPT`. [Evaluación real del paso 7](docs/evaluacion-prompt.md): 20 generaciones repartidas entre tres versiones, con correcciones documentadas. En el paso 8 se verificaron dos turnos reales desde la interfaz, con recuerdo del nombre y del tema. La muestra no garantiza ausencia de repeticiones o errores futuros.
-
-## Pruebas
+## Ejecutar las pruebas
 
 ```bash
 npm test
 npm run test:watch
 ```
 
-**130 tests en tres archivos**, sin llamadas reales ni consumo de Gemini. Incluyen grafemas, router, historial, concurrencia, rollback, transporte, timeouts, respuestas bloqueadas/truncadas, firma/expiración, cohorte, origen, cuotas y archivo concurrente entre instancias. El contrato Redis se prueba con fetch sustituido. Además, se verificó el script Lua contra Redis real con claves aisladas: concurrencia, persistencia, ventana móvil, límite diario y expiraciones; véase el registro de pruebas.
+Incluí **258 pruebas en ocho archivos** para validar caracteres, navegación, historiales separados, identidad, estados, errores, transporte, acceso, cuotas y contratos de Gemini. Uso mocks para que la suite no consuma Gemini ni Redis reales y restauro el entorno entre pruebas.
 
-La configuración de Vitest restaura mocks, globals y entorno entre casos. Un setup bloquea cualquier fetch no sustituido y aísla las variables privadas dentro del proceso de pruebas, sin editar archivos de entorno. La suite pasó también con orden mezclado y semilla 79. [Matriz, hallazgos y explicación del paso 9](docs/pruebas-unitarias.md).
+[Personajes y contrato](docs/personajes.md) · [Detalle de las pruebas](docs/pruebas-unitarias.md) · [Comprobaciones y límites](docs/pruebas.md).
 
-Las comprobaciones de navegador se registran en [pruebas.md](docs/pruebas.md), distinguiendo Gemini real del entorno aislado usado para provocar 429 y verificar Smith sin gastar cuota. Los tests antiguos del banco de respuestas simuladas se retiraron al sustituirlo por Gemini.
+## Acceso, datos y cuotas
 
-## Capturas y evidencia
+Guardo conversaciones y borradores en texto en localStorage bajo `morfeo.conversations.v1`. El progreso narrativo y los dos pares de Smith usan `morfeo.smith-story.v1`. Borrar las conversaciones conserva el ciclo, las claves ajenas y las cuotas Redis. [Detalles del guardado y sus límites](docs/persistencia.md).
 
-Las capturas siguientes son locales, no de producción. Las de Home muestran la interfaz; la conversación de Gemini procede de la integración real del paso 8.
+Mantengo la API key y los tres prompts en el servidor. El navegador se comunica mediante `POST /api/functions`; envío códigos de error controlados y muestro mensajes con `textContent`.
 
-| Móvil 320 | Tablet 768 | Escritorio 1024 |
-| --- | --- | --- |
-| ![Inicio móvil](docs/capturas/paso-8-home-320.jpg) | ![Inicio tablet](docs/capturas/paso-8-home-768.jpg) | ![Inicio escritorio](docs/capturas/paso-8-home-1024.jpg) |
+Valido el acceso con una cookie firmada, HttpOnly y SameSite=Strict, con expiración de ocho horas y Secure bajo HTTPS. Aplico el límite de caracteres tanto en cliente como en servidor.
 
-![Conversación con Gemini real](docs/capturas/paso-8-chat-gemini-1280.jpg)
+Redis guarda cantidades y tiempos de solicitudes, nunca mensajes. Reservo cuota antes de llamar a Gemini; una respuesta fallida también puede consumirla. Si configuras ambas credenciales Redis, tienen prioridad sobre el archivo local. En Vercel exijo Redis compartido.
 
-[Acceso vencido](docs/capturas/paso-10-acceso-vencido-320.jpg) y [Smith](docs/capturas/paso-10-smith-320.jpg) son escenarios de fallo controlados, con respuestas/cuotas sustituidas. [Método de la revisión UX](docs/revision-ux.md).
+El contador mide solicitudes de esta app; no toda la actividad externa de Google ni sus tokens. El día reinicia a medianoche del Pacífico. La espera indicada no garantiza que una cuota externa ya esté disponible.
 
-## Publicación
+El cuerpo de conversación admite hasta 64 KiB, sin recortar el historial. Uso un intento por generación, hasta 30 s para Gemini, 40 s para el cliente y 60 s como máximo de función. [Configuración de Redis](docs/redis.md).
 
-[Guía completa para Vercel](docs/despliegue.md): conectar el repositorio al proyecto existente, conservar la raíz del repositorio, publicar `src`, configurar Node 24 y las cinco variables del servidor, desplegar y probar las rutas/función bajo HTTPS.
+## Publicar en Vercel
 
-La conexión GitHub–Vercel con main, las variables Production/Preview y el chat real bajo HTTPS se verificaron en el paso 12. El commit funcional probado es `6b73ce1`; los cambios posteriores de este paso documentan esa versión. Las variables nuevas solo se aplican a despliegues nuevos. [Resultado de publicación](docs/produccion.md) · [Referencia de Vercel](https://vercel.com/docs/environment-variables).
+Conecto el repositorio con Vercel y publico desde `main`. Mantengo la raíz del repositorio como Root Directory, `src` como salida estática, Node 24 y `npm ci` como instalación.
 
-## Problemas frecuentes
+Configura en Production y Preview las cinco variables de servidor de la tabla, excluyendo `QUOTA_DRIVER`. Uso la misma base Redis cuando ambos entornos consumen el mismo proyecto de Gemini. Cada cambio de variables requiere un despliegue nuevo.
 
-| Síntoma | Qué revisar |
+[Guía de despliegue](docs/despliegue.md) · [Publicación de esta iteración](docs/publicacion-iteracion-2.md).
+
+## Capturas
+
+| Personajes en Acerca de | Terminal bajo la intervención de Smith |
 | --- | --- |
-| `npm ci` falla por versión | `node --version` debe indicar 24.x; ejecuta desde la raíz y conserva el lockfile. |
-| El puerto 3000 está ocupado | Comprueba si ya tienes el servidor iniciado; reutiliza esa instancia. Detén con Ctrl+C solo un proceso propio que reconozcas. |
-| HTML visible, pero el chat no conecta | Inicia con `npm start`, no Live Server. Revisa el estado HTTP de `/api/functions`. |
-| “El canal no está disponible” /503 | Revisa variables locales o de Vercel, modelo y Redis; reinicia local o crea un nuevo despliegue tras corregirlas. |
-| Vuelve a pedir la cohorte | Introduce 79. La sesión expira a las 8 horas y las cookies de localhost/127.0.0.1 son diferentes. |
-| Aparece Smith /429 | Espera la cuenta atrás y reintenta explícitamente. No recargues para intentar reiniciar el contador compartido. |
-| Conversación vacía al recargar | Es el comportamiento exigido: historial solo en memoria. |
-| `/chat` da 404 solo en Vercel | Revisa raíz del proyecto y las reglas de `vercel.json`. |
+| ![Tres personajes](docs/capturas/iteracion-2/acerca-de-1024.png) | ![Smith: escena de QA con respuestas simuladas](docs/capturas/iteracion-2/smith-1024.jpg) |
 
-## Límites conocidos
+Las capturas ilustran la interfaz. La escena de Smith se revisó con datos simulados; [las generaciones reales](docs/evaluacion-personajes.md) tienen sus registros propios.
 
-- El modelo puede equivocarse, repetirse o apartarse de su voz; el prompt y la muestra evaluada no garantizan todas las respuestas futuras.
-- La app no mide llamadas externas ni el consumo de tokens de Google. Un 429 del proveedor puede durar más que la espera estimada.
-- El código 79 abre acceso compartido; no identifica ni separa usuarios. Cambiar el secreto invalida sesiones existentes.
-- El cuerpo de la conversación admite hasta 64 KiB; se rechaza el exceso íntegro, sin recortar historial.
-- El retrato es CGI prerenderizado con animación CSS; no una malla articulada.
-- La revisión cubrió un navegador local y tamaños concretos. No se certificó con lector de pantalla real ni con todos los dispositivos.
-- HTTPS público, variables remotas, instalación limpia y auditoría final verificados. Quedan 33 avisos de herramientas de desarrollo (0 críticos); producción tiene 0 avisos reportados. [Alcance y detalle](docs/auditoria-final.md).
+## Límites y mantenimiento
 
-## Documentación y atribución
+- Gemini puede equivocarse, repetirse o tardar; los prompts y las pruebas no garantizan todas las respuestas futuras.
+- El código 79 es compartido. No ofrece identidad individual ni sincronización entre dispositivos.
+- Los rostros son interpretaciones procedurales y vectoriales; no busco una reproducción fotorrealista de los actores. El fallback de Home usa una escena 2D.
+- Probé tamaños concretos y un navegador; no certifico todos los dispositivos ni lectores de pantalla.
+- Fijé las dependencias mediante el lockfile. Los resultados de la auditoría anterior quedan identificados por versión y fecha en [su registro histórico](docs/auditoria-final.md); no representan un análisis nuevo de vulnerabilidades.
 
-- [Alcance y decisiones](docs/alcance.md).
-- [Arquitectura y conceptos del módulo](docs/arquitectura.md).
-- [Guía de despliegue](docs/despliegue.md).
-- [Producción verificada](docs/produccion.md).
-- [Mapa de evidencias para la entrega](docs/entrega.md).
-- [Auditoría final y dependencias](docs/auditoria-final.md).
-- [Registro de IA y prompts visuales](docs/uso-ia.md).
-- [Verificaciones](docs/pruebas.md).
-- [Pruebas unitarias consolidadas](docs/pruebas-unitarias.md).
-- [Revisión UX y casos borde](docs/revision-ux.md).
-- [Redis](docs/redis.md).
+## Documentación y asistencia de IA
 
-Miguel eligió personaje, dirección visual, requisitos y creó/guardó la clave. Codex implementó el código, los retratos generados y las pruebas. El uso de Matrix es una interpretación académica; no es un producto oficial.
+Desarrollé este proyecto con asistencia de Codex para el código, los retratos, las pruebas y la documentación. Definí el personaje, la dirección visual y los requisitos, y configuré mis cuentas y credenciales. Registro las solicitudes, decisiones y comprobaciones en [uso de IA](docs/uso-ia.md).
+
+- [Índice de documentación](docs/README.md).
+- [Alcance funcional](docs/alcance.md) y [mapa de objetivos y rúbrica](docs/entrega.md).
+- [Verificación y límites](docs/verificacion-iteracion-2.md).
+- [Personajes y evaluación real](docs/evaluacion-personajes.md).
+- [Arquitectura](docs/arquitectura.md), [historiales](docs/persistencia.md) y [Smith](docs/smith.md).
+- [Publicación](docs/publicacion-iteracion-2.md) y [guía de despliegue](docs/despliegue.md).
+
+© 2026 Miguel Miranda. Mi interpretación de Matrix es un proyecto académico; no es un producto oficial de la franquicia.

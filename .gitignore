@@ -6,3 +6,6 @@ coverage/
 .DS_Store
 *.log
 .data/
+
+# Generado por npm run build desde la dependencia fijada.
+src/vendor/

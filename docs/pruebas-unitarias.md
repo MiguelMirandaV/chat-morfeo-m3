@@ -1,4 +1,28 @@
-# Paso 9 — Pruebas unitarias consolidadas
+# Pruebas unitarias
+
+## Iteración 2: integración
+
+Resultado vigente: **258 casos en ocho archivos**. Cuatro casos nuevos con reloj sustituido verifican disponibilidad para el retorno, un único temporizador pese a varios renders, pausa/reinicio del plazo y retirada al desmontar. No usan Gemini ni esperas reales.
+
+## Registro de Smith
+
+Resultado de esa etapa: **254 casos en ocho archivos**. Agregué 30 casos en smith-story.test.js sobre cadencia, aislamiento, fallos, comandos, recarga, borrado y almacenamiento; y cuatro en smith-scene.test.js sobre movimiento reducido, pausa, visibilidad, límites de resolución, fallback y limpieza. Actualicé el contrato de cuota: la respuesta 15 admitida se conserva y quota.blocked anuncia espera para la siguiente; ya no activa Smith.
+
+## Registro de terminal
+
+Resultado de esa etapa: **220 casos en seis archivos**. `tests/chat-controls.test.js` añade 32 casos sobre solicitudes directas, falsas menciones, comandos inválidos, confirmación/cancelación, restauración, aislamiento del proveedor, concurrencia y reglas de teclado/composición. La prueba de IME usa eventos representados por objetos; no equivale a una sesión física con todos los teclados.
+
+## Registro de persistencia
+
+Resultado de esa etapa: **188 casos en cinco archivos**. `tests/history-storage.test.js` agrega 36 casos de formato externo, límite global, guardado, restauración, envíos interrumpidos, borrado seguro, fallos, conflictos y retirada del controlador al cerrar una página. Usa almacenamiento y proveedor sustituidos; no consume Gemini ni Redis.
+
+## Registro de la etapa de personajes
+
+Resultado de esa etapa: **152 casos en cuatro archivos**. La suite conserva las pruebas de regresión y adapta el contrato de generación a `{character, messages}` y `{character, reply, quota}`.
+
+Agregué `tests/characters.test.js` con 22 casos sobre identificadores permitidos, rechazo antes de reservar cuota, prompts por personaje, identidad de respuesta, cuota compartida, selección inicial, borradores/contextos separados, respuestas pendientes y recuperación de errores. Estos tests sustituyen al proveedor y no certifican el tono de sus generaciones reales.
+
+## Registro de la versión entregada — Paso 9
 
 Fecha: 27 de octubre de 2026. Resultado final: **130 casos aprobados en tres archivos de pruebas**.
 
@@ -18,9 +42,13 @@ npm run test:watch
 
 Termina el modo watch con Ctrl+C. No hace falta instalar nuevos paquetes: se usa Vitest 5.0.5 ya fijado en el proyecto.
 
-El resultado `Test Files 3 passed (3)` indica que pasaron los tres archivos; `Tests 130 passed (130)` cuenta los casos, incluidos los de `it.each`. No representa un porcentaje de cobertura del código.
+El resultado `Test Files 8 passed (8)` indica que pasaron los ocho archivos; `Tests 258 passed (258)` cuenta los casos, incluidos los de `it.each`. No representa un porcentaje de cobertura del código.
 
-## Organización y riesgos cubiertos
+## Organización vigente
+
+El [mapa de verificación actual](verificacion-iteracion-2.md) relaciona los ocho archivos y sus responsabilidades. La tabla siguiente conserva el desglose de la primera entrega.
+
+## Matriz histórica de riesgos de la primera entrega
 
 | Grupo | Casos | Qué protege |
 | --- | ---: | --- |
@@ -89,4 +117,4 @@ npm test -- --sequence.shuffle --sequence.seed=79
 
 ## Lo que se comprueba por separado
 
-La suite comprueba lógica y contratos con dobles de prueba. No certifica las animaciones, el foco del navegador, la apariencia responsive, la conducta lingüística de Gemini o el despliegue público. La conexión real de Redis y Gemini se verificó en el paso8; la revisión de interfaz corresponde al paso10 y el despliegue al12.
+La suite comprueba lógica y contratos con dobles de prueba. No certifica las animaciones, el foco del navegador, la apariencia responsive, la conducta lingüística de Gemini o el despliegue público. La conexión real de Redis y Gemini de la primera entrega se verificó en el paso8, su interfaz en el paso10 y su despliegue en el12. La evidencia de la iteración actual está en [verificación](verificacion-iteracion-2.md) y [evaluación de voces](evaluacion-personajes.md).

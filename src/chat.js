@@ -1,14 +1,20 @@
+import { emptyStory, validateStory, smithReply, createStoryStorage } from './smith-story.js';
+import { mountSmithScene } from './smith-scene.js';
+import { parseCharacterRequest, getComposerKeyAction, canRestoreSignal, createReturnTimer } from './chat-controls.js';
+import { createHistoryStorage, validateStoredHistory } from './history-storage.js';
+import { CHARACTERS, getCharacter, isCharacterId } from './characters.js';
 import { countCharacters, getMessageError, MAX_MESSAGE_LENGTH } from './utils.js';
 
 const requestErrors = {
   NETWORK_ERROR: 'No se pudo conectar. Revisa tu conexión e inténtalo de nuevo.',
   TIMEOUT: 'La respuesta tardó demasiado. Inténtalo de nuevo.',
-  INVALID_HISTORY: 'El historial no es válido. Recarga para iniciar otra sesión.',
-  HISTORY_TOO_LARGE: 'La conversación supera 64 KiB. Recarga para iniciar otra sesión.',
+  INVALID_CHARACTER: 'Elige Morfeo, el Oráculo o Trinity.',
+  INVALID_HISTORY: 'El historial no es válido. Borra esta conversación para iniciar otra.',
+  HISTORY_TOO_LARGE: 'La conversación supera 64 KiB. Borra esta conversación para iniciar otra.',
   RATE_LIMITED: 'Se alcanzó el límite de solicitudes por minuto.',
   DAILY_LIMIT: 'Se alcanzó el límite de solicitudes del día.',
   PROVIDER_RATE_LIMITED: 'La cuota del proveedor está ocupada. Espera antes de reintentar.',
-  SERVICE_UNAVAILABLE: 'Se perdió la señal con Morfeo. Inténtalo de nuevo.',
+  SERVICE_UNAVAILABLE: 'Se perdió la señal con el personaje. Inténtalo de nuevo.',
   QUOTA_UNAVAILABLE: 'No se pudo comprobar la disponibilidad del canal.',
   CONFIGURATION_ERROR: 'El canal no está disponible temporalmente.',
   INVALID_RESPONSE: 'La respuesta no llegó correctamente. Inténtalo de nuevo.',
@@ -36,7 +42,7 @@ export function subscribeAccess(listener) { accessListeners.add(listener); liste
 function updateQuota(quota, intercepted = false) {
   if (quota && Number.isFinite(quota.minuteUsed) && Number.isFinite(quota.dayUsed)) {
     access.quota = quota;
-    if (intercepted) access.interceptedUntil = quota.retryAt || Date.now() + 60_000;
+    if (intercepted || quota.blocked) access.interceptedUntil = quota.retryAt || Date.now() + 60_000;
     else if (!quota.blocked) access.interceptedUntil = 0;
     publishAccess();
   }
@@ -68,9 +74,10 @@ export async function postApi(payload, { fetchImpl = globalThis.fetch, timeoutMs
     throw new ChatRequestError('NETWORK_ERROR');
   } finally { clearTimeout(timer); }
 }
-export async function requestReply(messages, options) {
-  const data = await postApi({ messages }, options);
-  if (!data || typeof data.reply !== 'string' || !data.reply.trim()) throw new ChatRequestError('INVALID_RESPONSE');
+export async function requestReply(messages, { character = 'morpheus', ...options } = {}) {
+  if (!isCharacterId(character)) throw new ChatRequestError('INVALID_CHARACTER');
+  const data = await postApi({ character, messages }, options);
+  if (!data || data.character !== character || typeof data.reply !== 'string' || !data.reply.trim()) throw new ChatRequestError('INVALID_RESPONSE');
   return data.reply.trim();
 }
 let accessRequest;
@@ -123,26 +130,29 @@ export function mountAccess(form, onUnlocked) {
   return () => { mounted = false; unsubscribe(); form.removeEventListener('submit', submit); };
 }
 
-/** La sesión de conversación es volátil; los contadores y el acceso se comprueban en servidor. */
-export function createChatSession({ respond = requestReply } = {}) {
-  let messages = [], draft = '', pending = false, error = '', errorCode = '';
+/** Estado de un personaje. El coordinador conecta su persistencia; el servidor comprueba acceso y cuotas. */
+export function createChatSession({ respond = requestReply, character = 'morpheus', initialState } = {}) {
+  if (!isCharacterId(character)) throw new TypeError('Personaje no permitido.');
+  let messages = initialState ? initialState.messages.map(message => ({ ...message })) : [];
+  let draft = initialState?.draft ?? '', pending = false, error = '', errorCode = '';
   const listeners = new Set();
   const copyMessages = () => messages.map((message) => ({ ...message }));
-  const getState = () => ({ messages: copyMessages(), draft, pending, error, errorCode });
+  const getState = () => ({ character, messages: copyMessages(), draft, pending, error, errorCode });
   function notify() { for (const listener of listeners) listener(getState()); }
   function setDraft(text) {
-    if (pending || typeof text !== 'string') return;
+    if (pending || typeof text !== 'string' || (text === draft && !error)) return;
     draft = text; error = ''; errorCode = ''; notify();
   }
-  async function send() {
+  async function send(onCompleted = () => {}) {
     if (pending || getMessageError(draft)) return false;
     const submitted = draft;
     messages.push({ role: 'user', content: submitted });
     draft = ''; error = ''; errorCode = ''; pending = true; notify();
     try {
-      const reply = await respond(copyMessages());
+      const reply = await respond(copyMessages(), { character });
       if (typeof reply !== 'string' || !reply.trim()) throw new Error('Respuesta vacía');
       messages.push({ role: 'assistant', content: reply.trim() });
+      onCompleted();
       return true;
     } catch (cause) {
       messages.pop(); draft = submitted;
@@ -154,9 +164,106 @@ export function createChatSession({ respond = requestReply } = {}) {
   function subscribe(listener) { listeners.add(listener); listener(getState()); return () => listeners.delete(listener); }
   return { getState, setDraft, send, subscribe };
 }
-const session = createChatSession();
+/** Cada conversación posee mensajes, borrador y errores propios. Un envío fija su destino. */
+export function createCharacterSession({ respond = requestReply, initialCharacter = null } = {}) {
+  if (initialCharacter !== null && !isCharacterId(initialCharacter)) throw new TypeError('Personaje no permitido.');
+  let conversations = new Map(CHARACTERS.map(({ id }) => [id, createChatSession({ respond, character: id })]));
+  const listeners = new Set();
+  let character = initialCharacter, revision = 0, batching = false, transfer = null, controlMessage = '';
+  let childSubscriptions = [];
+  let story = emptyStory(), storyBlocked = false;
+  const isPending = () => [...conversations.values()].some(session => session.getState().pending);
+  function getState() {
+    const snapshots = Object.fromEntries([...conversations].map(([id, session]) => [id, session.getState()]));
+    const normal = character ? snapshots[character] : { messages: [], draft: '', pending: false, error: '', errorCode: '' };
+    const current = story.normalTurns === 3 ? { messages: story.messages.map(message => ({ ...message })), draft: story.draft, error: '', errorCode: '' } : normal;
+    return { ...current, character, revision, story: { ...story, messages: story.messages.map(message => ({ ...message })) }, storyBlocked, smithActive: story.normalTurns === 3, transfer: transfer ? { from: transfer.from, to: transfer.to } : null, controlMessage, pending: Object.values(snapshots).some(session => session.pending), conversations: snapshots };
+  }
+  function notify() { if (!batching) for (const listener of listeners) listener(getState()); }
+  function connectChildren() { childSubscriptions = [...conversations.values()].map(session => session.subscribe(notify)); }
+  connectChildren();
+  function restore(value) {
+    if (isPending()) return false;
+    let document;
+    try { document = validateStoredHistory(value); } catch { return false; }
+    batching = true;
+    for (const unsubscribe of childSubscriptions) unsubscribe();
+    conversations = new Map(CHARACTERS.map(({ id }) => [id, createChatSession({ respond, character: id, initialState: document.conversations[id] })]));
+    character = story.normalTurns === 3 ? story.returnCharacter : document.character; transfer = null; controlMessage = ''; revision += 1; connectChildren();
+    batching = false; notify(); return true;
+  }
+  function selectCharacter(id) {
+    if (!isCharacterId(id) || isPending() || transfer || story.normalTurns === 3 || storyBlocked) return false;
+    character = id; controlMessage = ''; notify(); return true;
+  }
+  return {
+    getState, selectCharacter, restore,
+    restoreStory(value) {
+      if (isPending()) return false;
+      let restored;
+      try { restored = validateStory(value); } catch { return false; }
+      story = restored; storyBlocked = false; transfer = null;
+      if (story.normalTurns === 3) character = story.returnCharacter;
+      revision += 1; notify(); return true;
+    },
+    blockStory(blocked) { storyBlocked = Boolean(blocked); notify(); },
+    finishSmith() {
+      if (storyBlocked || story.normalTurns !== 3 || story.messages.length !== 4) return false;
+      character = story.returnCharacter; story = emptyStory(); revision += 1;
+      controlMessage = `Señal recuperada. ${getCharacter(character).name} sigue al otro lado.`;
+      notify(); return true;
+    },
+    setDraft(text) {
+      if (storyBlocked || isPending() || transfer || typeof text !== 'string') return;
+      if (story.normalTurns === 3) {
+        if (story.messages.length < 4) { story.draft = text; controlMessage = ''; notify(); }
+      } else if (character) { controlMessage = ''; conversations.get(character).setDraft(text); }
+    },
+    async send() {
+      if (storyBlocked || !character || isPending() || transfer) return false;
+      if (story.normalTurns === 3) {
+        if (story.messages.length === 4 || getMessageError(story.draft)) return false;
+        if (parseCharacterRequest(story.draft)) { controlMessage = 'Smith controla la señal. Completa sus dos interacciones antes de cambiar de personaje.'; notify(); return false; }
+        const text = story.draft;
+        story.messages.push({ role: 'user', content: text }, { role: 'assistant', content: smithReply(text, story.messages.length / 2 + 1) });
+        story.draft = ''; controlMessage = ''; notify(); return true;
+      }
+      const draft = conversations.get(character).getState().draft;
+      if (getMessageError(draft)) return false;
+      const request = parseCharacterRequest(draft);
+      if (!request) {
+        controlMessage = '';
+        // Cuenta dentro del cierre del turno, antes de notificar pending=false y permitir otro envío.
+        return conversations.get(character).send(() => {
+          story.normalTurns += 1;
+          if (story.normalTurns === 3) { story.returnCharacter = character; revision += 1; }
+        });
+      }
+      if (request.type === 'help') controlMessage = 'Usa /hablar morfeo, /hablar oráculo o /hablar trinity.';
+      else if (request.target === character) controlMessage = `Ya estás hablando con ${getCharacter(character).name}.`;
+      else { transfer = { from: character, to: request.target, draft, revision }; controlMessage = 'Confirma el cambio de canal.'; }
+      notify(); return false;
+    },
+    confirmTransfer() {
+      if (storyBlocked || story.normalTurns === 3 || !transfer || isPending() || transfer.from !== character || transfer.revision !== revision || conversations.get(character).getState().draft !== transfer.draft) return false;
+      const target = transfer.to;
+      batching = true;
+      conversations.get(character).setDraft('');
+      character = target; transfer = null; controlMessage = `Conexión restablecida con ${getCharacter(target).name}.`;
+      batching = false; notify(); return true;
+    },
+    cancelTransfer() {
+      if (!transfer) return false;
+      transfer = null; controlMessage = 'Cambio cancelado. Conservé tu mensaje.'; notify(); return true;
+    },
+    subscribe(listener) { listeners.add(listener); listener(getState()); return () => listeners.delete(listener); },
+  };
+}
+const session = createCharacterSession();
+const historyStorage = typeof window === 'undefined' ? null : createHistoryStorage(session);
+const storyStorage = typeof window === 'undefined' ? null : createStoryStorage(session);
 
-export function mountChat(root, chatSession = session) {
+export function mountChat(root, chatSession = session, storage = chatSession === session ? historyStorage : null) {
   const log = root.querySelector('.chat-log');
   const empty = log.querySelector('.empty-state').cloneNode(true);
   const status = root.querySelector('.chat-status');
@@ -169,6 +276,16 @@ export function mountChat(root, chatSession = session) {
   const button = form.querySelector('button');
   const smith = root.querySelector('.smith-intrusion');
   const terminal = root.querySelector('.chat-terminal');
+  const picker = root.querySelector('[data-character-picker]');
+  const storageStatus = root.querySelector('[data-storage-status]');
+  const storageActions = root.querySelector('[data-storage-actions]');
+  const dialog = root.querySelector('[data-history-dialog]');
+  const transferDialog = root.querySelector('[data-transfer-dialog]');
+  let composing = false, compositionEndedAt = -Infinity;
+  let renderedCharacter, renderedRevision, confirmedAction;
+  const returnTimer = createReturnTimer(recoverSignal);
+  const narrativeStorage = chatSession === session ? storyStorage : null;
+  const smithScene = mountSmithScene(root.querySelector('[data-smith-canvas]'), root.querySelector('[data-smith-pause]'));
   let renderedCount = 0, scrollFrame = 0, focusFrame = 0, lastIntercepted = false;
   let wasAuthenticated = access.authenticated === true;
   let state = chatSession.getState();
@@ -176,7 +293,7 @@ export function mountChat(root, chatSession = session) {
   function append({ role, content }) {
     const article = document.createElement('article');
     article.className = `message message--${role === 'user' ? 'user' : 'morpheus'}`;
-    const author = document.createElement('p'); author.className = 'message-author'; author.textContent = role === 'user' ? 'TÚ >' : 'MORFEO >';
+    const author = document.createElement('p'); author.className = 'message-author'; author.textContent = role === 'user' ? 'TÚ >' : `${state.smithActive ? 'AGENTE SMITH' : getCharacter(state.character)?.name.toUpperCase() ?? 'MORFEO'} >`;
     const text = document.createElement('p'); text.className = 'message-content'; text.textContent = content;
     article.append(author, text); log.append(article);
   }
@@ -187,20 +304,52 @@ export function mountChat(root, chatSession = session) {
     consoleView.hidden = !authenticated;
     gate.hidden = authenticated;
     if (wasAuthenticated && !authenticated) {
+      if (dialog.open) dialog.close();
+      chatSession.cancelTransfer();
       // Espera a que el formulario haya habilitado su input al cambiar la sesión.
       cancelAnimationFrame(focusFrame);
       focusFrame = requestAnimationFrame(() => { if (mounted && access.authenticated !== true) gate.querySelector('input').focus(); });
     }
     wasAuthenticated = authenticated;
+    const character = state.smithActive ? { id: 'smith', name: 'Smith', terminal: 'agent_smith', emblem: '[ S ]', description: 'La señal está bajo control del sistema.', voice: 'Diálogo local · 2 interacciones' } : getCharacter(state.character);
+    const displayKey = state.smithActive ? 'smith' : state.character;
+    const completeSmith = state.smithActive && state.story.messages.length === 4;
+    const selected = Boolean(character);
+    picker.hidden = !authenticated || selected;
+    form.hidden = !selected;
+    log.hidden = !selected;
+    if (renderedCharacter !== displayKey || renderedRevision !== state.revision || !authenticated) {
+      log.replaceChildren(); renderedCount = 0; renderedCharacter = displayKey; renderedRevision = state.revision;
+    }
     const previous = renderedCount;
-    while (state.messages.length < renderedCount) { log.lastElementChild?.remove(); renderedCount -= 1; }
-    if (state.messages.length && !renderedCount) log.replaceChildren();
-    for (const message of state.messages.slice(renderedCount)) append(message);
-    renderedCount = state.messages.length;
-    if (!renderedCount && !log.firstElementChild) log.append(empty.cloneNode(true));
+    const visibleMessages = authenticated && selected ? state.messages : [];
+    while (visibleMessages.length < renderedCount) { log.lastElementChild?.remove(); renderedCount -= 1; }
+    if (visibleMessages.length && !renderedCount) log.replaceChildren();
+    for (const message of visibleMessages.slice(renderedCount)) append(message);
+    renderedCount = visibleMessages.length;
+    if (!renderedCount && !log.firstElementChild) {
+      const welcome = empty.cloneNode(true);
+      welcome.querySelector('h2').textContent = state.smithActive ? 'He encontrado su señal.' : 'El canal está abierto.';
+      welcome.querySelector('[data-empty-note]').textContent = state.smithActive ? 'Dos intervenciones conmigo. Después podrá recuperar su conversación.' : character ? character.description : 'Elige un personaje para comenzar.';
+      log.append(welcome);
+    }
     if (renderedCount !== previous) { cancelAnimationFrame(scrollFrame); scrollFrame = requestAnimationFrame(() => { log.scrollTop = log.scrollHeight; }); }
-    if (input.value !== state.draft) input.value = state.draft;
-    input.readOnly = state.pending;
+    writeText(root.querySelector('[data-channel-name]'), character ? `CONEXIÓN CON ${character.name.toUpperCase()}` : 'ELIGE TU CONEXIÓN');
+    writeText(root.querySelector('[data-terminal-name]'), `${character?.terminal ?? 'zion'}@zion:~`);
+    writeText(root.querySelector('[data-character-note]'), character ? `${character.description} / ${character.voice}` : 'Elige a quien te acompañará.');
+    root.querySelector('[data-character-portrait]').hidden = character?.id !== 'morpheus';
+    const emblem = root.querySelector('[data-character-emblem]'); emblem.hidden = !selected || character.id === 'morpheus';
+    writeText(emblem, character?.emblem ?? '');
+    writeText(root.querySelector('[data-transfer-help]'), state.smithActive ? 'Cambiar de personaje estará disponible al recuperar la señal.' : 'Para cambiar: /hablar trinity');
+    input.placeholder = character ? `Escribe a ${character.name}…` : 'Elige un personaje…';
+    terminal.setAttribute('aria-label', character ? `Conversación con ${character.name}` : 'Terminal de conversación');
+    if (input.value !== (authenticated ? state.draft : '')) input.value = authenticated ? state.draft : '';
+    renderStorage(authenticated);
+    input.readOnly = state.pending || Boolean(state.transfer) || completeSmith || state.storyBlocked;
+    if (authenticated && state.transfer) {
+      writeText(transferDialog.querySelector('#transfer-description'), `Origen: ${getCharacter(state.transfer.from).name}. Destino: ${getCharacter(state.transfer.to).name}. Recuperarás el historial y borrador de ese personaje. La solicitud de cambio no se envía a Gemini.`);
+      if (!transferDialog.open) { transferDialog.showModal(); transferDialog.querySelector('[data-transfer-cancel]').focus(); }
+    } else if (transferDialog.open) transferDialog.close();
     const length = countCharacters(state.draft), tooLong = length > MAX_MESSAGE_LENGTH;
     writeText(count, `${length} / ${MAX_MESSAGE_LENGTH}`);
     count.classList.toggle('is-over-limit', tooLong);
@@ -208,39 +357,145 @@ export function mountChat(root, chatSession = session) {
     fieldError.hidden = !tooLong;
     writeText(fieldError, tooLong ? getMessageError(state.draft) : '');
     const intercepted = access.interceptedUntil > Date.now();
-    button.disabled = !authenticated || state.pending || intercepted || Boolean(getMessageError(state.draft));
-    writeText(button, state.pending ? 'TRANSMITIENDO…' : intercepted ? 'CANAL BLOQUEADO' : state.error ? 'REINTENTAR ↗' : 'ENVIAR ↗');
+    const isControl = Boolean(parseCharacterRequest(state.draft));
+    button.disabled = !authenticated || !selected || state.pending || completeSmith || state.storyBlocked || Boolean(state.transfer) || (intercepted && !isControl && !state.smithActive) || Boolean(getMessageError(state.draft));
+    writeText(button, completeSmith ? 'RESTAURANDO SEÑAL…' : state.storyBlocked ? 'CICLO EN OTRA PESTAÑA' : state.pending ? 'TRANSMITIENDO…' : isControl && !state.smithActive ? 'SOLICITAR CAMBIO ↗' : intercepted && !state.smithActive ? 'CANAL BLOQUEADO' : state.error ? 'REINTENTAR ↗' : 'ENVIAR ↗');
     status.classList.toggle('chat-status--loading', state.pending);
-    status.classList.toggle('chat-status--error', Boolean(state.error));
-    const statusText = state.pending ? 'Morfeo está escribiendo…' : intercepted ? 'SEÑAL INTERCEPTADA · Tu mensaje está a salvo.' : state.error || 'CANAL ABIERTO · Morfeo está al otro lado.';
+    status.classList.toggle('chat-status--error', Boolean(state.error && !state.controlMessage));
+    const statusText = state.storyBlocked ? 'Otra pestaña actualizó el ciclo. Recarga para continuar.' : completeSmith ? 'Smith se retira. Restableciendo tu conversación…' : state.smithActive ? state.controlMessage || 'SMITH / CANAL LOCAL · Escribe para recuperar la señal.' : state.controlMessage || (!selected ? 'CANAL ABIERTO · Selecciona un personaje para comenzar.' : state.pending ? `${character.name} está escribiendo…` : intercepted ? 'SEÑAL INTERCEPTADA · Tu mensaje está a salvo.' : state.error || `CANAL ABIERTO · ${character.name} está al otro lado.`);
     if (status.textContent !== statusText) status.textContent = statusText;
-    smith.hidden = !intercepted;
-    terminal.classList.toggle('is-intercepted', intercepted);
-    if (intercepted && !lastIntercepted) {
-      terminal.classList.remove('smith-glitch');
-      void terminal.offsetWidth;
-      terminal.classList.add('smith-glitch');
+    smith.hidden = !authenticated || !state.smithActive;
+    smithScene.setActive(authenticated && state.smithActive);
+    terminal.classList.toggle('is-intercepted', authenticated && state.smithActive);
+    if (state.smithActive && !lastIntercepted && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      terminal.classList.remove('smith-glitch'); void terminal.offsetWidth; terminal.classList.add('smith-glitch');
     }
-    lastIntercepted = intercepted;
+    lastIntercepted = state.smithActive;
+    const smithTurns = state.story.messages.length / 2;
+    writeText(root.querySelector('[data-smith-progress]'), `Interacciones con Smith: ${smithTurns} / 2`);
+    writeText(root.querySelector('[data-story-progress]'), state.smithActive ? 'CANAL INTERCEPTADO · Tu conversación anterior se conserva.' : `Ciclo narrativo: ${state.story.normalTurns} / 3 turnos completos antes de Smith.`);
+    const lastNormal = state.conversations[state.character]?.messages.at(-1);
+    const details = root.querySelector('[data-last-normal]');
+    details.hidden = !lastNormal;
+    writeText(details.querySelector('p'), lastNormal?.role === 'assistant' ? lastNormal.content : '');
+    const recover = root.querySelector('[data-smith-return]'); recover.hidden = !completeSmith; recover.disabled = state.storyBlocked;
+    syncReturnTimer();
     const seconds = Math.max(0, Math.ceil((access.interceptedUntil - Date.now()) / 1000));
-    writeText(root.querySelector('[data-smith-countdown]'), seconds >= 3600 ? `${Math.ceil(seconds / 3600)} h` : seconds >= 60 ? `${Math.ceil(seconds / 60)} min` : `${seconds} s`);
+    root.querySelector('[data-quota-wait]').hidden = !authenticated || !intercepted;
+    writeText(root.querySelector('[data-quota-countdown]'), seconds >= 3600 ? `${Math.ceil(seconds / 3600)} h` : seconds >= 60 ? `${Math.ceil(seconds / 60)} min` : `${seconds} s`);
     const quota = access.quota;
     writeText(root.querySelector('[data-minute-quota]'), quota ? `${quota.minuteUsed} / ${quota.minuteLimit}` : '— / 15');
     writeText(root.querySelector('[data-day-quota]'), quota ? `${quota.dayUsed} / ${quota.dayLimit}` : '— / 500');
     root.querySelector('[data-minute-bar]').style.setProperty('--usage', `${quota ? Math.min(100, quota.minuteUsed / quota.minuteLimit * 100) : 0}%`);
     root.querySelector('[data-day-bar]').style.setProperty('--usage', `${quota ? Math.min(100, quota.dayUsed / quota.dayLimit * 100) : 0}%`);
   }
+  function renderStorage(authenticated) {
+    const saved = storage?.getState();
+    storageActions.hidden = !authenticated || !saved;
+    if (!saved) return;
+    writeText(storageStatus, saved.message);
+    storageStatus.dataset.kind = saved.kind;
+    const entries = Object.values(state.conversations ?? {});
+    const anyData = entries.some(entry => entry.messages.length || entry.draft.length);
+    const currentConversation = state.conversations[state.character];
+    root.querySelector('[data-history-action="current"]').disabled = state.pending || !state.character || !(currentConversation?.messages.length || currentConversation?.draft.length) || saved.blocked;
+    root.querySelector('[data-history-action="all"]').disabled = state.pending || (!anyData && !['invalid', 'error'].includes(saved.kind) && !saved.hasSaved) || saved.conflict;
+    root.querySelector('[data-storage-conflict]').hidden = !saved.conflict;
+    for (const choice of root.querySelectorAll('[data-storage-conflict] button')) choice.disabled = state.pending;
+  }
+  function historyAction(event) {
+    const action = event.target.closest('button[data-history-action]')?.dataset.historyAction;
+    if (!action || !storage || access.authenticated !== true || state.pending || state.transfer) return;
+    const descriptions = {
+      current: `Se borrarán los mensajes y el borrador de ${getCharacter(state.character)?.name}. Las otras conversaciones se conservarán.`,
+      all: 'Se borrarán los mensajes y borradores de los tres personajes guardados en este navegador. Las cuotas y el ciclo de Smith se conservan.',
+      load: 'Se reemplazará lo que tienes en esta pestaña por el último historial guardado. Los cambios que solo estén aquí se perderán.',
+      keep: 'Se guardará la versión de esta pestaña, reemplazando el historial que guardó la otra pestaña.',
+    };
+    if (!Object.hasOwn(descriptions, action)) return;
+    confirmedAction = action;
+    writeText(dialog.querySelector('h2'), ['current', 'all'].includes(action) ? '¿Borrar el historial?' : '¿Conservar esta versión?');
+    writeText(dialog.querySelector('p'), descriptions[action]);
+    dialog.showModal(); syncReturnTimer(); dialog.querySelector('[data-history-cancel]').focus();
+  }
+  function confirmHistory(event) {
+    event.preventDefault();
+    if (access.authenticated !== true || state.pending) { dialog.close(); return; }
+    const success = confirmedAction === 'load' ? storage.loadExternal() : confirmedAction === 'keep' ? storage.keepLocal() : storage.clear(confirmedAction);
+    dialog.close(); confirmedAction = null;
+    if (success) { if (chatSession.getState().character) input.focus(); else picker.querySelector('button').focus(); }
+  }
+  storageActions.addEventListener('click', historyAction);
+  dialog.querySelector('form').addEventListener('submit', confirmHistory);
+  const cancelHistory = () => { confirmedAction = null; dialog.close(); };
+  dialog.querySelector('[data-history-cancel]').addEventListener('click', cancelHistory);
+  dialog.addEventListener('cancel', cancelHistory);
+  function syncReturnTimer() {
+    returnTimer.update(canRestoreSignal({
+      authenticated: access.authenticated === true,
+      complete: state.smithActive && state.story.messages.length === 4,
+      blocked: state.storyBlocked,
+      hidden: document.hidden,
+      dialogOpen: dialog.open || transferDialog.open,
+      reading: root.querySelector('[data-last-normal]').open,
+    }));
+  }
+  function resumeView() { if (mounted) render(); }
+  function recoverSignal() {
+    returnTimer.update(false);
+    if (!mounted || access.authenticated !== true) return;
+    const restoreFocus = input === document.activeElement || smith.contains(document.activeElement);
+    if (chatSession.finishSmith() && restoreFocus) input.focus();
+  }
+  root.querySelector('[data-smith-return]').addEventListener('click', recoverSignal);
+  document.addEventListener('visibilitychange', resumeView);
+  dialog.addEventListener('close', syncReturnTimer);
+  transferDialog.addEventListener('close', syncReturnTimer);
+  root.querySelector('[data-last-normal]').addEventListener('toggle', syncReturnTimer);
   function handleInput() { chatSession.setDraft(input.value); }
+  function handleKey(event) {
+    const action = getComposerKeyAction(event, { composing, justComposed: performance.now() - compositionEndedAt < 80 });
+    if (!action) return;
+    event.preventDefault();
+    if (action === 'submit' && !button.disabled) form.requestSubmit();
+  }
+  function compositionStart() { composing = true; }
+  function compositionEnd() { composing = false; compositionEndedAt = performance.now(); }
+  function cancelTransfer(event) { event?.preventDefault(); chatSession.cancelTransfer(); input.focus(); }
+  function confirmTransfer(event) {
+    event.preventDefault();
+    if (access.authenticated === true && chatSession.confirmTransfer()) input.focus();
+    else chatSession.cancelTransfer();
+  }
+  transferDialog.addEventListener('cancel', cancelTransfer);
+  transferDialog.querySelector('[data-transfer-cancel]').addEventListener('click', cancelTransfer);
+  transferDialog.querySelector('form').addEventListener('submit', confirmTransfer);
+  input.addEventListener('keydown', handleKey);
+  input.addEventListener('compositionstart', compositionStart);
+  input.addEventListener('compositionend', compositionEnd);
   function handleSubmit(event) { event.preventDefault(); if (button.disabled) return; input.focus({ preventScroll: true }); void chatSession.send(); }
+  function chooseCharacter(event) {
+    const choice = event.target.closest('button[data-character]');
+    if (!choice || access.authenticated !== true) return;
+    if (chatSession.selectCharacter(choice.dataset.character)) input.focus();
+  }
+  picker.addEventListener('click', chooseCharacter);
   input.addEventListener('input', handleInput); form.addEventListener('submit', handleSubmit);
   const unsubscribeChat = chatSession.subscribe((next) => { state = next; render(); });
   const unsubscribeAccess = subscribeAccess(render);
+  const unsubscribeStorage = storage?.subscribe(render) ?? (() => {});
+  const unsubscribeStory = narrativeStorage?.subscribe(saved => {
+    writeText(root.querySelector('[data-story-storage]'), saved.message);
+    root.querySelector('[data-story-storage]').dataset.kind = saved.kind;
+  }) ?? (() => {});
   const cleanGate = mountAccess(gate.querySelector('form'), () => {
     if (state.errorCode === 'AUTH_REQUIRED') chatSession.setDraft(state.draft);
-    render(); input.focus();
+    render();
+    if (state.character) input.focus(); else picker.querySelector('button').focus();
   });
   const tick = setInterval(() => {
-    render();
+    if (document.hidden) return;
+    if (access.interceptedUntil) render();
     const quota = access.quota;
     const expired = (access.interceptedUntil && access.interceptedUntil <= Date.now()) || (quota?.minuteUsed > 0 && quota.minuteResetAt <= Date.now());
     if (authenticatedNow() && expired && !refreshing && Date.now() - refreshedAt > 5000) {
@@ -249,5 +504,15 @@ export function mountChat(root, chatSession = session) {
     }
   }, 1000);
   function authenticatedNow() { return access.authenticated === true; }
-  return () => { mounted = false; clearInterval(tick); unsubscribeChat(); unsubscribeAccess(); cleanGate(); cancelAnimationFrame(scrollFrame); cancelAnimationFrame(focusFrame); input.removeEventListener('input', handleInput); form.removeEventListener('submit', handleSubmit); };
+  return () => { mounted = false; returnTimer.dispose();
+    document.removeEventListener('visibilitychange', resumeView);
+    dialog.removeEventListener('close', syncReturnTimer);
+    transferDialog.removeEventListener('close', syncReturnTimer);
+    root.querySelector('[data-last-normal]').removeEventListener('toggle', syncReturnTimer);
+    smithScene.dispose(); unsubscribeStory(); root.querySelector('[data-smith-return]').removeEventListener('click', recoverSignal); chatSession.cancelTransfer(); if (transferDialog.open) transferDialog.close();
+    transferDialog.removeEventListener('cancel', cancelTransfer);
+    transferDialog.querySelector('[data-transfer-cancel]').removeEventListener('click', cancelTransfer);
+    transferDialog.querySelector('form').removeEventListener('submit', confirmTransfer);
+    input.removeEventListener('keydown', handleKey); input.removeEventListener('compositionstart', compositionStart); input.removeEventListener('compositionend', compositionEnd);
+    clearInterval(tick); unsubscribeChat(); unsubscribeAccess(); unsubscribeStorage(); cleanGate(); if (dialog.open) dialog.close(); storageActions.removeEventListener('click', historyAction); dialog.querySelector('form').removeEventListener('submit', confirmHistory); dialog.querySelector('[data-history-cancel]').removeEventListener('click', cancelHistory); dialog.removeEventListener('cancel', cancelHistory); cancelAnimationFrame(scrollFrame); cancelAnimationFrame(focusFrame); input.removeEventListener('input', handleInput); form.removeEventListener('submit', handleSubmit); picker.removeEventListener('click', chooseCharacter); };
 }

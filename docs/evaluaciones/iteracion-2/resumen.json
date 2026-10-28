@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-27",
+  "timeZone": "America/Bogota",
+  "model": "gemini-3.5-flash-lite",
+  "realGenerations": 8,
+  "initialGenerations": 6,
+  "targetedRepeat": 2,
+  "retainedFinalSamples": 6,
+  "wordsRangeAllSamples": [
+    45,
+    67
+  ],
+  "finalRecallPassed": 3,
+  "exactRepeatedReplies": 0,
+  "quotaBefore": {
+    "minuteUsed": 0,
+    "minuteLimit": 15,
+    "dayUsed": 58,
+    "dayLimit": 500,
+    "minuteResetAt": 1793150604952,
+    "dayResetAt": 1793170800000,
+    "blocked": false,
+    "retryAt": 1793150604952,
+    "scope": "app"
+  },
+  "quotaAfter": {
+    "minuteUsed": 8,
+    "minuteLimit": 15,
+    "dayUsed": 66,
+    "dayLimit": 500,
+    "minuteResetAt": 1793150605901,
+    "dayResetAt": 1793170800000,
+    "blocked": false,
+    "retryAt": 1793150605901,
+    "scope": "app"
+  },
+  "oracleCorrection": "Primera respuesta genérica sin nombre; prompt de Oracle precisa identificación explícita. Dos respuestas nuevas verifican identidad y memoria. Morfeo/Trinity no cambiaron.",
+  "limitations": [
+    "Muestra pequeña, no garantía sobre todas las respuestas futuras.",
+    "Varias respuestas exceden la orientación habitual de una a tres frases; no se recortó texto.",
+    "Se ejecutó el handler real en Node con desbloqueo/cookie firmada, Redis y SDK; no fue una prueba visual ni HTTP remota de Preview.",
+    "La palabra count usa segmentos separados por espacios, no tokens del modelo."
+  ],
+  "automatedTests": 258,
+  "testFiles": 8,
+  "build": "passed"
+}

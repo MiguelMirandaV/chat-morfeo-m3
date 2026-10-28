@@ -1,58 +1,54 @@
-# Alcance y decisiones de Chat con Morfeo
+# Alcance funcional de Chat con Morfeo
 
-Documento vigente al 27 de octubre de 2026. Se conserva la estructura simple del Proyecto Integrador M3: `/api`, `/src`, `/tests` y documentación. El estado de ejecución y publicación está en [README](../README.md); los resultados históricos están en [pruebas.md](pruebas.md).
+Creé una SPA en español para conversar con tres interpretaciones ficticias de Matrix. Conservo HTML, CSS y JavaScript con módulos ES, una función Node en Vercel y la estructura simple `/src`, `/api` y `/tests` del M3.
 
-## Personaje y objetivo
+## Recorrido y rutas
 
-SPA para conversar en español con una interpretación de Morfeo de *The Matrix (1999)*. Es sereno, firme, paciente y reflexivo; trata al usuario de tú y normalmente responde en una a tres frases. Explora elección, percepción, libertad y aprendizaje, sin asumir que quien escribe se llama Neo ni que puede acceder a su equipo. Las respuestas son originales generadas por Gemini.
-
-[Prompt evaluado](evaluacion-prompt.md); la fuente vigente es `MORPHEUS_SYSTEM_PROMPT` en [api/functions.js](../api/functions.js). No se mantiene un segundo prompt activo en la interfaz.
-
-## Decisiones expresas de Miguel
-
-1. Morfeo, terminal inspirada en Matrix y desarrollo desde cero.
-2. Mensajes del usuario de hasta 280 caracteres, con regla compartida de grafemas.
-3. Lluvia de caracteres verdes exclusivamente en Home.
-4. Footer ©2026 Miguel Miranda con enlace al repositorio GitHub.
-5. Ampliación posterior: estética cyberpunk intensa, retrato 3D de Morfeo, transición por su boca al chat, cuotas 15/min y 500/día con intervención de Smith y acceso exclusivo con cohorte 79.
-
-Estas últimas instrucciones ampliaron el alcance inicial. Redis persiste contadores, pero la conversación sigue solo en memoria. No se implementan cuentas individuales ni múltiples personajes conversacionales.
-
-## Tres vistas
-
-| Ruta | Contenido y acción |
+| Ruta | Experiencia |
 | --- | --- |
-| `/home` | Presentación, acceso con cohorte, lluvia, retrato y entrada al chat. |
-| `/chat` | Acceso si falta sesión, historial, estados, cuotas, textarea y Enviar. |
-| `/about` | Personaje, proyecto, tecnologías, datos y funcionamiento de la sesión. |
+| `/home` | Lluvia volumétrica, rostro procedural de caracteres y acceso con **79**. La cámara entra por la boca hacia el chat; incluye pausa, omisión y fallback 2D. |
+| `/chat` | Acceso validado, elección inicial de Morfeo, el Oráculo o Trinity, historial propio, envío y recuperación de errores. |
+| `/about` | Presentación del proyecto, tres tarjetas de personajes y explicación de uso y datos. |
 
-La navegación usa History API sin recargar. Atrás/Adelante y render inicial se contemplan; el fallback de Vercel entrega index.html en rutas de la SPA.
+History API mantiene URL y vista sin recargar. Atrás/Adelante y la carga directa se resuelven mediante el router y el fallback estático de Vercel.
 
-## Reglas de conversación
+## Conversaciones
 
-- Cuenta espacios y saltos de línea. Un emoji compuesto cuenta como un grafema.
-- Vacío o solo blancos: bloqueado. Exactamente 280: permitido. Más de 280: conserva todo, explica el error y bloquea el envío. Cliente y servidor validan.
-- Enter inserta una línea; el botón envía. No hay truncado silencioso.
-- El historial completo va en cada petición, en orden. No se guarda en localStorage ni Redis. Navegar conserva conversación y borrador; recargar los borra.
-- Un envío en curso bloquea otro; el indicador de escritura es estático. Al fallar, se retira solo el turno fallido y vuelve el borrador.
-- El log distingue TÚ/MORFEO con etiquetas, alineación y bordes; tiene scroll interno y auto-scroll al agregar turnos.
-- El cuerpo admite hasta 64 KiB; se rechaza el exceso sin recortar el historial.
+- Entrada de hasta **280 grafemas**: espacios, saltos y emojis compuestos cuentan. Un texto vacío o excesivo no se envía; se conserva para corregirlo.
+- **Enter envía**, **Shift+Enter** agrega una línea; también existe un botón. La composición IME y las repeticiones de tecla no deben provocar envíos involuntarios.
+- Mensajes del usuario y personaje diferenciados, estado de escritura, scroll al último turno y borrador recuperable ante error.
+- Un envío pendiente bloquea otro envío y un cambio de personaje. La respuesta queda asociada al personaje que la solicitó aunque se navegue a otra vista.
+- Para cambiar se escribe una petición directa o `/hablar trinity`, `/hablar oráculo`, `/hablar morfeo` y se confirma. Los comandos no se añaden al contexto ni consumen Gemini.
+- Cada petición normal envía el historial completo de su personaje, hasta 64 KiB. El servidor rechaza el exceso; no recorta mensajes.
 
-## Ampliación Matrix
+## Extra credit incorporado
 
-- Morfeo es un retrato CGI prerenderizado con perspectiva CSS. La apertura usa imágenes alineadas, crossfade y zoom; no una malla 3D articulada.
-- Portal de 1,8 s con botón para omitir y Escape; foco contenido y fondo inactivo mientras aparece.
-- Lluvia decorativa con pausa, limpieza al salir de Home y reglas de movimiento reducido. No aparece en Chat/Acerca de.
-- Smith es una intervención visual al recibir 429, con cuenta atrás y borrador conservado. No responde como segundo personaje ni reenvía automáticamente.
-- Cohorte 79 validada en servidor; cookie firmada de 8 horas. Es un código compartido, no identidad personal.
-- Servidor impone 15 reservas en 60 s móviles y 500 por día del Pacífico. Redis tiene prioridad con ambas credenciales; el archivo privado sirve solo de alternativa local sin Redis. En Vercel Redis es obligatorio.
+| Grupo | Implementación |
+| --- | --- |
+| Historial persistente | Conversaciones y borradores separados en localStorage; restauración, indicador real de guardado, borrado confirmado y manejo de fallos/conflictos. |
+| Múltiples personajes | Tres prompts de servidor, elección inicial, cambio solicitado y tres tarjetas visuales en Acerca de. |
+| Envío con teclado | Enter y botón para enviar; Shift+Enter conserva el salto de línea. |
 
-## Entorno y exclusiones
+La persistencia amplía expresamente el comportamiento mínimo del M3 que conservaba historial solo hasta recargar. No incorporé timestamps, copiar respuestas, toggle claro/oscuro ni un indicador animado de escritura como extras de esta iteración.
 
-HTML/CSS/JavaScript ES modules, Vercel Function Node 24, Gemini SDK y Vitest. No se requiere React, Express ni PostgreSQL. No se implementa el extra credit de historial persistente, galería de personajes, timestamps, indicador animado de escritura, copiar respuestas, envío por Enter ni selector claro/oscuro.
+## Ampliaciones propias
 
-## Aceptación y límites
+Smith aparece cada **tres turnos normales completos**, acumulados entre personajes, y responde durante **dos interacciones locales**. Después devuelve el canal anterior, conservando su contexto. Su rostro de caracteres, lluvia y cambio de terminal son una escena ficticia identificada como tal. No requiere agotar cuota ni realiza generaciones de Gemini.
 
-[Mapa de las ocho categorías](entrega.md), [revisión UX](revision-ux.md) y [tests](pruebas-unitarias.md) relacionan requisitos con evidencia. Gemini y Redis se verificaron localmente. La publicación HTTPS se verificó en el paso 12; la auditoría desde una copia limpia quedó completada en el paso 13. El criterio Excelente orienta la revisión; Henry determina la calificación final.
+El progreso se guarda en una clave independiente. Borrar historiales, cambiar de personaje o recibir un error no reinicia la cadencia. Durante Smith no se procesan transferencias. La despedida permite volver con un botón o tras doce segundos disponibles; la lectura abierta, un diálogo o una pestaña oculta pausan el plazo.
 
-El modelo puede fallar o repetirse. La cuota de esta app no mide llamadas externas ni tokens. La revisión responsive cubre tamaños concretos, sin certificar todos los dispositivos o lectores de pantalla.
+## Acceso, datos y cuotas
+
+El código **79** abre una sesión compartida mediante cookie firmada de ocho horas; no identifica personas. La clave de Gemini y los prompts permanecen en el servidor. El historial se envía a Gemini para responder y se guarda localmente cuando el navegador lo permite. El texto recibido se muestra con textContent.
+
+Redis guarda cantidades y tiempos, no conversaciones. Reserva hasta **15 solicitudes por 60 segundos móviles y 500 por día del Pacífico**, compartidas entre personajes y despliegues que usan la misma base. Un fallo posterior puede consumir reserva. El ciclo narrativo no modifica esos contadores.
+
+localStorage pertenece al origen y no sincroniza dispositivos. Sus fallos, registros inválidos o cambios de otra pestaña se anuncian; no prometo almacenamiento infalible ni coordinación transaccional. [Detalle de persistencia](persistencia.md) y [Smith](smith.md).
+
+## Evidencia y límites
+
+[Entrega y rúbrica](entrega.md) relaciona los ocho objetivos con el código y las verificaciones. [Verificación de esta iteración](verificacion-iteracion-2.md) distingue tests, escenarios simulados y generaciones reales. La publicación pública se documentará con su propio commit y resultados; [estado de publicación](publicacion-iteracion-2.md).
+
+La calificación corresponde a Henry. Los prompts pueden fallar o repetirse, los servicios pueden no estar disponibles y la revisión de tamaños concretos no certifica todos los dispositivos. El rostro es procedural, sin garantía de semejanza fotorrealista con un actor.
+
+[Alcance histórico de la primera entrega](alcance-v1.md) · [Decisiones y etapas aprobadas](iteracion-2.md).

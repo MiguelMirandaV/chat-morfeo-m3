@@ -1,5 +1,7 @@
 import { MAX_MESSAGE_LENGTH } from './utils.js';
 import { mountChat, mountAccess } from './chat.js';
+import { mountMatrixScene } from './matrix-scene.js';
+import { CHARACTERS } from './characters.js';
 
 const arrow = '<span aria-hidden="true">↗</span>';
 
@@ -43,56 +45,63 @@ function accessForm(id) {
 
 function renderHomeView() {
   return `<main id="main-content" class="home-view" tabindex="-1">
-    <div class="matrix-rain" aria-hidden="true"></div>
-    <div class="home-grid page-width">
-      <section class="hero-copy" aria-labelledby="home-title">
-        <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span>TRANSMISIÓN ENCRIPTADA / HENRY M3</p>
-        <p class="boot-line">Wake up, Neo<span aria-hidden="true">_</span></p>
-        <h1 id="home-title">LA REALIDAD<br>ES UNA<br><span>ELECCIÓN.</span></h1>
-        <p class="hero-description">Has encontrado la señal. Morfeo te espera al otro lado. Introduce tu cohorte y cruza el umbral.</p>
-        ${accessForm('home-cohort')}
-        <p class="hero-caption">ACCESO RESTRINGIDO · UNA CONVERSACIÓN CON MORFEO</p>
-      </section>
-      <figure class="morpheus-stage" aria-label="Retrato tridimensional de Morfeo">
-        <div class="portrait-target" aria-hidden="true"></div>
-        <div class="portrait-depth"><img class="morpheus-portrait" src="/assets/morpheus-closed.png" alt="Morfeo con gafas oscuras, iluminado por la lluvia de código verde" width="1024" height="1024" fetchpriority="high"></div>
-        <figcaption><span>SUBJECT / MORPHEUS</span><span>LINK ESTABLISHED <b>●</b></span></figcaption>
-        <span class="portrait-coordinate" aria-hidden="true">ZION_NET // 079<br>35° 41′ 22″ N</span>
-      </figure>
-    </div>
-    <div class="home-bottom page-width"><span class="home-note">[ FOLLOW THE WHITE RABBIT. ]<br>Tu historial desaparece al recargar.</span><button class="motion-control" type="button" aria-pressed="false">Pausar animación Ⅱ</button></div>
+    <div class="matrix-scene" aria-hidden="true"></div>
+    <div class="matrix-vignette" aria-hidden="true"></div>
+    <div class="scene-telemetry" aria-hidden="true"><span>ZION MAINFRAME<br>SUBJECT_01 / MORPHEUS</span><span>THE SYSTEM IS A LIE<br>FOLLOW THE WHITE RABBIT</span></div>
+    <section class="home-console" aria-labelledby="home-title">
+      <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span>SEÑAL ENCONTRADA / CANAL 079</p>
+      <h1 id="home-title">Wake up, Neo<span aria-hidden="true">_</span></h1>
+      <p class="home-instruction">Introduce el código para establecer acceso seguro.</p>
+      ${accessForm('home-cohort')}
+      <p class="home-disclaimer">Una puerta. Una elección. Morfeo te espera.</p>
+    </section>
+    <div class="scene-bottom"><span aria-hidden="true">[ FREE YOUR MIND. ]</span><button class="motion-control" type="button" aria-pressed="false">Pausar animación Ⅱ</button></div>
   </main>`;
 }
 
 function renderChatView() {
   return `<main id="main-content" class="chat-view page-width" tabindex="-1">
-    <div class="page-heading"><div><p class="eyebrow">ZION / CANAL PRIVADO</p><h1>Más allá del código<span class="text-accent">_</span></h1></div><p class="heading-aside">CONEXIÓN CON MORFEO<br>COHORTE HENRY 79</p></div>
+    <div class="page-heading"><div><p class="eyebrow">ZION / CANAL PRIVADO</p><h1>Más allá del código<span class="text-accent">_</span></h1></div><p class="heading-aside"><span data-channel-name>ELIGE TU CONEXIÓN</span><br>COHORTE HENRY 79</p></div>
     <div class="chat-layout">
       <aside class="signal-panel" aria-label="Estado y solicitudes de esta app">
-        <div class="signal-portrait"><img src="/assets/morpheus-closed.png" alt="Morfeo" width="1024" height="1024"><span>MORPHEUS / 01</span></div>
-        <p class="eyebrow">SOLICITUDES DE ESTA APP</p>
+        <div class="signal-portrait" data-character-portrait><img src="/assets/morpheus-closed.png" alt="Morfeo" width="1024" height="1024"><span>MORPHEUS / 01</span></div>
+        <div class="character-emblem" data-character-emblem hidden aria-hidden="true"></div><p class="eyebrow">SOLICITUDES DE ESTA APP</p>
         <div class="quota-item"><p>ÚLTIMO MINUTO <strong data-minute-quota>— / 15</strong></p><div class="quota-bar" data-minute-bar></div></div>
         <div class="quota-item"><p>HOY <strong data-day-quota>— / 500</strong></p><div class="quota-bar" data-day-bar></div></div>
         <p class="quota-note">Contador compartido. El día reinicia a medianoche del Pacífico. Google puede aplicar otros límites.</p>
-        <div class="signal-quote">“Free your mind.”<span>— MORPHEUS</span></div>
+        <div class="signal-quote" data-character-note>Elige a quien te acompañará.</div>
       </aside>
-      <section class="terminal chat-terminal" aria-label="Conversación con Morfeo">
-        <div class="terminal-bar"><span><span class="terminal-square" aria-hidden="true"></span>morpheus@zion:~</span><span class="terminal-bar-end">SECURE CHANNEL</span></div>
+      <section class="terminal chat-terminal" aria-label="Terminal de conversación">
+        <div class="terminal-bar"><span><span class="terminal-square" aria-hidden="true"></span><span data-terminal-name>zion@network:~</span></span><span class="terminal-bar-end">SECURE CHANNEL</span></div>
         <div class="chat-gate" data-chat-gate><span class="gate-symbol" aria-hidden="true">[ × ]</span><p class="eyebrow">IDENTIFICACIÓN REQUERIDA</p><h2>La puerta está cerrada.</h2><p>Introduce el número de tu cohorte de Henry para abrir el canal.</p>${accessForm('chat-cohort')}</div>
         <div class="chat-console" data-chat-console hidden>
-          <div class="chat-log" role="log" tabindex="0" aria-label="Mensajes de la conversación" aria-live="polite" aria-relevant="additions text"><div class="empty-state"><span class="empty-symbol" aria-hidden="true">&gt;_</span><h2>Te estaba esperando.</h2><p>Hay una diferencia entre conocer el camino<br>y recorrerlo. Haz tu primera pregunta.</p></div></div>
-          <div class="smith-intrusion" hidden><img class="smith-face" loading="lazy" src="/assets/agent-smith.png" alt="" width="1024" height="1024"><div><p class="eyebrow">INTRUSIÓN DETECTADA / AGENTE SMITH</p><h2>Señor Anderson…</h2><p>El canal ha alcanzado su límite.<br>Recuperación en <strong data-smith-countdown>60 s</strong>.</p><small>Efecto visual de la historia. Tu mensaje sigue en el campo.</small></div></div>
+          <div class="history-toolbar" data-storage-actions hidden>
+            <p data-storage-status role="status"></p>
+            <div class="history-buttons"><button type="button" data-history-action="current">Borrar esta conversación</button><button type="button" data-history-action="all">Borrar todos los historiales</button></div>
+            <div class="storage-conflict" data-storage-conflict hidden><button type="button" data-history-action="load">Cargar historial guardado</button><button type="button" data-history-action="keep">Conservar esta pestaña</button></div>
+          </div>
+          <section class="character-picker" data-character-picker aria-labelledby="picker-title">
+            <p class="eyebrow">CANAL DESBLOQUEADO</p><h2 id="picker-title">¿Con quién quieres hablar?</h2>
+            <p>Cada personaje conserva su propia conversación.</p>
+            <div class="character-options">${CHARACTERS.map(character => `<button type="button" data-character="${character.id}"><span aria-hidden="true">${character.emblem}</span><strong>${character.name}</strong><small>${character.description}</small></button>`).join('')}</div>
+          </section>
+          <div class="chat-log" role="log" tabindex="0" aria-label="Mensajes de la conversación" aria-live="polite" aria-relevant="additions text"><div class="empty-state"><span class="empty-symbol" aria-hidden="true">&gt;_</span><h2>El canal está abierto.</h2><p data-empty-note>Haz tu primera pregunta.</p></div></div>
+          <section class="smith-intrusion" aria-label="Intervención de Smith" hidden><div class="smith-signal"><canvas data-smith-canvas aria-hidden="true"></canvas><span class="smith-fallback" aria-hidden="true">[ AGENT_SMITH ]</span><button type="button" data-smith-pause aria-pressed="false">Pausar lluvia</button></div><div class="smith-brief"><p class="eyebrow">SEÑAL TOMADA / AGENTE SMITH</p><h2>Su canal ahora es mío.</h2><p data-smith-progress role="status">Interacciones: 0 / 2</p><small>Escena narrativa · Respuestas locales, sin Gemini.</small><details data-last-normal><summary>La última respuesta quedó guardada</summary><p></p><small>Al completar 2/2, el retorno automático espera a que cierres esta lectura. También puedes usar Recuperar conexión.</small></details><button type="button" data-smith-return hidden>Recuperar conexión ↗</button></div></section>
+          <p class="story-progress" data-story-progress></p><p class="story-storage" data-story-storage role="status"></p>
+          <p class="quota-wait" data-quota-wait role="status" hidden>Gemini está en pausa por cuota. Recuperación en <strong data-quota-countdown></strong>. Tu borrador se conserva.</p>
           <p class="chat-status" role="status">CONECTANDO…</p>
           <form class="composer" aria-label="Escribir un mensaje">
             <div class="composer-top"><label for="message-input">TU MENSAJE &gt;</label><output id="character-count" for="message-input" aria-label="Caracteres escritos">0 / ${MAX_MESSAGE_LENGTH}</output></div>
             <textarea id="message-input" name="message" rows="3" placeholder="Escribe a Morfeo…" aria-describedby="message-help message-error" spellcheck="true"></textarea>
             <p id="message-error" class="input-error" role="status" hidden></p>
-            <div class="composer-bottom"><p id="message-help">Máximo ${MAX_MESSAGE_LENGTH} caracteres.<br>Enter agrega una nueva línea.</p><button class="button button-primary" type="submit" disabled>ENVIAR ↗</button></div>
+            <div class="composer-bottom"><p id="message-help">Máximo ${MAX_MESSAGE_LENGTH} caracteres.<br>Enter envía · Shift+Enter agrega una línea.<br><span data-transfer-help>Para cambiar: /hablar trinity</span></p><button class="button button-primary" type="submit" disabled>ENVIAR ↗</button></div>
           </form>
         </div>
       </section>
     </div>
-    <p class="chat-caption">IA generativa · Interpretación ficticia de Morfeo. Historial en memoria: se borra al recargar.</p>
+    <dialog class="history-dialog" data-history-dialog aria-labelledby="history-dialog-title" aria-describedby="history-dialog-description"><form><h2 id="history-dialog-title">¿Borrar el historial?</h2><p id="history-dialog-description"></p><div><button type="button" data-history-cancel>Cancelar</button><button type="submit">Confirmar</button></div></form></dialog>
+    <dialog class="history-dialog" data-transfer-dialog aria-labelledby="transfer-title" aria-describedby="transfer-description"><form><p class="eyebrow">ENRUTAMIENTO / ZION</p><h2 id="transfer-title">¿Cambiar de personaje?</h2><p id="transfer-description"></p><div><button type="button" data-transfer-cancel>Cancelar</button><button type="submit">Cambiar canal ↗</button></div></form></dialog>
+    <p class="chat-caption">IA generativa · Interpretaciones ficticias de Matrix. Historiales guardados en este navegador cuando el almacenamiento está disponible.</p>
   </main>`;
 }
 
@@ -100,19 +109,17 @@ function renderAboutView() {
   return `
     <main id="main-content" class="about-view page-width" tabindex="-1">
       <div class="page-heading"><div><p class="eyebrow">DETRÁS DE LA TERMINAL</p><h1>Acerca del proyecto<span class="text-accent">.</span></h1></div><span class="section-index" aria-hidden="true">03 / ABOUT</span></div>
-      <div class="about-grid">
-        <section class="about-character" aria-labelledby="character-title">
-          <p class="eyebrow">EL PERSONAJE</p><h2 id="character-title">Morfeo<span class="text-accent">_</span></h2>
-          <p>Sereno, firme y convencido de que aprender comienza por cuestionar. Morfeo guía a Neo a través de una realidad que nunca había imaginado.</p>
-          <p>Esta interpretación se inspira en el personaje de <cite>The Matrix (1999)</cite>: su manera de hacer preguntas, sus metáforas y su confianza en la libertad de elegir.</p>
-          <div class="character-facts"><div><span>UNIVERSO</span><strong>The Matrix</strong></div><div><span>VOZ</span><strong>Español · Reflexiva</strong></div></div>
-          <a class="text-link" href="/chat">Volver a las preguntas ${arrow}</a>
-        </section>
-        <div class="about-details">
-          <section class="detail-section" aria-labelledby="project-title"><span class="detail-number" aria-hidden="true">01</span><div><h2 id="project-title">Una experiencia de aprendizaje</h2><p>Proyecto Integrador del Módulo 3 de Full Stack de Henry. Desarrollado por Miguel Miranda con asistencia de Codex para explorar interfaces responsive, navegación SPA e integración de inteligencia artificial.</p></div></section>
-          <section class="detail-section" aria-labelledby="tech-title"><span class="detail-number" aria-hidden="true">02</span><div><h2 id="tech-title">Cómo está construido</h2><p>HTML, CSS y JavaScript con módulos, con pruebas de lógica en Vitest. El chat se comunica con una función de Vercel. Gemini genera las respuestas; su clave permanece en el servidor. El acceso se valida con una cookie firmada y los límites se comprueban antes de cada solicitud.</p><ul class="tech-list" aria-label="Tecnologías"><li>JavaScript</li><li>Gemini</li><li>Vercel</li><li>Vitest</li></ul></div></section>
-          <section class="detail-section" aria-labelledby="session-title"><span class="detail-number" aria-hidden="true">03</span><div><h2 id="session-title">Una conversación, una sesión</h2><p>Los mensajes se conservan en memoria hasta que recargas la aplicación. Cada mensaje tuyo admite hasta 280 caracteres. Gemini recibe el historial completo para responder con contexto. El código de cohorte abre una sesión compartida de acceso: no identifica personas. Los contadores guardan cantidades y tiempos, nunca conversaciones.</p></div></section>
-        </div>
+      <p class="about-intro">Tres voces. Tres formas de mirar la misma realidad. Elige tu primera conexión al desbloquear el chat con el código <strong>79</strong>.</p>
+      <section class="character-gallery" aria-label="Personajes de la terminal">
+        ${CHARACTERS.map((character, index) => `<article class="character-card character-card--${character.id}">
+          <div class="character-card-art"><img src="/assets/${character.id}-signal.svg" alt="" width="480" height="420" loading="lazy"><span aria-hidden="true">SIGNAL / 0${index + 1}</span></div>
+          <div class="character-card-body"><p class="eyebrow">${character.voice}</p><h2>${character.name}</h2><p>${character.description}</p><p class="character-card-quote">${['La pregunta es el comienzo del camino.', 'Una elección también cuenta tu historia.', 'Da el paso. Estaré al otro lado.'][index]}</p><span class="character-card-label">${character.terminal}@zion</span></div>
+        </article>`).join('')}
+      </section>
+      <div class="about-details about-details--wide">
+        <section class="detail-section" aria-labelledby="project-title"><span class="detail-number" aria-hidden="true">01</span><div><h2 id="project-title">Mi terminal de aprendizaje</h2><p>Creé esta experiencia para el Proyecto Integrador del Módulo 3 de Full Stack de Henry, con asistencia de Codex. Me inspiré en <cite>The Matrix (1999)</cite> para explorar una SPA responsive e inteligencia artificial. Los personajes son interpretaciones ficticias.</p></div></section>
+        <section class="detail-section" aria-labelledby="tech-title"><span class="detail-number" aria-hidden="true">02</span><div><h2 id="tech-title">Una voz, un contexto</h2><p>Cada personaje tiene sus propias instrucciones en el servidor. Para cambiar, pídeselo desde la conversación: «Quiero hablar con Trinity» o <code>/hablar trinity</code>. Confirma el cambio para recuperar su historial. La petición de cambio no consume Gemini.</p><ul class="tech-list" aria-label="Tecnologías"><li>JavaScript</li><li>Three.js</li><li>Gemini</li><li>Redis</li><li>Vercel</li></ul></div></section>
+        <section class="detail-section" aria-labelledby="session-title"><span class="detail-number" aria-hidden="true">03</span><div><h2 id="session-title">Tu señal permanece</h2><p>Guardo mensajes y borradores separados en este navegador cuando localStorage está disponible. Puedes borrarlos con confirmación. Enter envía; Shift+Enter agrega una línea. Cada mensaje admite 280 caracteres. El código 79 abre un acceso compartido; no identifica personas. Después de tres turnos completos, Smith interviene durante dos interacciones locales; al terminar recuperas el personaje anterior. El ciclo se guarda aparte del historial. Las claves y los contadores de solicitudes permanecen en el servidor.</p><a class="text-link" href="/chat">Entrar a la terminal ${arrow}</a></div></section>
       </div>
     </main>`;
 }
@@ -121,43 +128,6 @@ function renderNotFoundView() {
   return `<main id="main-content" class="not-found page-width" tabindex="-1"><p class="eyebrow">404 / RUTA NO ENCONTRADA</p><h1>Este camino<br>no existe<span class="text-accent">.</span></h1><p>Puedes regresar al inicio y elegir otra dirección.</p><a class="button button-primary" href="/home">Volver a Inicio <span aria-hidden="true">→</span></a></main>`;
 }
 
-/** El efecto pertenece a Home; el router llama a su cleanup antes de cambiar de vista. */
-function startMatrixRain(container, control) {
-  const characters = Array.from('アイウエオカキクケコサシスセソタチツテトナニヌネノ012345789');
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  let pausedByUser = false;
-  for (let column = 0; column < 64; column += 1) {
-    const stream = document.createElement('span');
-    stream.className = 'matrix-stream';
-    stream.textContent = Array.from({ length: 14 + Math.floor(Math.random() * 14) }, () => characters[Math.floor(Math.random() * characters.length)]).join('');
-    stream.style.setProperty('--column', `${((column + 0.5) / 64) * 100}%`);
-    stream.style.setProperty('--duration', `${3 + Math.random() * 5}s`);
-    stream.style.setProperty('--delay', `${-Math.random() * 8}s`);
-    container.append(stream);
-  }
-  const observer = new ResizeObserver(([entry]) => {
-    container.style.setProperty('--rain-travel', `${entry.contentRect.height}px`);
-  });
-  observer.observe(container);
-  function syncMotion() {
-    container.classList.toggle('is-paused', pausedByUser || document.hidden);
-    control.disabled = reducedMotion.matches;
-    control.setAttribute('aria-pressed', String(pausedByUser));
-    control.textContent = reducedMotion.matches ? 'Movimiento reducido' : pausedByUser ? 'Reanudar animación ▶' : 'Pausar animación Ⅱ';
-  }
-  function toggleMotion() { pausedByUser = !pausedByUser; syncMotion(); }
-  control.addEventListener('click', toggleMotion);
-  reducedMotion.addEventListener('change', syncMotion);
-  document.addEventListener('visibilitychange', syncMotion);
-  syncMotion();
-  return () => {
-    observer.disconnect();
-    control.removeEventListener('click', toggleMotion);
-    reducedMotion.removeEventListener('change', syncMotion);
-    document.removeEventListener('visibilitychange', syncMotion);
-    container.replaceChildren();
-  };
-}
 
 const views = {
   '/home': ['home', renderHomeView, 'Inicio'],
@@ -193,40 +163,38 @@ export function getSpaDestination({ href, target, download, button, modified, de
 }
 
 let cancelPortal = () => {};
-/** Crossfade de la boca y cámara hacia su centro; el cleanup evita navegar tras salir. */
+let homeScene;
+/** La cámara entra en la boca del mismo rostro de caracteres. Escape permite omitir. */
 function enterPortal(destination) {
   if (document.querySelector('.mouth-portal')) return;
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { navigateTo(destination); return; }
-  const source = document.querySelector('.morpheus-portrait');
-  if (!source) { navigateTo(destination); return; }
-  const rect = source.getBoundingClientRect();
+  if (!homeScene || window.matchMedia('(prefers-reduced-motion: reduce)').matches) { navigateTo(destination); return; }
   const portal = document.createElement('div');
   portal.className = 'mouth-portal';
   portal.setAttribute('role', 'dialog');
   portal.setAttribute('aria-modal', 'true');
   portal.setAttribute('aria-label', 'Entrando al chat');
-  portal.innerHTML = `<div class="portal-camera"><img class="portal-closed" src="/assets/morpheus-closed.png" alt=""><img class="portal-open" src="/assets/morpheus-open.png" alt=""><div class="portal-mouth"></div></div><p role="status">CRUZANDO EL UMBRAL…</p><button type="button">Omitir transición ↗</button>`;
-  const camera = portal.querySelector('.portal-camera');
-  Object.assign(camera.style, { left: `${rect.left}px`, top: `${rect.top}px`, width: `${rect.width}px`, height: `${rect.height}px` });
-  camera.style.setProperty('--portal-x', `${window.innerWidth / 2 - (rect.left + rect.width * .51)}px`);
-  camera.style.setProperty('--portal-y', `${window.innerHeight / 2 - (rect.top + rect.height * .59)}px`);
-  camera.style.setProperty('--portal-scale', Math.max(window.innerWidth, window.innerHeight) / Math.max(1, rect.width) * 28);
+  portal.innerHTML = `<p role="status">CRUZANDO EL UMBRAL…</p><button type="button">Omitir transición ↗</button>`;
   document.body.append(portal);
+  document.body.classList.add('is-entering');
   const app = document.querySelector('#app');
   const previousInert = app.inert;
   app.inert = true;
   const skip = portal.querySelector('button');
   let timer;
+  const finish = () => { cancelPortal(); navigateTo(destination); };
   const skipKey = (event) => {
     if (event.key === 'Escape') finish();
     if (event.key === 'Tab') { event.preventDefault(); skip.focus(); }
   };
   document.addEventListener('keydown', skipKey);
-  const finish = () => { cancelPortal(); navigateTo(destination); };
   skip.addEventListener('click', finish);
-  cancelPortal = () => { clearTimeout(timer); document.removeEventListener('keydown', skipKey); app.inert = previousInert; portal.remove(); cancelPortal = () => {}; };
+  cancelPortal = () => {
+    clearTimeout(timer); document.removeEventListener('keydown', skipKey); app.inert = previousInert;
+    homeScene?.cancel(); document.body.classList.remove('is-entering'); portal.remove(); cancelPortal = () => {};
+  };
+  homeScene.enter();
   skip.focus({ preventScroll: true });
-  timer = setTimeout(finish, 1800);
+  timer = setTimeout(finish, 2300);
 }
 
 let cleanupCurrentView = () => {};
@@ -246,10 +214,9 @@ function renderRoute({ moveFocus = false } = {}) {
   renderedLocation = `${route.path}${window.location.search}`;
   document.querySelector('#app').innerHTML = `${header(route.page)}${route.render()}${footer()}`;
   if (route.page === 'home') {
-    const openPortrait = new Image(); openPortrait.src = '/assets/morpheus-open.png';
-    const cleanRain = startMatrixRain(document.querySelector('.matrix-rain'), document.querySelector('.motion-control'));
+    homeScene = mountMatrixScene(document.querySelector('.matrix-scene'), document.querySelector('.motion-control'));
     const cleanAccess = mountAccess(document.querySelector('.access-form'), () => enterPortal('/chat'));
-    cleanupCurrentView = () => { cleanRain(); cleanAccess(); cancelPortal(); };
+    cleanupCurrentView = () => { cancelPortal(); cleanAccess(); homeScene?.dispose(); homeScene = null; };
   } else if (route.page === 'chat') {
     cleanupCurrentView = mountChat(document.querySelector('.chat-view'));
   }
@@ -297,8 +264,7 @@ function handleNavigation(event) {
   }, window.location.href);
   if (destination === null) return;
   event.preventDefault();
-  if (document.body.dataset.page === 'home' && normalizePathname(new URL(destination, window.location.href).pathname) === '/chat') enterPortal(destination);
-  else navigateTo(destination);
+  navigateTo(destination);
 }
 
 function initializeApp() {

@@ -12,14 +12,17 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "vercel:login": "vercel login",
-    "vercel:whoami": "vercel whoami"
+    "vercel:whoami": "vercel whoami",
+    "build": "node scripts/prepare-assets.js",
+    "prestart": "npm run build"
   },
   "devDependencies": {
     "vercel": "65.3.1",
     "vitest": "5.0.5"
   },
   "dependencies": {
-    "@google/genai": "2.31.0"
+    "@google/genai": "2.31.0",
+    "three": "0.186.1"
   },
   "overrides": {
     "tar": "7.5.22"

@@ -1,5 +1,7 @@
 # Auditoría final — Paso 13
 
+> Registro histórico de la primera entrega, identificada por `m3-v1-entregado`. Sus cifras y capturas no certifican la iteración actual. Consulta [entrega.md](entrega.md) para la información vigente.
+
 27 de octubre de 2026. Revisión de la consigna, sus ocho objetivos, las buenas prácticas y las ocho categorías de la rúbrica aportada por Miguel. El criterio Excelente se usó como guía de aceptación; la calificación corresponde a Henry.
 
 ## Enlaces de entrega

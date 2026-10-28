@@ -1,5 +1,7 @@
 # Paso 10 — Revisión UX y casos borde
 
+> Registro histórico de la primera entrega, identificada por `m3-v1-entregado`. Sus cifras y capturas no certifican la iteración actual. Consulta [verificacion-iteracion-2.md](verificacion-iteracion-2.md) para la información vigente.
+
 27 de octubre de 2026. Frontend real, servidor QA separado con proveedor y cuotas controlados. Cero solicitudes reales a Gemini o Redis durante esta revisión. Las pruebas reales de integración siguen documentadas en el paso 8.
 
 ## Correcciones

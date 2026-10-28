@@ -2,7 +2,7 @@
 
 ## Cómo leer este registro
 
-Estado vigente: pasos 1–11 completos en local; publicación y auditoría final pendientes. Las secciones numeradas conservan la cronología: “pendiente” o “se implementará” describe lo que faltaba en aquella etapa, no el estado actual. Consulta [README](../README.md) y [mapa de evidencias](entrega.md) para el estado de entrega.
+Conservo el registro de la versión entregada y la preparación de la iteración 2. Cada sección describe lo ocurrido en su etapa; el README resume el producto disponible y el alcance de iteración distingue las funcionalidades aprobadas de las implementadas. Las secciones numeradas conservan la cronología: “pendiente” o “se implementará” describe lo que faltaba en aquella etapa, no el estado actual. Consulta [README](../README.md) y [mapa de evidencias](entrega.md) para el estado de entrega.
 
 Miguel definió personaje, requisitos y dirección visual, creó las cuentas y guardó las credenciales. Codex realizó el desarrollo, los retratos, las pruebas y esta documentación. No se atribuyen a Miguel acciones técnicas de Codex.
 
@@ -178,3 +178,63 @@ Miguel pidió continuar y después solicitó estado por la demora. Codex configu
 ## 13. Auditoría final
 
 Miguel pidió continuar. Codex clonó el repositorio público, instaló desde el lockfile sin secretos y ejecutó 130 tests. Revisó la consigna/rúbrica, código, historial Git, enlaces y contratos públicos. Al detectar un aviso crítico de tar en herramientas, consultó el aviso del mantenedor, validó el parche 7.5.22 primero en el clon y después lo aplicó al proyecto. Se repitieron npm ci, tests y empaquetado. Se registraron también los 33 avisos no críticos de herramientas, 0 de producción y los límites de las pruebas. No se generaron nuevas respuestas Gemini. Se completó el informe de entrega sin atribuir una calificación otorgada por Henry.
+
+
+## Iteración 2 — Preparación y reglas aprobadas
+
+Miguel aprobó el plan, eligió historiales separados y sustituyó la regla de Smith por una intervención después de cada tres turnos normales, durante dos turnos con Smith. Codex conservó la versión entregada con un tag, creó la rama feat/matrix-v2 y reescribió el README en primera persona, con el código 79 explícito y sin una bitácora de pasos.
+
+El alcance define los turnos, la acumulación entre personajes, el retorno a la conversación anterior y la independencia respecto de las cuotas. Se mantiene la modalidad local de diálogo de Smith propuesta en el plan aprobado. El código de la aplicación aún conserva el comportamiento de la versión entregada; las nuevas funciones se implementarán en las etapas siguientes. No se instalaron dependencias ni se generaron respuestas Gemini para esta preparación.
+
+
+## Iteración 2 — Prototipo de Inicio
+
+Codex implementó el rostro procedural de caracteres, lluvia volumétrica y transición de mandíbula/cámara usando Three.js 0.186.1. No generó ni utilizó una fotografía para la nueva Home. El chat conserva por ahora su retrato y comportamiento anteriores. La biblioteca y su licencia se copian localmente durante el build.
+
+Se corrigieron durante el desarrollo un error de sintaxis en la función gaussiana, la competencia entre contextos 2D/WebGL del mismo canvas y una primera lluvia demasiado tenue. La revisión de navegador comprobó WebGL real, tamaños 320/768/1024, pausa, transición completa, Escape y desmontaje. Los escenarios sin WebGL y con movimiento reducido se sirvieron con fixtures locales identificados, sin presentarlos como pruebas del proveedor real. Los códigos 78/79 se comprobaron contra la función local. Las 130 pruebas pasan; la auditoría de producción reporta cero avisos. No se generaron respuestas Gemini en esta etapa.
+
+
+## Iteración 2 — Personajes, contrato y conversaciones
+
+Codex implementó identificadores públicos permitidos, prompts de servidor distintos para Morfeo, el Oráculo y Trinity, y el contrato explícito de personaje. Refactorizó la sesión en tres conversaciones en memoria, con borradores/errores separados y bloqueo de cambio durante un envío. Incluyó una elección inicial mínima para revisar los tres personajes; el cambio solicitado dentro del chat sigue pendiente de su etapa.
+
+La suite suma 152 casos. Al actualizar el contrato se corrigieron expectativas y un fixture antiguo sin identidad en la respuesta; no se eliminó la prueba de recuperación que lo detectó. Se comprobaron tres respuestas reales mediante la interfaz local, una por personaje, con preguntas y nombres ficticios. Redis pasó de 30 a 33 reservas diarias. La consulta inicial de disponibilidad falló de forma transitoria; el reintento de desbloqueo y la lectura posterior funcionaron, sin sustituir las cuotas reales por contadores locales. La muestra confirma integración, no una evaluación exhaustiva de personalidad o seguridad.
+
+La revisión visual comprobó la selección tras autenticar, etiquetas de autor/canal, tamaños 320/1024 sin desbordamiento y conservación de personaje/borrador al navegar entre Chat y Acerca de. No se modificaron credenciales ni configuración de Redis, y no se presentó persistencia tras recarga como si ya existiera.
+
+
+## Iteración 2 — Persistencia
+
+Codex implementó la clave versionada morfeo.conversations.v1, validación externa, guardado de historiales/borradores, restauración, indicador y borrado actual/todos con diálogo. El controlador conserva registros inválidos hasta una decisión explícita, informa fallos de lectura/escritura y pausa al detectar cambios externos. No cambió credenciales, dependencias, API de generación ni cuotas.
+
+La revisión detectó dos situaciones que se corrigieron: el callback de un envío podía escribir al cerrar la página, y el aborto de fetch podía retirar la marca de interrupción antes de pagehide. Se añadió limpieza del controlador y se conserva la marca ante errores de red/timeout. También se corrigió el borrado de una conversación cuyo borrador excedía el límite de almacenamiento.
+
+Se usaron escenarios locales con datos ficticios y proveedor/cuotas simulados para revisar recarga, interrupción sin reenvío, diálogo y cancelación, conflicto entre pestañas, guardado bloqueado y contenido oculto antes de 79. El borrado efectivo y sus fallos se comprobaron en tests con almacenamiento sustituido. La suite alcanza 188 casos. Se reinició la instancia Vercel Dev propia porque su manifiesto inicial no incluía history-storage.js; se comprobó después que respondía 200 con el tipo JavaScript correcto. No se generaron respuestas Gemini para esta etapa.
+
+## Iteración 2 — Terminal y teclado
+
+Usé Codex para implementar peticiones directas de transferencia con confirmación, Enter/Shift+Enter y tres tarjetas con SVG originales. Revisé el cambio como un control local, separado del contexto del modelo: cancelar conserva el comando, confirmar recupera solo el historial del destino y las intenciones no se guardan. Se corrigió el selector del texto descriptivo del diálogo y se usó Object.hasOwn para rechazar nombres heredados como constructor.
+
+La suite alcanza 220 casos; las pruebas de UI usaron respuestas simuladas en un puerto propio, sin nuevas generaciones Gemini ni operaciones Redis. Se comprobaron Enter, Shift+Enter, Escape/foco, bloqueo de 281 caracteres, transferencias, restauración y tarjetas a 320/768/1024 px. La composición IME se verificó como lógica de eventos, no con teclado físico. Smith 3+2 sigue pendiente de su etapa.
+
+## Iteración 2 — Smith 3+2
+
+Usé Codex para implementar la cadencia, persistencia independiente y el rostro procedural proyectado en Canvas con lluvia de caracteres. Las respuestas locales se identifican en la UI; no se atribuyen a Gemini. El cierre del turno se cuenta antes de liberar pending para impedir carreras; transferencias y errores no cuentan. Las pruebas verifican borrado de historial sin reiniciar el ciclo y conflictos entre pestañas.
+
+La suite alcanza 254 casos. Se comprobó en UI simulada la entrada al tercer turno, recarga tras 1/2, respuesta 2/2 y retorno automático; en un escenario con cuota agotada, Smith siguió funcionando y devolvió Trinity con las tres respuestas y el bloqueo de cuota intactos. Se corrigió un temporizador que debía cancelarse al usar el botón de retorno. No hubo nuevas generaciones reales de Gemini.
+
+## Iteración 2 — Integración de lectura, foco y temporizadores
+
+Con la Preview de Smith confirmada por Miguel, revisé problemas concretos del ciclo de vida. Incorporé un controlador de retorno que pausa ante ocultamiento, diálogos o lectura desplegada, y se cancela al desmontar. El foco vuelve al campo si desaparece un control de Smith. Eliminé renders cada segundo cuando no hay cuenta atrás de cuota y consultas periódicas de la vista oculta. La suite pasa 258 casos, incluidos cuatro de este controlador con reloj sustituido. El QA visual usa una API simulada; no se generaron nuevas respuestas reales. No se presenta como un benchmark de GPU/FPS.
+
+## Iteración 2 — Evaluación real de voces y contexto
+
+Usé Codex para ejecutar una muestra acotada contra el handler real, con acceso firmado, Redis y Gemini configurados. Seis generaciones iniciales comprobaron voz, memoria y límites. Detecté que el Oráculo describía su personaje sin nombrarse al responder quién era. Se precisó únicamente esa instrucción y se verificó con dos generaciones adicionales, sin cambiar otros prompts. Conservo ambos registros con sus hashes y textos completos.
+
+Ocho respuestas aceptadas; memoria de nombre/interés correcta para los tres personajes; 45–67 palabras. Algunas superan la guía habitual de una a tres frases: se registra como límite y no se recorta la salida. La cuota diaria observada pasó de 58 a 66. La suite continúa en 258 casos; no se confunden con llamadas reales. El script optativo requiere --real, respeta la cuota y guarda solo casos ficticios en .data. No se expusieron claves, cookies ni variables privadas. [Informe](evaluacion-personajes.md).
+
+## Iteración 2 — Consolidación documental
+
+Con asistencia de Codex consolidé el README en primera persona, con acceso 79, funciones vigentes, capturas actuales y enlace de Preview identificable. Actualicé alcance, mapa de objetivos/rúbrica, arquitectura, persistencia y despliegue; este último ahora refleja npm run build y Three.js. Separé los resultados históricos de la primera entrega de la evidencia de esta iteración, sin convertir cifras antiguas en verificaciones nuevas.
+
+Agregué un índice documental, una síntesis de verificación y el documento de publicación con el cierre de producción aún pendiente. Corregí que borrar todos los historiales conserva a Smith si está activo y documenté su clave separada. La revisión de esta etapa comprueba enlaces locales y coherencia con la configuración; no genera nuevas respuestas ni afirma una nueva auditoría de vulnerabilidades.
