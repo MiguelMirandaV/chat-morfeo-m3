@@ -232,3 +232,9 @@ Con la Preview de Smith confirmada por Miguel, revisé problemas concretos del c
 Usé Codex para ejecutar una muestra acotada contra el handler real, con acceso firmado, Redis y Gemini configurados. Seis generaciones iniciales comprobaron voz, memoria y límites. Detecté que el Oráculo describía su personaje sin nombrarse al responder quién era. Se precisó únicamente esa instrucción y se verificó con dos generaciones adicionales, sin cambiar otros prompts. Conservo ambos registros con sus hashes y textos completos.
 
 Ocho respuestas aceptadas; memoria de nombre/interés correcta para los tres personajes; 45–67 palabras. Algunas superan la guía habitual de una a tres frases: se registra como límite y no se recorta la salida. La cuota diaria observada pasó de 58 a 66. La suite continúa en 258 casos; no se confunden con llamadas reales. El script optativo requiere --real, respeta la cuota y guarda solo casos ficticios en .data. No se expusieron claves, cookies ni variables privadas. [Informe](evaluacion-personajes.md).
+
+## Iteración 2 — Consolidación documental
+
+Con asistencia de Codex consolidé el README en primera persona, con acceso 79, funciones vigentes, capturas actuales y enlace de Preview identificable. Actualicé alcance, mapa de objetivos/rúbrica, arquitectura, persistencia y despliegue; este último ahora refleja npm run build y Three.js. Separé los resultados históricos de la primera entrega de la evidencia de esta iteración, sin convertir cifras antiguas en verificaciones nuevas.
+
+Agregué un índice documental, una síntesis de verificación y el documento de publicación con el cierre de producción aún pendiente. Corregí que borrar todos los historiales conserva a Smith si está activo y documenté su clave separada. La revisión de esta etapa comprueba enlaces locales y coherencia con la configuración; no genera nuevas respuestas ni afirma una nueva auditoría de vulnerabilidades.

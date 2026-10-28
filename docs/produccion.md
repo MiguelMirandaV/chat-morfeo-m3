@@ -1,5 +1,7 @@
 # Publicación verificada — Paso 12
 
+> Registro histórico de la primera entrega, identificada por `m3-v1-entregado`. Sus cifras y capturas no certifican la iteración actual. Consulta [publicacion-iteracion-2.md](publicacion-iteracion-2.md) para la información vigente.
+
 27 de octubre de 2026. [Abrir Chat con Morfeo](https://chat-morfeo-m3.vercel.app/home). Código de acceso: **79**.
 
 ## Configuración comprobada

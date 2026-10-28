@@ -4,7 +4,7 @@ Guardo las conversaciones y borradores separados de Morfeo, el Oráculo y Trinit
 
 ## Dónde y qué se guarda
 
-Uso únicamente la clave **`morfeo.conversations.v1`** de localStorage. Contiene una versión de formato, el personaje activo y tres entradas con `messages`, `draft` e `interrupted`. No guarda credenciales, cookies, prompts ni cuotas. Los errores transitorios de la interfaz tampoco se serializan.
+El controlador de conversaciones usa la clave **`morfeo.conversations.v1`** de localStorage. El [ciclo de Smith](smith.md) usa una clave independiente y no se elimina al borrar conversaciones. Contiene una versión de formato, el personaje activo y tres entradas con `messages`, `draft` e `interrupted`. No guarda credenciales, cookies, prompts ni cuotas. Los errores transitorios de la interfaz tampoco se serializan.
 
 El almacenamiento pertenece al **origen**: protocolo, dominio y puerto. Se conserva entre sesiones del mismo navegador; cambiar de dispositivo, perfil, puerto o dominio de Preview no traslada los datos. Para revisar la iteración de forma continua uso su [URL estable de rama](https://chat-morfeo-m3-git-feat-matrix-v2-miguel-miranda-v.vercel.app/home). La URL de producción tiene su propio almacenamiento. [Referencia: localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage).
 
@@ -31,7 +31,7 @@ Recuperar el borrador no recupera una respuesta del servidor que nunca llegó al
 ## Borrado con confirmación
 
 - **Borrar esta conversación:** elimina mensajes y borrador del personaje activo; conserva las otras conversaciones y la selección.
-- **Borrar todos los historiales:** elimina nuestra clave y vuelve a la selección inicial.
+- **Borrar todos los historiales:** elimina la clave de conversaciones y vuelve a la selección inicial, salvo que Smith controle la terminal: en ese caso conserva su intervención y personaje de retorno.
 - Ambas acciones muestran un diálogo con alcance explícito y Cancelar como foco inicial. Escape cancela. [Referencia del diálogo modal](https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement/showModal).
 - Se bloquean durante una respuesta pendiente. Primero se comprueba el cambio de almacenamiento y después se limpia la memoria. Si el navegador rechaza el cambio, se informa y la conversación permanece disponible.
 - No uso `localStorage.clear()`. Las claves ajenas y las cuotas Redis se conservan.
@@ -44,9 +44,9 @@ Al detectar un cambio pauso el guardado automático. La memoria local se conserv
 
 Esta coordinación detecta cambios y evita sobrescrituras automáticas conocidas; localStorage no es una base transaccional entre usuarios. La elección de conservar una versión reemplaza la otra y no combina conversaciones divergentes.
 
-## Evidencia de esta etapa
+## Evidencia de la etapa de persistencia
 
-- **188 tests** pasan, incluidos 36 casos de persistencia con almacenamiento sustituido.
+- En esa etapa pasaron **188 tests**, incluidos 36 casos de persistencia con almacenamiento sustituido.
 - Navegador con frontend real y backend de QA identificado: recarga restaura un turno y borrador; interrumpir un envío restaura el borrador sin generar otro.
 - El diálogo de borrado se abrió y canceló sin cambios. El borrado efectivo, alcance, claves ajenas y fallos se verificaron en tests; no se borraron conversaciones del usuario para probarlo.
 - Dos pestañas compartiendo el origen de QA muestran el conflicto y el diálogo de elección. Cancelar mantiene el estado local.

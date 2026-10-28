@@ -1,46 +1,54 @@
-# Mapa de evidencias de la entrega
+# Guía de entrega y mapa de evidencias
 
-Estado al 27 de octubre de 2026: pasos 1–13 completos, con publicación y auditoría verificadas. Este documento orienta al evaluador. [Auditoría final](auditoria-final.md); la calificación corresponde a Henry.
+Desarrollé Chat con Morfeo como Proyecto Integrador M3 de Henry, con asistencia de Codex. Esta guía describe la iteración con persistencia, tres personajes, teclado y Smith 3+2. El código de acceso es **79**.
 
-- Repositorio: [MiguelMirandaV/chat-morfeo-m3](https://github.com/MiguelMirandaV/chat-morfeo-m3).
-- URL pública: [chat-morfeo-m3.vercel.app](https://chat-morfeo-m3.vercel.app/home).
-- Instalación, configuración y tests: [README](../README.md).
-- Guía de publicación: [despliegue.md](despliegue.md).
-- Registro de decisiones y prompts: [uso-ia.md](uso-ia.md).
+- [Repositorio](https://github.com/MiguelMirandaV/chat-morfeo-m3).
+- [Preview de revisión](https://chat-morfeo-m3-git-feat-matrix-v2-miguel-miranda-v.vercel.app/home); puede requerir mi sesión Vercel.
+- [Instalación y uso](../README.md), [alcance](alcance.md), [verificación](verificacion-iteracion-2.md) y [publicación](publicacion-iteracion-2.md).
 
-Publicación: [evidencia HTTPS y conversación real](produccion.md). Las comprobaciones de producción se realizaron en el paso 12; la instalación limpia y el contraste de la entrega quedaron completados en el paso 13.
+La Preview fue confirmada funcional por Miguel. La integración y verificación de esta iteración en el dominio público corresponden al paso de publicación. La [evidencia de producción anterior](produccion.md) está identificada como histórica.
 
-## Ocho categorías de la rúbrica
+## Ocho objetivos del M3
 
-| Categoría | Evidencia disponible | Estado después de publicar |
-| --- | --- | --- |
-| Responsive | CSS mobile-first, Grid/Flex,768/1024; [12 combinaciones de vistas/tamaños](capturas/paso-10-casos.json) y capturas en README. | Verificado en paso 12. |
-| SPA | Vistas/routing en app.js, tests del router y [verificación de Atrás/Adelante del paso 4](pruebas.md). | Rutas directas y revisión final verificadas. |
-| Asincronía y Fetch | postApi, sesión y tests de estados; [fallos y navegación durante peticiones](revision-ux.md). | Verificado en paso 12. |
-| Gemini | System prompt v3, historial completo, parseo y [evaluación real por versiones](evaluacion-prompt.md); integración real en paso 8. | Verificados, con recuerdo de nombre/lenguaje. |
-| Seguridad y serverless | Secretos en servidor, env.example, cookie firmada, validaciones, cuotas atómicas y tests. | Variables, cookies, assets y respuestas HTTP verificados; no se capturó Network del navegador. |
-| Chat y UX | Diferenciación TÚ/MORFEO, log acotado, auto-scroll, escritura, borrador y sesión; [revisión UX](revision-ux.md). | Conversación, navegación y nueve tamaños/vistas verificados. |
-| Vitest |130 casos en 3 archivos, mocks restaurados, fetch real bloqueado; [matriz de pruebas](pruebas-unitarias.md). | 130/130 aprobados desde instalación limpia. |
-| Despliegue y documentación | Estructura simple, README, capturas, uso de IA y guía de despliegue. | URL, SHA y auditoría final verificados. |
+| Objetivo | Código y evidencia |
+| --- | --- |
+| 1. Responsive, mobile-first y estados de chat | [CSS](../src/styles.css), Grid/Flex y tamaños revisados; [capturas y límites](verificacion-iteracion-2.md). |
+| 2. SPA con History API | [Router](../src/app.js), Home/Chat/About, pushState/popstate, [tests](../tests/app.test.js) y reglas de Vercel. |
+| 3. Promises, async/await y Fetch | [postApi y sesiones](../src/chat.js), espera/error, finally y borrador; [tests de sesión/transporte](../tests/utils.test.js). |
+| 4. JSON y separación de responsabilidades | [Backend](../api/functions.js): validateHistory, toGeminiContents y parseGeminiReply; render separado en mountChat. |
+| 5. Prompting y criterio ante la IA | [Prompts de servidor](../api/functions.js), [evaluación y corrección del Oráculo](evaluacion-personajes.md), [registro de IA](uso-ia.md). |
+| 6. APIs de IA, roles, tokens y cuotas | Historial completo propio, assistant → model, systemInstruction, presupuesto de salida y reserva; [arquitectura](arquitectura.md). |
+| 7. Secretos y función proxy | Variables privadas, cookie firmada, validación y Redis; [.env.example](../.env.example), [.vercelignore](../.vercelignore), [tests](../tests/access-quota-gemini.test.js). |
+| 8. Vitest, mocks, GitHub y Vercel | 258 casos en ocho archivos, [pruebas](pruebas-unitarias.md), [despliegue](despliegue.md) y [cierre de publicación](publicacion-iteracion-2.md). |
 
-## Buenas prácticas de la consigna
+## Ocho categorías de evaluación
 
-- Personaje distintivo y respuestas breves: ficha en alcance.md y prompt evaluado.
-- Contexto, preguntas y tono: evaluación real de 20 generaciones entre v1/v2/v3; no son 20 pruebas de la última versión.
-- API key privada: backend y entorno; assets y respuestas públicas revisados sin valores privados.
-- Tamaños de pantalla: medidas y capturas locales 320/768/1024, más 600 en revisión UX.
-- Historial solo durante la sesión: memoria del módulo; navegación conserva y recarga limpia. Redis solo contiene contadores.
-- Debug: sin console.log en el código de src/api al cierre; los escenarios controlados viven fuera del repositorio.
-- Función desplegada: verificada por HTTPS con Gemini y Redis reales en paso 12.
+| Categoría | Evidencia de esta iteración |
+| --- | --- |
+| Responsive | Home, selección y chat revisados en móvil/escritorio; Acerca de en 320/768/1024; intervención Smith cabe a 320. No se certifica cada combinación en todos los navegadores. |
+| SPA | Tres vistas, URL coherente, enlaces internos, atrás/adelante y restauración de estado sin reenviar mensajes. |
+| Asincronía y Fetch | Bloqueo de doble envío, errores controlados, timeout y recuperación; escenarios de fallo con mocks. |
+| Gemini | Tres prompts propios; ocho generaciones reales de evaluación, tres recuerdos correctos y corrección de identidad verificada. |
+| Seguridad y serverless | Acceso y cuotas de servidor, contrato validado antes de reservar, render de texto y exclusión de archivos privados. |
+| Chat y UX | 280 grafemas, estados y scroll; historiales separados, transferencias confirmadas y Smith local 3+2. |
+| Tests | 258 pruebas en ocho archivos, sin servicios reales; ocho generaciones reales documentadas aparte. |
+| Despliegue/documentación | Rama GitHub, Previews Ready, README y documentación actualizados; verificación pública de la iteración al publicar. |
 
-La ampliación de Miguel incluye acceso por cohorte, cuotas y efectos Matrix. No se incorporó el extra credit de historial persistente, galería de personajes, timestamps, copiar respuestas, envío por Enter ni toggle claro/oscuro.
+## Buenas prácticas
 
-## Guion breve para explicar el trabajo
+Elegí voces distintas y evalué contexto, tono y límites con datos ficticios. Mantuve claves fuera del cliente, responsabilidades separadas, commits descriptivos, comentarios sobre decisiones y pruebas sin red. Las revisiones de UI usan tamaños concretos; los casos de cuota/fallo se simulan para no agotar solicitudes reales.
 
-1. Presenta a Morfeo y la decisión visual; distingue el retrato renderizado de una malla 3D.
-2. Muestra las tres rutas y cómo conserva el historial al navegar.
-3. Explica el límite 280 en ambos lados y el borrador ante errores.
-4. Sigue una petición navegador → función → Redis → Gemini → parseo → vista.
-5. Ejecuta npm test y explica un caso de error con mock.
-6. Abre el registro de IA y una corrección basada en evidencia, por ejemplo el parseo inválido o la recuperación 401.
-7. Presenta la URL pública y el commit verificados. Atribuye a Codex el desarrollo/pruebas y a Miguel las decisiones y acciones que realizó.
+La regla mínima de historial en sesión fue ampliada por el extra credit aprobado de localStorage. Conservo la estructura simple y registro cuándo una evidencia pertenece a la primera entrega. No atribuyo a una simulación las propiedades del proveedor real ni uso una auditoría histórica como prueba actual de seguridad.
+
+## Guion para presentar el proyecto
+
+1. Abre la aplicación con **79** y presenta las tres rutas y voces.
+2. Envía un mensaje; explica los 280 grafemas, Enter/Shift+Enter y la espera.
+3. Solicita un cambio de personaje y confirma; muestra su historial separado y recuperación al recargar.
+4. Completa el ciclo 3+2: explica que Smith usa respuestas locales y no reinicia la cuota.
+5. Sigue una pregunta: navegador → función → Redis → Gemini → respuesta validada → vista.
+6. Ejecuta npm test y explica un caso de error o restauración con mock.
+7. Presenta la corrección del Oráculo basada en respuestas reales y reconoce los límites observados.
+8. Muestra el commit y despliegue públicos verificados al completar la publicación. Explica mi dirección del producto y el trabajo realizado con asistencia de Codex.
+
+La rúbrica orienta la evidencia; Henry decide la calificación.

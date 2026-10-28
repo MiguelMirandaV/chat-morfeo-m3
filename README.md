@@ -2,7 +2,7 @@
 
 Creé esta aplicación para conversar en español con interpretaciones de Morfeo, el Oráculo y Trinity de *The Matrix (1999)*. Es mi Proyecto Integrador del Módulo 3 de Full Stack de Henry; lo desarrollé con asistencia de Codex.
 
-**[Abrir la versión entregada](https://chat-morfeo-m3.vercel.app/home)** · **[Ver el repositorio](https://github.com/MiguelMirandaV/chat-morfeo-m3)**
+**[Probar la aplicación en Preview](https://chat-morfeo-m3-git-feat-matrix-v2-miguel-miranda-v.vercel.app/home)** · **[Ver el repositorio](https://github.com/MiguelMirandaV/chat-morfeo-m3)**
 
 ## Código de acceso
 
@@ -16,7 +16,7 @@ Uso este código como una puerta temática compartida. No representa una cuenta 
 
 Elegí a Morfeo por su voz serena y reflexiva, sus preguntas sobre la libertad y su forma de acompañar el aprendizaje. Cada personaje tiene instrucciones propias de voz y conserva su conversación independiente. Las respuestas aprovechan el contexto y distinguen el universo ficticio de Matrix del mundo real.
 
-Diseñé la interfaz como una terminal de Zion. En esta rama construí una entrada de pantalla completa: lluvia volumétrica y un rostro procedural en 3D formado por caracteres, con una cámara que entra por su boca para abrir el chat. Incluí pausa, opción de omitir la transición, navegación con teclado, movimiento reducido y una alternativa en Canvas 2D cuando WebGL no está disponible. [Explico la escena y sus límites](docs/home-3d.md). La aplicación publicada conserva la versión entregada mientras reviso esta iteración en Preview.
+Diseñé la interfaz como una terminal de Zion. Construí una entrada de pantalla completa: lluvia volumétrica y un rostro procedural en 3D formado por caracteres, con una cámara que entra por su boca para abrir el chat. Incluí pausa, opción de omitir la transición, navegación con teclado, movimiento reducido y una alternativa en Canvas 2D cuando WebGL no está disponible. [Explico la escena y sus límites](docs/home-3d.md).
 
 ## Qué puedes hacer
 
@@ -32,7 +32,7 @@ Diseñé la interfaz como una terminal de Zion. En esta rama construí una entra
 - Vivir la intervención de **Smith cada tres turnos completos**: dos interacciones locales y regreso al personaje anterior, conservando su contexto.
 - Recuperar el progreso del ciclo al recargar; pausar la lluvia de Smith.
 
-Guardo historiales y borradores por personaje en localStorage; se recuperan al volver al mismo sitio. El indicador muestra si el navegador pudo guardarlos. Para cambiar, escribe **«Quiero hablar con Trinity»** o **`/hablar trinity`** y confirma. Acerca de presenta las tres voces con retratos vectoriales originales. [Explico las reglas de esta iteración](docs/iteracion-2.md).
+Guardo historiales y borradores por personaje en localStorage; se recuperan al volver al mismo sitio. El indicador muestra si el navegador pudo guardarlos. Para cambiar, escribe **«Quiero hablar con Trinity»** o **`/hablar trinity`** y confirma. Acerca de presenta las tres voces con retratos vectoriales originales. [Explico el funcionamiento y los límites](docs/alcance.md).
 
 ## Cómo usar la aplicación
 
@@ -56,6 +56,7 @@ src/index.html         Documento inicial
 src/app.js             Vistas, routing, foco y transición
 src/matrix-scene.js    Rostro procedural, lluvia 3D, fallback y limpieza
 scripts/prepare-assets.js Copia local de módulos Three.js y licencia
+scripts/evaluate-characters.js Evaluación real optativa con control de cuota
 src/chat.js            Conversaciones separadas, peticiones HTTP y render del chat
 src/smith-story.js     Ciclo 3+2, respuestas locales y persistencia independiente
 src/smith-scene.js     Rostro de caracteres, lluvia y pausa de Smith
@@ -87,7 +88,7 @@ Utilizo **Node.js 24.x**, npm, Git y Vercel CLI local al proyecto. Necesitas una
 En una carpeta nueva:
 
 ```bash
-git clone https://github.com/MiguelMirandaV/chat-morfeo-m3.git
+git clone --branch feat/matrix-v2 https://github.com/MiguelMirandaV/chat-morfeo-m3.git
 cd chat-morfeo-m3
 npm ci
 cp -n .env.example .env
@@ -134,7 +135,7 @@ Incluí **258 pruebas en ocho archivos** para validar caracteres, navegación, h
 
 ## Acceso, datos y cuotas
 
-Guardo conversaciones y borradores en texto en localStorage, únicamente bajo la clave propia `morfeo.conversations.v1`. El borrado conserva las demás claves del navegador y las cuotas Redis. [Detalles del guardado y sus límites](docs/persistencia.md).
+Guardo conversaciones y borradores en texto en localStorage bajo `morfeo.conversations.v1`. El progreso narrativo y los dos pares de Smith usan `morfeo.smith-story.v1`. Borrar las conversaciones conserva el ciclo, las claves ajenas y las cuotas Redis. [Detalles del guardado y sus límites](docs/persistencia.md).
 
 Mantengo la API key y los tres prompts en el servidor. El navegador se comunica mediante `POST /api/functions`; envío códigos de error controlados y muestro mensajes con `textContent`.
 
@@ -152,32 +153,33 @@ Conecto el repositorio con Vercel y publico desde `main`. Mantengo la raíz del 
 
 Configura en Production y Preview las cinco variables de servidor de la tabla, excluyendo `QUOTA_DRIVER`. Uso la misma base Redis cuando ambos entornos consumen el mismo proyecto de Gemini. Cada cambio de variables requiere un despliegue nuevo.
 
-[Guía de despliegue](docs/despliegue.md) · [Evidencia de producción](docs/produccion.md).
+[Guía de despliegue](docs/despliegue.md) · [Publicación de esta iteración](docs/publicacion-iteracion-2.md).
 
 ## Capturas
 
-| Móvil | Tablet | Escritorio |
-| --- | --- | --- |
-| ![Inicio móvil](docs/capturas/paso-12-home-320.jpg) | ![Inicio tablet](docs/capturas/paso-12-home-768.jpg) | ![Inicio escritorio](docs/capturas/paso-12-home-1024.jpg) |
+| Personajes en Acerca de | Terminal bajo la intervención de Smith |
+| --- | --- |
+| ![Tres personajes](docs/capturas/iteracion-2/acerca-de-1024.png) | ![Smith: escena de QA con respuestas simuladas](docs/capturas/iteracion-2/smith-1024.jpg) |
 
-![Conversación real con Gemini](docs/capturas/paso-12-chat-gemini.jpg)
+Las capturas ilustran la interfaz. La escena de Smith se revisó con datos simulados; [las generaciones reales](docs/evaluacion-personajes.md) tienen sus registros propios.
 
 ## Límites y mantenimiento
 
 - Gemini puede equivocarse, repetirse o tardar; los prompts y las pruebas no garantizan todas las respuestas futuras.
 - El código 79 es compartido. No ofrece identidad individual ni sincronización entre dispositivos.
-- Uso un retrato CGI prerenderizado animado con CSS en la versión publicada.
+- Los rostros son interpretaciones procedurales y vectoriales; no busco una reproducción fotorrealista de los actores. El fallback de Home usa una escena 2D.
 - Probé tamaños concretos y un navegador; no certifico todos los dispositivos ni lectores de pantalla.
-- Registré 33 avisos de herramientas de desarrollo, sin críticos, y 0 avisos de dependencias de producción en la auditoría. Fijé el parche `tar@7.5.22` mediante overrides. [Alcance del examen](docs/auditoria-final.md).
+- Fijé las dependencias mediante el lockfile. Los resultados de la auditoría anterior quedan identificados por versión y fecha en [su registro histórico](docs/auditoria-final.md); no representan un análisis nuevo de vulnerabilidades.
 
 ## Documentación y asistencia de IA
 
 Desarrollé este proyecto con asistencia de Codex para el código, los retratos, las pruebas y la documentación. Definí el personaje, la dirección visual y los requisitos, y configuré mis cuentas y credenciales. Registro las solicitudes, decisiones y comprobaciones en [uso de IA](docs/uso-ia.md).
 
-- [Alcance de la versión entregada](docs/alcance.md).
-- [Alcance aprobado de la siguiente iteración](docs/iteracion-2.md).
-- [Evaluación del personaje](docs/evaluacion-prompt.md).
-- [Revisión de experiencia](docs/revision-ux.md).
-- [Auditoría de entrega](docs/auditoria-final.md).
+- [Índice de documentación](docs/README.md).
+- [Alcance funcional](docs/alcance.md) y [mapa de objetivos y rúbrica](docs/entrega.md).
+- [Verificación y límites](docs/verificacion-iteracion-2.md).
+- [Personajes y evaluación real](docs/evaluacion-personajes.md).
+- [Arquitectura](docs/arquitectura.md), [historiales](docs/persistencia.md) y [Smith](docs/smith.md).
+- [Publicación](docs/publicacion-iteracion-2.md) y [guía de despliegue](docs/despliegue.md).
 
 © 2026 Miguel Miranda. Mi interpretación de Matrix es un proyecto académico; no es un producto oficial de la franquicia.

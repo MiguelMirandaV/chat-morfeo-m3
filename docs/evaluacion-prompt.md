@@ -6,7 +6,7 @@ Estado: **paso 7 completado el 26 de octubre de 2026**. Miguel guardó la clave 
 
 ## Actualización de integración
 
-El proveedor se integró y verificó en el chat durante el paso 8; la suite actual es de 130 tests. Las cantidades83/20 y los futuros del texto siguiente pertenecen al registro de la evaluación del paso 7. No se repitió la evaluación de Gemini para actualizar esta documentación. [Integración y resultados posteriores](pruebas.md).
+El proveedor se integró y verificó en el chat durante el paso 8; la suite de esa entrega era de 130 tests. Las cantidades83/20 y los futuros del texto siguiente pertenecen al registro de la evaluación del paso 7. No se repitió la evaluación de Gemini para actualizar esta documentación. [Integración y resultados posteriores](pruebas.md).
 
 ## Fuente única del prompt
 
