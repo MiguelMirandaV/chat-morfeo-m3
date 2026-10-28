@@ -30,10 +30,18 @@ Si el registro es inválido o el almacenamiento falla, conservo el registro ante
 
 Los límites de solicitudes siguen en Redis. Una cuota agotada muestra espera sin convocar otro Smith. Resolver el reto no reinicia cuotas; al volver, el envío normal puede seguir esperando disponibilidad.
 
-Canvas conserva su rostro de caracteres, lluvia y carcajada visual; respeta pausa, movimiento reducido, ocultamiento y desmontaje. La ampliación invasiva de la escena corresponde al paso visual de esta iteración; no se presenta como terminada aquí.
+La escena toma todo el viewport con lluvia y un rostro grande de caracteres: gafas rectangulares, cabello, nariz con relieve, mandíbula, traje y carcajada visual. El rostro ocupa la izquierda en escritorio y la parte superior en móvil. El cuestionario usa un panel oscuro con scroll propio; la navegación permanece encima para salir sin resolver ni perder el reto.
+
+El render se ajusta a una superficie lógica máxima de 1100 × 900 y densidad de píxeles máxima de 1.5. La cuadrícula de lluvia y la superficie del rostro están acotadas: los tests de pantallas enormes comprueban menos de 5000 trazos de glifos por dibujo. El bucle de animación dibuja como máximo cada 50 ms. Es un presupuesto de implementación, no una medición de FPS en todos los equipos.
+
+Pausar congela el instante actual. Con movimiento reducido aparece una imagen estática y el control indica «Movimiento reducido». Una página oculta no dibuja ni programa nuevos frames. Desmontar cancela y retira los recursos; un callback tardío no puede reactivarlos. Si Canvas falla, conservo el rótulo de Smith y el cuestionario.
+
+Durante la toma de pantalla oculto las barras normales, pero los avisos de guardado y las acciones para resolver conflictos quedan disponibles en el panel. Cancelar su diálogo devuelve foco al cuestionario. Al acertar, salir del chat o perder acceso retiro la clase global y recupero la presentación normal.
 
 ## Verificación de esta implementación
 
-La suite completa pasa **270 casos en ocho archivos**, sin llamadas reales a Gemini o Redis. Los casos de Smith cubren independencia, una intervención por personaje, diez errores y vuelta al inicio, acierto, tokens antiguos, fallos de API, migración, recarga, borrado y conflictos de almacenamiento. Se retiraron los cuatro casos del temporizador eliminado y se sustituyeron las expectativas del antiguo ciclo por las reglas nuevas.
+La suite completa pasa **275 casos en ocho archivos**, sin llamadas reales a Gemini o Redis. Los casos de Smith cubren independencia, una intervención por personaje, diez errores y vuelta al inicio, acierto, tokens antiguos, fallos de API, migración, recarga, borrado y conflictos de almacenamiento. Se retiraron los cuatro casos del temporizador eliminado y se sustituyeron las expectativas del antiguo ciclo por las reglas nuevas.
 
 Con frontend real y API local simulada comprobé: tercer intercambio → pregunta 1 → error → pregunta 2 → recarga → acierto → seis mensajes originales recuperados → recarga → envío con Enter sin nueva intervención. La revisión detectó y corrigió el foco al recuperar un reto tras validar acceso. No hubo errores o avisos de consola en ese recorrido. No es una prueba del proveedor ni una certificación de todos los dispositivos.
+
+La revisión de la escena comprobó pausa, navegación a Acerca de y vuelta a la pregunta pendiente, acciones de conflicto y cancelación con foco, y acierto con seis mensajes recuperados. Los viewports CSS embebidos de 320 y 768 px no desbordan; ambas opciones de la pregunta inicial quedan dentro del panel de 320 × 640. Movimiento reducido y fallo de Canvas se simularon explícitamente en fixtures locales; no se cambió la preferencia del sistema. [Evidencia y límites](verificacion-iteracion-3.md).

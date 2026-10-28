@@ -19,7 +19,7 @@ El banco de diez preguntas está en [preguntas de Smith](preguntas-smith.md); la
 
 ![Pregunta pendiente conservada tras recargar, con API local simulada](capturas/iteracion-3/cuestionario-local.png)
 
-La captura ilustra la integración funcional del cuestionario con la presentación anterior. La simplificación de terminal y la escena de Smith a gran escala siguen en sus pasos respectivos. No se presenta esta imagen como la interfaz final ni como una prueba móvil.
+La captura ilustra la integración funcional del cuestionario con la presentación anterior. En ese paso todavía no se habían completado la simplificación de terminal ni la escena ampliada; sus comprobaciones aparecen más abajo. No se presenta esta imagen como la interfaz final ni como una prueba móvil.
 
 Los casos de migración y borrado utilizaron almacenamiento ficticio en Vitest; no se borraron conversaciones del usuario. La coordinación de localStorage detecta conflictos conocidos y no ofrece transacciones entre pestañas. No se consumió cuota real para comprobar errores o el cuestionario.
 
@@ -38,4 +38,25 @@ El paso 4 mantiene las **270 pruebas en ocho archivos** y el build aprobados. Ca
 
 ![Terminal con datos ficticios y API local simulada](capturas/iteracion-3/terminal-escritorio.png)
 
-[Captura de los viewports embebidos](capturas/iteracion-3/terminal-responsive.png). El rostro invasivo de Smith sigue pendiente de su paso visual.
+[Captura de los viewports embebidos](capturas/iteracion-3/terminal-responsive.png). La escena ampliada se comprueba en el apartado siguiente.
+
+## Toma de pantalla de Smith
+
+El paso 5 cierra con **275 pruebas en ocho archivos** y build aprobado. Los **nueve casos de escena** cubren píxeles y glifos acotados en pantallas enormes, intervalo de dibujo, pausa, movimiento reducido, cero dibujo oculto, desmontaje idempotente, callbacks tardíos y fallback de Canvas.
+
+En navegador comprobé:
+
+- Escena de 1280 × 720 que cubre exactamente el viewport, con navegación por encima y opciones legibles.
+- Pausa, error y avance de pregunta; salida a Acerca de con la clase global retirada y vuelta a la pregunta pendiente.
+- Aviso y acciones de conflicto accesibles dentro de Smith. Abrir y cancelar el diálogo conserva los datos y devuelve foco al cuestionario.
+- Acierto que retira la escena y recupera seis mensajes y el campo de entrada.
+- Viewports CSS embebidos de 320 × 640 y 768 × 820 sin desbordamiento horizontal. En 320 px, ambas opciones de la pregunta inicial quedan dentro del panel; el contenido adicional puede desplazarse.
+- Movimiento reducido simulado con imagen estática; fallo de Canvas simulado con cuestionario resoluble. No se cambió la configuración del sistema.
+
+**Cero generaciones Gemini y cero operaciones Redis reales.** No hubo errores ni avisos de consola en el recorrido directo y en el fallback comprobados. No se afirma una prueba física de móvil o lector de pantalla ni un benchmark gráfico.
+
+[Registro, dimensiones y huellas de código](capturas/iteracion-3/smith-escena-local.json).
+
+![Smith de gran escala con API local simulada](capturas/iteracion-3/smith-invasivo.png)
+
+[Vista móvil y tablet con movimiento reducido simulado](capturas/iteracion-3/smith-responsive.png). La integración y publicación de esta iteración siguen pendientes del paso 6.

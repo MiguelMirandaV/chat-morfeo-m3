@@ -376,14 +376,15 @@ export function mountChat(root, chatSession = session, storage = chatSession ===
     const statusText = state.storyBlocked ? 'Otra pestaña actualizó el progreso. Recarga para continuar.' : state.smithActive ? '' : state.controlMessage || (state.pending ? `${character?.name ?? 'Tu personaje'} está escribiendo…` : state.error);
     status.hidden = !authenticated || !statusText;
     if (status.textContent !== statusText) status.textContent = statusText;
-    smith.hidden = !authenticated || !state.smithActive;
-    smithScene.setActive(authenticated && state.smithActive);
-    terminal.classList.toggle('is-intercepted', authenticated && state.smithActive);
-    const enteringSmith = authenticated && state.smithActive && !lastIntercepted;
-    if (enteringSmith && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      terminal.classList.remove('smith-glitch'); void terminal.offsetWidth; terminal.classList.add('smith-glitch');
-    }
-    lastIntercepted = authenticated && state.smithActive;
+    const takeover = authenticated && state.smithActive;
+    smith.hidden = !takeover;
+    root.classList.toggle('has-smith', takeover);
+    document.body.classList.toggle('smith-takeover', takeover);
+    if (takeover) historyMenu.open = false;
+    // El tamaño de pantalla completa debe aplicarse antes del primer dibujo del canvas.
+    smithScene.setActive(takeover);
+    const enteringSmith = takeover && !lastIntercepted;
+    lastIntercepted = takeover;
     renderQuiz(authenticated);
     if (enteringSmith && authenticated) {
       cancelAnimationFrame(focusFrame);
@@ -407,6 +408,18 @@ export function mountChat(root, chatSession = session, storage = chatSession ===
     storyNotice.hidden = !authenticated || !narrativeStatus || narrativeStatus.kind === 'saved';
     writeText(storyNotice, narrativeStatus?.message ?? '');
     storyNotice.dataset.kind = narrativeStatus?.kind ?? '';
+    // La toma de pantalla oculta las barras normales; sus avisos accionables siguen visibles aquí.
+    const warnings = [];
+    if (state.storyBlocked) warnings.push('Otra pestaña actualizó el progreso. Recarga para continuar.');
+    else if (narrativeStatus && narrativeStatus.kind !== 'saved') warnings.push(narrativeStatus.message);
+    const saved = storage?.getState();
+    if (saved && ['error', 'invalid', 'conflict'].includes(saved.kind)) warnings.push(saved.message);
+    const smithWarning = root.querySelector('[data-smith-warning]');
+    writeText(smithWarning, warnings.join(' '));
+    smithWarning.hidden = !takeover || !warnings.length;
+    const smithConflict = root.querySelector('[data-smith-history-conflict]');
+    smithConflict.hidden = !takeover || !saved?.conflict;
+    for (const choice of smithConflict.querySelectorAll('button')) choice.disabled = state.pending;
   }
   function renderStorage(authenticated) {
     const saved = storage?.getState();
@@ -445,9 +458,9 @@ export function mountChat(root, chatSession = session, storage = chatSession ===
     dialog.close(); confirmedAction = null;
     if (success) focusConversation();
   }
-  storageActions.addEventListener('click', historyAction);
+  root.addEventListener('click', historyAction);
   dialog.querySelector('form').addEventListener('submit', confirmHistory);
-  const cancelHistory = () => { confirmedAction = null; dialog.close(); historyMenu.querySelector('summary').focus(); };
+  const cancelHistory = () => { confirmedAction = null; dialog.close(); if (state.smithActive) focusConversation(); else historyMenu.querySelector('summary').focus(); };
   dialog.querySelector('[data-history-cancel]').addEventListener('click', cancelHistory);
   dialog.addEventListener('cancel', cancelHistory);
   function closeHistoryMenu(event) {
@@ -558,6 +571,7 @@ export function mountChat(root, chatSession = session, storage = chatSession ===
   }, 1000);
   function authenticatedNow() { return access.authenticated === true; }
   return () => { mounted = false; clearTimeout(quizUnlockTimer);
+    document.body.classList.remove('smith-takeover'); root.classList.remove('has-smith');
     document.removeEventListener('visibilitychange', resumeView);
     historyMenu.removeEventListener('keydown', closeHistoryMenu); root.removeEventListener('pointerdown', closeHistoryMenu);
     smithScene.dispose(); unsubscribeStory(); quizOptions.removeEventListener('click', answerQuiz); quizOptions.removeEventListener('keydown', guardQuizRepeat); chatSession.cancelTransfer(); if (transferDialog.open) transferDialog.close();
@@ -565,5 +579,5 @@ export function mountChat(root, chatSession = session, storage = chatSession ===
     transferDialog.querySelector('[data-transfer-cancel]').removeEventListener('click', cancelTransfer);
     transferDialog.querySelector('form').removeEventListener('submit', confirmTransfer);
     input.removeEventListener('keydown', handleKey); input.removeEventListener('compositionstart', compositionStart); input.removeEventListener('compositionend', compositionEnd);
-    clearInterval(tick); unsubscribeChat(); unsubscribeAccess(); unsubscribeStorage(); cleanGate(); if (dialog.open) dialog.close(); storageActions.removeEventListener('click', historyAction); dialog.querySelector('form').removeEventListener('submit', confirmHistory); dialog.querySelector('[data-history-cancel]').removeEventListener('click', cancelHistory); dialog.removeEventListener('cancel', cancelHistory); cancelAnimationFrame(scrollFrame); cancelAnimationFrame(focusFrame); input.removeEventListener('input', handleInput); form.removeEventListener('submit', handleSubmit); picker.removeEventListener('click', chooseCharacter); };
+    clearInterval(tick); unsubscribeChat(); unsubscribeAccess(); unsubscribeStorage(); cleanGate(); if (dialog.open) dialog.close(); root.removeEventListener('click', historyAction); dialog.querySelector('form').removeEventListener('submit', confirmHistory); dialog.querySelector('[data-history-cancel]').removeEventListener('click', cancelHistory); dialog.removeEventListener('cancel', cancelHistory); cancelAnimationFrame(scrollFrame); cancelAnimationFrame(focusFrame); input.removeEventListener('input', handleInput); form.removeEventListener('submit', handleSubmit); picker.removeEventListener('click', chooseCharacter); };
 }

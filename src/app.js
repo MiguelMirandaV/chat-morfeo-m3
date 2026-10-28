@@ -82,11 +82,16 @@ function renderChatView() {
             <div class="character-options">${CHARACTERS.map(character => `<button type="button" data-character="${character.id}"><span aria-hidden="true">${character.emblem}</span><strong>${character.name}</strong></button>`).join('')}</div>
           </section>
           <div class="chat-log" role="log" tabindex="0" aria-label="Mensajes de la conversación" aria-live="polite" aria-relevant="additions text"><div class="empty-state"><span class="empty-symbol" aria-hidden="true">&gt;_</span><h2>El canal está abierto.</h2><p data-empty-note>Haz tu primera pregunta.</p></div></div>
-          <section class="smith-intrusion" aria-label="Intervención de Smith" hidden>
-            <div class="smith-signal"><canvas data-smith-canvas aria-hidden="true"></canvas><span class="smith-fallback" aria-hidden="true">[ AGENT_SMITH ]</span><button type="button" data-smith-pause aria-pressed="false">Pausar lluvia</button></div>
-            <div class="smith-brief"><p class="eyebrow">SEÑAL TOMADA / AGENTE SMITH</p><h2>Su canal ahora es mío.</h2><p data-smith-progress role="status"></p>
+          <section class="smith-intrusion" aria-labelledby="smith-title" hidden>
+            <div class="smith-signal" aria-hidden="true"><canvas data-smith-canvas></canvas><span class="smith-fallback">[ SMITH ]</span></div>
+            <div class="smith-shade" aria-hidden="true"></div>
+            <div class="smith-heading"><p class="eyebrow"><span aria-hidden="true">[ S ]</span> SEÑAL INTERCEPTADA</p><h2 id="smith-title">Su señal <br>me pertenece.</h2></div>
+            <div class="smith-brief">
+              <div class="smith-quiz-meta"><p data-smith-progress role="status"></p><button type="button" data-smith-pause aria-pressed="false">Pausar lluvia</button></div>
               <div class="smith-quiz" role="group" aria-labelledby="smith-question"><h3 id="smith-question" data-smith-question tabindex="-1"></h3><p data-smith-feedback role="status"></p><div class="smith-options" data-smith-options></div></div>
-              <details data-last-normal><summary>Tu última respuesta está guardada</summary><p></p></details>
+              <details data-last-normal><summary>Tu conversación sigue a salvo</summary><p></p></details>
+              <p class="smith-warning" data-smith-warning role="status" hidden></p>
+              <div class="smith-conflict-actions" data-smith-history-conflict hidden><button type="button" data-history-action="load">Cargar historial guardado</button><button type="button" data-history-action="keep">Conservar esta pestaña</button></div>
             </div>
           </section>
           <p class="story-storage" data-story-storage role="status" hidden></p>

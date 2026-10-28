@@ -2,7 +2,7 @@
 
 ## Iteración 3: cuestionario por personaje
 
-Resultado en la rama de desarrollo: **270 casos en ocho archivos**. El cuestionario sustituye las expectativas del ciclo 3+2 y retira las cuatro pruebas del temporizador eliminado. Cubro contadores independientes, una intervención por personaje, acierto, diez errores y vuelta a la primera, tokens duplicados, recarga, migración, borrado y conflictos con proveedor/almacenamiento sustituidos. [Comportamiento y recorrido de UI simulado](smith.md).
+Resultado en la rama de desarrollo: **275 casos en ocho archivos**. La escena de pantalla completa añade presupuesto gráfico, callbacks tardíos y ausencia de trabajo oculto a las comprobaciones del cuestionario. El cuestionario sustituye las expectativas del ciclo 3+2 y retira las cuatro pruebas del temporizador eliminado. Cubro contadores independientes, una intervención por personaje, acierto, diez errores y vuelta a la primera, tokens duplicados, recarga, migración, borrado y conflictos con proveedor/almacenamiento sustituidos. [Comportamiento y recorrido de UI simulado](smith.md).
 
 ## Iteración 2: integración (histórico)
 
@@ -46,7 +46,7 @@ npm run test:watch
 
 Termina el modo watch con Ctrl+C. No hace falta instalar nuevos paquetes: se usa Vitest 5.0.5 ya fijado en el proyecto.
 
-El resultado `Test Files 8 passed (8)` indica que pasaron los ocho archivos; `Tests 270 passed (270)` cuenta los casos, incluidos los de `it.each`. No representa un porcentaje de cobertura del código.
+El resultado `Test Files 8 passed (8)` indica que pasaron los ocho archivos; `Tests 275 passed (275)` cuenta los casos, incluidos los de `it.each`. No representa un porcentaje de cobertura del código.
 
 ## Organización vigente
 

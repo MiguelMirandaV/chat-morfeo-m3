@@ -33,7 +33,7 @@ Diseñé la interfaz como una terminal de Zion. Construí una entrada de pantall
 - Resolver cambios detectados desde otra pestaña antes de sobrescribir un historial.
 - Consultar las solicitudes compartidas de la app: **15 en una ventana móvil de 60 segundos y 500 al día**.
 - Resolver un reto de **Smith una sola vez por personaje**, tras tres intercambios completos: diez preguntas del M3, dos opciones y un acierto para recuperar la conversación.
-- Recuperar la pregunta pendiente o el reto superado al recargar; pausar la lluvia de Smith.
+- Recuperar la pregunta pendiente o el reto superado al recargar; vivir la toma de pantalla de Smith, con rostro de caracteres a gran escala, pausa y movimiento reducido.
 
 Guardo historiales y borradores por personaje en localStorage; se recuperan al volver al mismo sitio. El indicador muestra si el navegador pudo guardarlos. Para cambiar, escribe **«Quiero hablar con Trinity»** o **`/hablar trinity`** y confirma. Acerca de presenta las tres voces con retratos vectoriales originales. [Explico el funcionamiento y los límites](docs/alcance.md).
 
@@ -133,7 +133,7 @@ npm test
 npm run test:watch
 ```
 
-Incluí **270 pruebas en ocho archivos** para validar caracteres, navegación, historiales separados, identidad, estados, errores, transporte, acceso, cuotas, cuestionario de Smith y contratos de Gemini. Uso mocks para que la suite no consuma Gemini ni Redis reales y restauro el entorno entre pruebas.
+Incluí **275 pruebas en ocho archivos** para validar caracteres, navegación, historiales separados, identidad, estados, errores, transporte, acceso, cuotas, cuestionario de Smith y contratos de Gemini. Uso mocks para que la suite no consuma Gemini ni Redis reales y restauro el entorno entre pruebas.
 
 [Personajes y contrato](docs/personajes.md) · [Detalle de las pruebas](docs/pruebas-unitarias.md) · [Comprobaciones y límites](docs/pruebas.md).
 
