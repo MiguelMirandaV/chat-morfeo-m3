@@ -4,8 +4,6 @@ Creé esta aplicación para conversar en español con interpretaciones de Morfeo
 
 **[Abrir la aplicación](https://chat-morfeo-m3.vercel.app/home)** · **[Ver el repositorio](https://github.com/MiguelMirandaV/chat-morfeo-m3)**
 
-> [Probar esta iteración en Preview](https://chat-morfeo-m3-git-feat-matrix-v3-miguel-miranda-v.vercel.app/home) · código **79**. Puede requerir mi sesión de Vercel. El dominio público conserva la versión anterior hasta aprobar esta revisión.
-
 ## Código de acceso
 
 **El código para abrir el chat es `79`.** Introdúcelo en el campo de cohorte de Henry y pulsa **Desbloquear**.
@@ -163,9 +161,9 @@ Configura en Production y Preview las cinco variables de servidor de la tabla, e
 
 | Terminal de conversación | Intervención de Smith |
 | --- | --- |
-| ![Terminal simplificada](docs/capturas/iteracion-3/preview-terminal.png) | ![Smith y cuestionario](docs/capturas/iteracion-3/preview-smith.png) |
+| ![Terminal simplificada](docs/capturas/iteracion-3/produccion-terminal.png) | ![Smith y cuestionario](docs/capturas/iteracion-3/preview-smith.png) |
 
-Estas dos capturas proceden del Preview con tres respuestas reales de Morfeo y el cuestionario local de Smith. La imagen de Inicio conserva el diseño publicado anterior, sin cambios en esta iteración. Distingo las comprobaciones locales de la [verificación del despliegue](docs/publicacion-iteracion-3.md) y de la [evaluación real de voces](docs/evaluacion-personajes.md).
+La terminal corresponde a Production con una respuesta real del Oráculo; Smith corresponde al Preview revisado, tras tres respuestas reales de Morfeo y con cuestionario local. La imagen de Inicio conserva el diseño publicado anterior, sin cambios en esta iteración. Distingo las comprobaciones locales de la [verificación del despliegue](docs/publicacion-iteracion-3.md) y de la [evaluación real de voces](docs/evaluacion-personajes.md).
 
 ## Límites y mantenimiento
 

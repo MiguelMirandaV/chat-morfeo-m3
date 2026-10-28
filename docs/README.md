@@ -1,8 +1,8 @@
 # Documentación de Chat con Morfeo
 
-## Iteración en revisión
+## Versión actual
 
-[Iteración 3: alcance aprobado](iteracion-3.md) y [cuestionario de Smith](preguntas-smith.md). La rama de desarrollo incorpora el nuevo reto; su implementación está en [Smith](smith.md) y sus comprobaciones en [verificación de la iteración 3](verificacion-iteracion-3.md). La entrega describe la iteración 3; el informe de publicación distingue su Preview del dominio público.
+[Iteración 3: alcance aprobado](iteracion-3.md) y [cuestionario de Smith](preguntas-smith.md). La versión actual incorpora el nuevo reto; su implementación está en [Smith](smith.md) y sus comprobaciones en [verificación de la iteración 3](verificacion-iteracion-3.md). La entrega describe la iteración 3; el informe de publicación registra Preview y Production por separado.
 
 ## Uso y entrega vigentes
 

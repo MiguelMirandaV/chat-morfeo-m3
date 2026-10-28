@@ -1,6 +1,6 @@
 # Publicación de la iteración 3
 
-## Preview para revisión
+## Preview revisado
 
 - **Preview:** [Matrix v3](https://chat-morfeo-m3-git-feat-matrix-v3-miguel-miranda-v.vercel.app/home).
 - **Código de acceso:** **79**.
@@ -32,6 +32,21 @@ El contador diario pasó de **9 a 12**. Las opciones del cuestionario y las reca
 - Las comprobaciones HTTP anónimas fueron interceptadas por el login de Vercel: no las cuento como pruebas satisfactorias de hashes, rutas ni exclusión de archivos privados. La correspondencia del despliegue se respalda en el estado Vercel asociado al SHA de GitHub y en el recorrido del navegador.
 - Esta iteración no cambia dependencias, función de servidor ni credenciales.
 
-## Production
+## Production comprobada
 
-La revisión de Miguel está pendiente. No integré la pull request ni publiqué esta iteración en Production. El [dominio público](https://chat-morfeo-m3.vercel.app/home) conserva la [iteración 2](publicacion-iteracion-2.md). Después de aprobar el Preview integraré el cambio y comprobaré el dominio público por separado.
+Completé la revisión de Preview y continué con la integración dentro del flujo acordado. La [pull request #2](https://github.com/MiguelMirandaV/chat-morfeo-m3/pull/2) quedó integrada el **28 de octubre de 2026, 20:54 UTC**.
+
+- **Aplicación pública:** [chat-morfeo-m3.vercel.app](https://chat-morfeo-m3.vercel.app/home), código **79**, sin login de Vercel.
+- **Commit de integración:** `7036cb2b533f366cd085837731ad5e050ec2e501`.
+- **Vercel:** [despliegue de producción completado](https://vercel.com/miguel-miranda-v/chat-morfeo-m3/8yMr9B5EXveiRUB9U8MSrNUyfMkT), estado SUCCESS asociado a ese SHA.
+- Los commits de cierre posteriores actualizan únicamente documentación y capturas; conservan el código funcional comprobado.
+
+Comprobé **16 resultados HTTP**, sin sesión Vercel: las tres rutas SPA entregan el index esperado; seis archivos públicos coinciden byte por byte con el código local; `.env`, `package.json` y `docs/uso-ia.md` devuelven 404; la sesión anónima está cerrada, 78 se rechaza, 79 abre el acceso y la sesión autenticada se recupera. La cookie incluye HttpOnly, Secure y SameSite=Strict. No guardé su valor. [Resultados y SHA-256](capturas/iteracion-3/produccion-http.json).
+
+En el navegador público conservé los seis mensajes anteriores de la conversación ficticia de Lucía con el Oráculo. El contador nuevo comenzó en cero, como requiere la migración. Envié **una nueva pregunta real** sobre probar funciones async sin API externa; el Oráculo respondió con una explicación de mocks. El contador de Smith avanzó de 0 a 1 y el diario de **19 a 20**. No hubo errores ni avisos de consola observados.
+
+![Terminal de producción con historial conservado y respuesta real](capturas/iteracion-3/produccion-terminal.png)
+
+El recorrido público comprueba publicación, acceso, conservación del historial y respuesta real; el ciclo completo de Smith se verificó en Preview, cuyo código funcional coincide. No repetí tres generaciones en producción ni las pruebas de todos los casos límite. El alcance de los tests locales, tamaños embebidos y limitaciones sigue indicado arriba.
+
+La iteración queda publicada. La [iteración 2](publicacion-iteracion-2.md) conserva sus evidencias históricas.

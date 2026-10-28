@@ -1,0 +1,107 @@
+{
+  "origin": "https://chat-morfeo-m3.vercel.app",
+  "verifiedCommit": "7036cb2b533f366cd085837731ad5e050ec2e501",
+  "checkedAt": "2026-10-28T20:55:07.752393+00:00",
+  "generationRequests": 0,
+  "checks": [
+    {
+      "path": "/home",
+      "status": 200,
+      "host": "chat-morfeo-m3.vercel.app",
+      "pass": true
+    },
+    {
+      "path": "/chat",
+      "status": 200,
+      "host": "chat-morfeo-m3.vercel.app",
+      "pass": true
+    },
+    {
+      "path": "/about",
+      "status": 200,
+      "host": "chat-morfeo-m3.vercel.app",
+      "pass": true
+    },
+    {
+      "path": "/app.js",
+      "status": 200,
+      "host": "chat-morfeo-m3.vercel.app",
+      "sha256": "ea7a601b032217e1545be37ff4a0d02c3323b88bfcdd3a5cb716491e50334a8b",
+      "pass": true
+    },
+    {
+      "path": "/chat.js",
+      "status": 200,
+      "host": "chat-morfeo-m3.vercel.app",
+      "sha256": "396bec4864203bf5de7406242faca4c629e50ea73b38d9b65acf42168811b0da",
+      "pass": true
+    },
+    {
+      "path": "/smith-story.js",
+      "status": 200,
+      "host": "chat-morfeo-m3.vercel.app",
+      "sha256": "28bd41a161cd29609b57fece47dd8e65ecea4be2364daab929161b4347de7da9",
+      "pass": true
+    },
+    {
+      "path": "/smith-questions.js",
+      "status": 200,
+      "host": "chat-morfeo-m3.vercel.app",
+      "sha256": "bb1904df0a61e52a53daaa2a22a60362d4fba62123600f4c2cc3144444007e48",
+      "pass": true
+    },
+    {
+      "path": "/smith-scene.js",
+      "status": 200,
+      "host": "chat-morfeo-m3.vercel.app",
+      "sha256": "6866e5c113b38b3dc8ee3dfbe96d3296ab2bc1fe401d7d0eb07c51a2de20014a",
+      "pass": true
+    },
+    {
+      "path": "/styles.css",
+      "status": 200,
+      "host": "chat-morfeo-m3.vercel.app",
+      "sha256": "97c5ed7ccf9438f15f20ef3eb6c3ad3400c00e2dd5a98cf942b650529f24f022",
+      "pass": true
+    },
+    {
+      "path": "/.env",
+      "status": 404,
+      "host": "chat-morfeo-m3.vercel.app",
+      "pass": true
+    },
+    {
+      "path": "/package.json",
+      "status": 404,
+      "host": "chat-morfeo-m3.vercel.app",
+      "pass": true
+    },
+    {
+      "path": "/docs/uso-ia.md",
+      "status": 404,
+      "host": "chat-morfeo-m3.vercel.app",
+      "pass": true
+    },
+    {
+      "action": "anonymous-session",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "action": "reject-78",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "action": "unlock-79",
+      "status": 200,
+      "cookieFlagsOK": true,
+      "passed": true
+    },
+    {
+      "action": "authenticated-session",
+      "status": 200,
+      "passed": true
+    }
+  ]
+}

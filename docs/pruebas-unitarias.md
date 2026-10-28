@@ -2,7 +2,7 @@
 
 ## Iteración 3: cuestionario por personaje
 
-Resultado en la rama de desarrollo: **275 casos en ocho archivos**. La escena de pantalla completa añade presupuesto gráfico, callbacks tardíos y ausencia de trabajo oculto a las comprobaciones del cuestionario. El cuestionario sustituye las expectativas del ciclo 3+2 y retira las cuatro pruebas del temporizador eliminado. Cubro contadores independientes, una intervención por personaje, acierto, diez errores y vuelta a la primera, tokens duplicados, recarga, migración, borrado y conflictos con proveedor/almacenamiento sustituidos. [Comportamiento y recorrido de UI simulado](smith.md).
+Resultado de esta versión: **275 casos en ocho archivos**. La escena de pantalla completa añade presupuesto gráfico, callbacks tardíos y ausencia de trabajo oculto a las comprobaciones del cuestionario. El cuestionario sustituye las expectativas del ciclo 3+2 y retira las cuatro pruebas del temporizador eliminado. Cubro contadores independientes, una intervención por personaje, acierto, diez errores y vuelta a la primera, tokens duplicados, recarga, migración, borrado y conflictos con proveedor/almacenamiento sustituidos. [Comportamiento y recorrido de UI simulado](smith.md).
 
 ## Iteración 2: integración (histórico)
 

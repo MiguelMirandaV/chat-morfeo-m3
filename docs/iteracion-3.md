@@ -2,7 +2,7 @@
 
 ## Alcance aprobado
 
-Trabajo sobre la versión publicada `27825b0524753fa041f460d8eb5ec412d5f7ae37`, en la rama `feat/matrix-v3`. Esta especificación describe la próxima versión; la aplicación publicada conserva el comportamiento de la iteración 2 hasta la integración y el despliegue.
+Partí de la versión `27825b0524753fa041f460d8eb5ec412d5f7ae37` y desarrollé este alcance en `feat/matrix-v3`. Tras la revisión de Preview, integré la pull request #2 en `main`. La [publicación](publicacion-iteracion-3.md) documenta el resultado y sus comprobaciones.
 
 1. Reescribir el uso de IA en primera persona, con ejemplos puntuales de prompts, respuestas y decisiones verificables. Evitar la bitácora y distinguir las citas de los resúmenes.
 2. Sustituir el ciclo global Smith 3+2 por una única intervención por personaje, después de tres intercambios completos con ese personaje.
