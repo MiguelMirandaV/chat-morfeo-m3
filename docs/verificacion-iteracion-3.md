@@ -59,4 +59,4 @@ En navegador comprobé:
 
 ![Smith de gran escala con API local simulada](capturas/iteracion-3/smith-invasivo.png)
 
-[Vista móvil y tablet con movimiento reducido simulado](capturas/iteracion-3/smith-responsive.png). La integración y publicación de esta iteración siguen pendientes del paso 6.
+[Vista móvil y tablet con movimiento reducido simulado](capturas/iteracion-3/smith-responsive.png). La comprobación remota de esta implementación se registra por separado en [Preview y publicación](publicacion-iteracion-3.md); Production sigue pendiente de la revisión del Preview.

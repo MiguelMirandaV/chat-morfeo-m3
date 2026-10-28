@@ -6,7 +6,7 @@ Desarrollé Chat con Morfeo como Proyecto Integrador M3 de Henry, con asistencia
 - [Aplicación pública](https://chat-morfeo-m3.vercel.app/home), código **79**, sin cuenta Vercel.
 - [Instalación y uso](../README.md), [alcance](alcance.md), [verificación](verificacion-iteracion-3.md) y [publicación](publicacion-iteracion-3.md).
 
-La iteración 3 se prepara para revisión en Preview antes de integrarse a `main`. Registro su despliegue y límites en el [informe de publicación](publicacion-iteracion-3.md). La [publicación de la iteración 2](publicacion-iteracion-2.md) es evidencia histórica y corresponde al dominio público hasta aprobar esta revisión.
+La iteración 3 está disponible en [Preview](https://chat-morfeo-m3-git-feat-matrix-v3-miguel-miranda-v.vercel.app/home) para revisión antes de integrarse a `main`. Registro su despliegue y límites en el [informe de publicación](publicacion-iteracion-3.md). La [publicación de la iteración 2](publicacion-iteracion-2.md) es evidencia histórica y corresponde al dominio público hasta aprobar esta revisión.
 
 ## Ocho objetivos del M3
 
