@@ -1,6 +1,6 @@
 # Preparación y evaluación del prompt de Morfeo
 
-> Registro de la versión entregada. La iteración 2 conserva esta evidencia como referencia; los tres prompts vigentes y la muestra de integración están descritos en [Personajes y contrato](personajes.md). La evaluación amplia de esas voces corresponde a la etapa de verificación de la iteración.
+> Registro de la versión entregada. La iteración 2 conserva esta evidencia como referencia; los tres prompts vigentes y la muestra de integración están descritos en [Personajes y contrato](personajes.md). La muestra vigente de las tres voces y la corrección del Oráculo están en [Evaluación de personajes](evaluacion-personajes.md).
 
 Estado: **paso 7 completado el 26 de octubre de 2026**. Miguel guardó la clave local y Codex verificó acceso, cuota y respuestas reales por REST. Prompt actual: v3. Hubo 20 generaciones distribuidas entre tres versiones, con HTTP 200 y finishReason STOP. La evaluación se ejecutó aparte del chat; la integración del proveedor corresponde al paso 8. Los 83 tests unitarios siguen pasando y se distinguen de estas llamadas reales.
 

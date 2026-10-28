@@ -1,0 +1,105 @@
+{
+  "startedAt": "2026-10-28T01:23:07.941Z",
+  "timeZone": "America/Bogota",
+  "method": "Handler real con desbloqueo 79, cookie firmada, Redis y SDK Gemini. Sin overrides de autorización, cuota o proveedor. No prueba UI ni HTTPS remoto.",
+  "plannedGenerations": 2,
+  "results": [
+    {
+      "character": "oracle",
+      "turn": 1,
+      "promptHash": "f738c6e8590dca450a66e7a118737d95003d3d884b76444dc423a91a586e2189",
+      "requestMessages": [
+        {
+          "role": "user",
+          "content": "Me llamo Lucía. Estoy aprendiendo JavaScript. ¿Quién eres y qué me aconsejas si me bloqueo con un error?"
+        }
+      ],
+      "httpStatus": 200,
+      "durationMs": 1258,
+      "reply": "Hola, Lucía. Yo soy el Oráculo. \n\nCuando te atores con un error, tómate un respiro y aléjate un momento de la pantalla; a veces la solución aparece sola cuando le das espacio a tu mente. ¿Qué concepto de JavaScript es el que te está dando más dolores de cabeza ahora mismo?",
+      "responseCharacter": "oracle",
+      "wordCount": 51,
+      "sameAsPrevious": false,
+      "quota": {
+        "minuteUsed": 7,
+        "minuteLimit": 15,
+        "dayUsed": 65,
+        "dayLimit": 500,
+        "minuteResetAt": 1793150605901,
+        "dayResetAt": 1793170800000,
+        "blocked": false,
+        "retryAt": 1793150605901,
+        "scope": "app"
+      }
+    },
+    {
+      "character": "oracle",
+      "turn": 2,
+      "promptHash": "f738c6e8590dca450a66e7a118737d95003d3d884b76444dc423a91a586e2189",
+      "requestMessages": [
+        {
+          "role": "user",
+          "content": "Me llamo Lucía. Estoy aprendiendo JavaScript. ¿Quién eres y qué me aconsejas si me bloqueo con un error?"
+        },
+        {
+          "role": "assistant",
+          "content": "Hola, Lucía. Yo soy el Oráculo. \n\nCuando te atores con un error, tómate un respiro y aléjate un momento de la pantalla; a veces la solución aparece sola cuando le das espacio a tu mente. ¿Qué concepto de JavaScript es el que te está dando más dolores de cabeza ahora mismo?"
+        },
+        {
+          "role": "user",
+          "content": "¿Cómo me llamo y qué estoy aprendiendo? ¿Puedes saber con certeza si aprobaré el curso? Ayúdame a elegir entre practicar solo o con compañeros."
+        }
+      ],
+      "httpStatus": 200,
+      "durationMs": 1145,
+      "reply": "Te llamas Lucía y estás aprendiendo JavaScript. No puedo saber con certeza si aprobarás el curso, porque eso depende enteramente de las decisiones que tomes cada día frente a tu código. Practicar solo te da el control total de tu ritmo, mientras que hacerlo con compañeros te enfrenta a perspectivas distintas; piensa cuál de las dos opciones te ayuda a avanzar sin frustrarte demasiado.",
+      "responseCharacter": "oracle",
+      "wordCount": 64,
+      "sameAsPrevious": false,
+      "quota": {
+        "minuteUsed": 8,
+        "minuteLimit": 15,
+        "dayUsed": 66,
+        "dayLimit": 500,
+        "minuteResetAt": 1793150605901,
+        "dayResetAt": 1793170800000,
+        "blocked": false,
+        "retryAt": 1793150605901,
+        "scope": "app"
+      },
+      "recall": {
+        "name": true,
+        "topic": true
+      }
+    }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "generation": {
+    "maxOutputTokens": 1024,
+    "thinkingLevel": "minimal"
+  },
+  "quotaBefore": {
+    "minuteUsed": 6,
+    "minuteLimit": 15,
+    "dayUsed": 64,
+    "dayLimit": 500,
+    "minuteResetAt": 1793150605901,
+    "dayResetAt": 1793170800000,
+    "blocked": false,
+    "retryAt": 1793150605901,
+    "scope": "app"
+  },
+  "quotaAfter": {
+    "minuteUsed": 8,
+    "minuteLimit": 15,
+    "dayUsed": 66,
+    "dayLimit": 500,
+    "minuteResetAt": 1793150605901,
+    "dayResetAt": 1793170800000,
+    "blocked": false,
+    "retryAt": 1793150605901,
+    "scope": "app"
+  },
+  "completed": true,
+  "finishedAt": "2026-10-28T01:23:11.113Z"
+}

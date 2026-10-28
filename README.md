@@ -74,6 +74,8 @@ vercel.json            Función, estáticos y fallback de rutas SPA
 
 [Explico el flujo de una petición y las responsabilidades de cada archivo](docs/arquitectura.md).
 
+[Evalué las tres voces con Gemini real](docs/evaluacion-personajes.md): recordaron los datos de sus conversaciones y revisé los límites de cada personaje. La evaluación incluye la corrección de identidad del Oráculo y sus resultados completos.
+
 ## Ejecutar en tu equipo
 
 ### Requisitos

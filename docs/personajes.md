@@ -62,7 +62,11 @@ La selección cambia la conversación activa sin copiar mensajes entre personaje
 
 La separación es del estado cliente. El backend recibe y valida el historial enviado, sin almacenarlo ni demostrar su procedencia. Redis sigue guardando únicamente cantidades y tiempos; los tres personajes comparten **15 reservas por 60 segundos móviles y 500 por día del Pacífico**.
 
-## Verificación
+## Evaluación vigente
+
+Completé una muestra real de dos turnos por personaje y repetí los dos del Oráculo tras corregir su identificación. Las tres conversaciones recordaron nombre e interés, con resultados y límites en [Evaluación de personajes](evaluacion-personajes.md).
+
+## Registro de verificación inicial
 
 - En la etapa de personajes pasaron **152 tests**; 22 nuevos cubren riesgos de identidad, contrato, separación, concurrencia y errores. El test de cuotas alterna los tres personajes y rechaza la reserva 16.
 - Se probaron tres respuestas reales por la interfaz local, una por personaje, usando preguntas y nombres ficticios. Las tres terminaron correctamente; las reservas diarias compartidas pasaron de **30 a 33**.

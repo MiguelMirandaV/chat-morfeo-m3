@@ -226,3 +226,9 @@ La suite alcanza 254 casos. Se comprobó en UI simulada la entrada al tercer tur
 ## Iteración 2 — Integración de lectura, foco y temporizadores
 
 Con la Preview de Smith confirmada por Miguel, revisé problemas concretos del ciclo de vida. Incorporé un controlador de retorno que pausa ante ocultamiento, diálogos o lectura desplegada, y se cancela al desmontar. El foco vuelve al campo si desaparece un control de Smith. Eliminé renders cada segundo cuando no hay cuenta atrás de cuota y consultas periódicas de la vista oculta. La suite pasa 258 casos, incluidos cuatro de este controlador con reloj sustituido. El QA visual usa una API simulada; no se generaron nuevas respuestas reales. No se presenta como un benchmark de GPU/FPS.
+
+## Iteración 2 — Evaluación real de voces y contexto
+
+Usé Codex para ejecutar una muestra acotada contra el handler real, con acceso firmado, Redis y Gemini configurados. Seis generaciones iniciales comprobaron voz, memoria y límites. Detecté que el Oráculo describía su personaje sin nombrarse al responder quién era. Se precisó únicamente esa instrucción y se verificó con dos generaciones adicionales, sin cambiar otros prompts. Conservo ambos registros con sus hashes y textos completos.
+
+Ocho respuestas aceptadas; memoria de nombre/interés correcta para los tres personajes; 45–67 palabras. Algunas superan la guía habitual de una a tres frases: se registra como límite y no se recorta la salida. La cuota diaria observada pasó de 58 a 66. La suite continúa en 258 casos; no se confunden con llamadas reales. El script optativo requiere --real, respeta la cuota y guarda solo casos ficticios en .data. No se expusieron claves, cookies ni variables privadas. [Informe](evaluacion-personajes.md).
