@@ -4,6 +4,8 @@ Creé esta aplicación para conversar en español con interpretaciones de Morfeo
 
 **[Abrir la aplicación](https://chat-morfeo-m3.vercel.app/home)** · **[Ver el repositorio](https://github.com/MiguelMirandaV/chat-morfeo-m3)**
 
+> [Probar esta iteración en Preview](https://chat-morfeo-m3-git-feat-matrix-v3-miguel-miranda-v.vercel.app/home) · código **79**. Puede requerir mi sesión de Vercel. El dominio público conserva la versión anterior hasta aprobar esta revisión.
+
 ## Código de acceso
 
 **El código para abrir el chat es `79`.** Introdúcelo en el campo de cohorte de Henry y pulsa **Desbloquear**.
@@ -25,12 +27,13 @@ Diseñé la interfaz como una terminal de Zion. Construí una entrada de pantall
 - Conversar mediante Gemini, enviando el historial completo del personaje elegido en cada petición. Los borradores y errores también se mantienen separados.
 - Enviar con **Enter** o el botón; agregar líneas con **Shift+Enter**.
 - Escribir hasta **280 caracteres visibles**, incluidos espacios, saltos y emojis compuestos. El texto pegado que excede el límite se conserva para corregirlo.
+- Conversar en una terminal de una columna, con emblemas cifrados para los tres personajes y contadores breves.
 - Ver el estado de escritura y recuperar el borrador si una respuesta falla.
 - Recuperar conversaciones y borradores al recargar; borrar una conversación o todas, con confirmación.
 - Resolver cambios detectados desde otra pestaña antes de sobrescribir un historial.
 - Consultar las solicitudes compartidas de la app: **15 en una ventana móvil de 60 segundos y 500 al día**.
-- Vivir la intervención de **Smith cada tres turnos completos**: dos interacciones locales y regreso al personaje anterior, conservando su contexto.
-- Recuperar el progreso del ciclo al recargar; pausar la lluvia de Smith.
+- Resolver un reto de **Smith una sola vez por personaje**, tras tres intercambios completos: diez preguntas del M3, dos opciones y un acierto para recuperar la conversación.
+- Recuperar la pregunta pendiente o el reto superado al recargar; vivir la toma de pantalla de Smith, con rostro de caracteres a gran escala, pausa y movimiento reducido.
 
 Guardo historiales y borradores por personaje en localStorage; se recuperan al volver al mismo sitio. El indicador muestra si el navegador pudo guardarlos. Para cambiar, escribe **«Quiero hablar con Trinity»** o **`/hablar trinity`** y confirma. Acerca de presenta las tres voces con retratos vectoriales originales. [Explico el funcionamiento y los límites](docs/alcance.md).
 
@@ -41,8 +44,8 @@ Guardo historiales y borradores por personaje en localStorage; se recuperan al v
 3. Elige a **Morfeo, el Oráculo o Trinity**, escribe una pregunta y presiona **Enter** o pulsa **Enviar**. Usa **Shift+Enter** para agregar una línea.
 4. Espera la respuesta. Ante un fallo, revisa el mensaje de estado y reintenta con el borrador conservado.
 5. Puedes navegar o recargar y recuperar lo guardado en ese mismo navegador y sitio. Un envío interrumpido vuelve como borrador; no se reenvía automáticamente.
-6. Después de tres turnos completos, conversa dos veces con Smith. Su diálogo es local y no consume Gemini. La conexión vuelve automáticamente tras 12 segundos, o antes con **Recuperar conexión**. Si estás leyendo la respuesta guardada, atendiendo un diálogo o tienes la pestaña oculta, la espera se pausa.
-7. Usa **Borrar esta conversación** o **Borrar todos los historiales** y confirma si quieres eliminarlos. El borrado no reinicia el ciclo narrativo ni las cuotas.
+6. Después de tres intercambios completos con un personaje, responde una pregunta de Smith. Un acierto recupera tu conversación y evita nuevas interrupciones para ese personaje. Si fallas, aparece la siguiente; después de la décima vuelve a la primera. El cuestionario es local y no consume solicitudes de IA.
+7. Abre **Historial**, elige **Borrar esta conversación** o **Borrar todos los historiales** y confirma si quieres eliminarlos. El borrado conserva el progreso de Smith y las cuotas.
 
 Envío las preguntas a Gemini a través de mi función de servidor. No escribas contraseñas ni claves en la conversación.
 
@@ -58,7 +61,8 @@ src/matrix-scene.js    Rostro procedural, lluvia 3D, fallback y limpieza
 scripts/prepare-assets.js Copia local de módulos Three.js y licencia
 scripts/evaluate-characters.js Evaluación real optativa con control de cuota
 src/chat.js            Conversaciones separadas, peticiones HTTP y render del chat
-src/smith-story.js     Ciclo 3+2, respuestas locales y persistencia independiente
+src/smith-story.js     Progreso de Smith por personaje y persistencia independiente
+src/smith-questions.js Diez preguntas educativas y opciones del reto local
 src/smith-scene.js     Rostro de caracteres, lluvia y pausa de Smith
 src/chat-controls.js   Peticiones de cambio y reglas del teclado
 src/characters.js      Identificadores y metadatos públicos de personajes
@@ -129,13 +133,13 @@ npm test
 npm run test:watch
 ```
 
-Incluí **258 pruebas en ocho archivos** para validar caracteres, navegación, historiales separados, identidad, estados, errores, transporte, acceso, cuotas y contratos de Gemini. Uso mocks para que la suite no consuma Gemini ni Redis reales y restauro el entorno entre pruebas.
+Incluí **275 pruebas en ocho archivos** para validar caracteres, navegación, historiales separados, identidad, estados, errores, transporte, acceso, cuotas, cuestionario de Smith y contratos de Gemini. Uso mocks para que la suite no consuma Gemini ni Redis reales y restauro el entorno entre pruebas.
 
-[Personajes y contrato](docs/personajes.md) · [Detalle de las pruebas](docs/pruebas-unitarias.md) · [Comprobaciones y límites](docs/pruebas.md).
+[Personajes y contrato](docs/personajes.md) · [Detalle de las pruebas](docs/pruebas-unitarias.md) · [Comprobaciones y límites](docs/verificacion-iteracion-3.md).
 
 ## Acceso, datos y cuotas
 
-Guardo conversaciones y borradores en texto en localStorage bajo `morfeo.conversations.v1`. El progreso narrativo y los dos pares de Smith usan `morfeo.smith-story.v1`. Borrar las conversaciones conserva el ciclo, las claves ajenas y las cuotas Redis. [Detalles del guardado y sus límites](docs/persistencia.md).
+Guardo conversaciones y borradores en texto en localStorage bajo `morfeo.conversations.v1`. El progreso por personaje y la pregunta pendiente usan `morfeo.smith-story.v2`. La migración estrena contadores en cero y conserva los historiales previos y la clave antigua. Borrar las conversaciones conserva los retos superados o pendientes, las claves ajenas y las cuotas Redis. [Detalles del guardado y sus límites](docs/persistencia.md).
 
 Mantengo la API key y los tres prompts en el servidor. El navegador se comunica mediante `POST /api/functions`; envío códigos de error controlados y muestro mensajes con `textContent`.
 
@@ -153,15 +157,15 @@ Conecto el repositorio con Vercel y publico desde `main`. Mantengo la raíz del 
 
 Configura en Production y Preview las cinco variables de servidor de la tabla, excluyendo `QUOTA_DRIVER`. Uso la misma base Redis cuando ambos entornos consumen el mismo proyecto de Gemini. Cada cambio de variables requiere un despliegue nuevo.
 
-[Guía de despliegue](docs/despliegue.md) · [Publicación de esta iteración](docs/publicacion-iteracion-2.md).
+[Guía de despliegue](docs/despliegue.md) · [Publicación de esta iteración](docs/publicacion-iteracion-3.md).
 
 ## Capturas
 
-| Personajes en Acerca de | Terminal bajo la intervención de Smith |
+| Terminal de conversación | Intervención de Smith |
 | --- | --- |
-| ![Tres personajes](docs/capturas/iteracion-2/acerca-de-1024.png) | ![Smith en producción: diálogo local](docs/capturas/iteracion-2/produccion/smith.jpg) |
+| ![Terminal simplificada](docs/capturas/iteracion-3/preview-terminal.png) | ![Smith y cuestionario](docs/capturas/iteracion-3/preview-smith.png) |
 
-Las capturas ilustran la interfaz publicada. Smith usa diálogo local; [la verificación pública](docs/publicacion-iteracion-2.md) y [la evaluación de voces con Gemini](docs/evaluacion-personajes.md) tienen sus registros propios.
+Estas dos capturas proceden del Preview con tres respuestas reales de Morfeo y el cuestionario local de Smith. La imagen de Inicio conserva el diseño publicado anterior, sin cambios en esta iteración. Distingo las comprobaciones locales de la [verificación del despliegue](docs/publicacion-iteracion-3.md) y de la [evaluación real de voces](docs/evaluacion-personajes.md).
 
 ## Límites y mantenimiento
 
@@ -173,13 +177,13 @@ Las capturas ilustran la interfaz publicada. Smith usa diálogo local; [la verif
 
 ## Documentación y asistencia de IA
 
-Desarrollé este proyecto con asistencia de Codex para el código, los retratos, las pruebas y la documentación. Definí el personaje, la dirección visual y los requisitos, y configuré mis cuentas y credenciales. Registro las solicitudes, decisiones y comprobaciones en [uso de IA](docs/uso-ia.md).
+Desarrollé este proyecto con asistencia de Codex para el código, los retratos, las pruebas y la documentación. Definí el personaje, la dirección visual y los requisitos, y configuré mis cuentas y credenciales. En [cómo utilicé la IA](docs/uso-ia.md) explico mi proceso con ejemplos de prompts, respuestas y decisiones.
 
 - [Índice de documentación](docs/README.md).
 - [Alcance funcional](docs/alcance.md) y [mapa de objetivos y rúbrica](docs/entrega.md).
-- [Verificación y límites](docs/verificacion-iteracion-2.md).
+- [Verificación y límites](docs/verificacion-iteracion-3.md).
 - [Personajes y evaluación real](docs/evaluacion-personajes.md).
 - [Arquitectura](docs/arquitectura.md), [historiales](docs/persistencia.md) y [Smith](docs/smith.md).
-- [Publicación](docs/publicacion-iteracion-2.md) y [guía de despliegue](docs/despliegue.md).
+- [Publicación](docs/publicacion-iteracion-3.md) y [guía de despliegue](docs/despliegue.md).
 
 © 2026 Miguel Miranda. Mi interpretación de Matrix es un proyecto académico; no es un producto oficial de la franquicia.

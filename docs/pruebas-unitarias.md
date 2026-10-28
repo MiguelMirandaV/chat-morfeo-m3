@@ -1,8 +1,12 @@
 # Pruebas unitarias
 
-## Iteración 2: integración
+## Iteración 3: cuestionario por personaje
 
-Resultado vigente: **258 casos en ocho archivos**. Cuatro casos nuevos con reloj sustituido verifican disponibilidad para el retorno, un único temporizador pese a varios renders, pausa/reinicio del plazo y retirada al desmontar. No usan Gemini ni esperas reales.
+Resultado en la rama de desarrollo: **275 casos en ocho archivos**. La escena de pantalla completa añade presupuesto gráfico, callbacks tardíos y ausencia de trabajo oculto a las comprobaciones del cuestionario. El cuestionario sustituye las expectativas del ciclo 3+2 y retira las cuatro pruebas del temporizador eliminado. Cubro contadores independientes, una intervención por personaje, acierto, diez errores y vuelta a la primera, tokens duplicados, recarga, migración, borrado y conflictos con proveedor/almacenamiento sustituidos. [Comportamiento y recorrido de UI simulado](smith.md).
+
+## Iteración 2: integración (histórico)
+
+Resultado de esa versión: **258 casos en ocho archivos**. Cuatro casos nuevos con reloj sustituido verifican disponibilidad para el retorno, un único temporizador pese a varios renders, pausa/reinicio del plazo y retirada al desmontar. No usan Gemini ni esperas reales.
 
 ## Registro de Smith
 
@@ -42,11 +46,11 @@ npm run test:watch
 
 Termina el modo watch con Ctrl+C. No hace falta instalar nuevos paquetes: se usa Vitest 5.0.5 ya fijado en el proyecto.
 
-El resultado `Test Files 8 passed (8)` indica que pasaron los ocho archivos; `Tests 258 passed (258)` cuenta los casos, incluidos los de `it.each`. No representa un porcentaje de cobertura del código.
+El resultado `Test Files 8 passed (8)` indica que pasaron los ocho archivos; `Tests 275 passed (275)` cuenta los casos, incluidos los de `it.each`. No representa un porcentaje de cobertura del código.
 
 ## Organización vigente
 
-El [mapa de verificación actual](verificacion-iteracion-2.md) relaciona los ocho archivos y sus responsabilidades. La tabla siguiente conserva el desglose de la primera entrega.
+El [mapa de verificación de la iteración 2](verificacion-iteracion-2.md) relaciona los ocho archivos y sus responsabilidades. La tabla siguiente conserva el desglose de la primera entrega.
 
 ## Matriz histórica de riesgos de la primera entrega
 

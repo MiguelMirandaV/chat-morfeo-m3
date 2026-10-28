@@ -4,9 +4,9 @@ Guardo las conversaciones y borradores separados de Morfeo, el Oráculo y Trinit
 
 ## Dónde y qué se guarda
 
-El controlador de conversaciones usa la clave **`morfeo.conversations.v1`** de localStorage. El [ciclo de Smith](smith.md) usa una clave independiente y no se elimina al borrar conversaciones. Contiene una versión de formato, el personaje activo y tres entradas con `messages`, `draft` e `interrupted`. No guarda credenciales, cookies, prompts ni cuotas. Los errores transitorios de la interfaz tampoco se serializan.
+El controlador de conversaciones usa la clave **`morfeo.conversations.v1`** de localStorage. El [progreso de Smith](smith.md) usa `morfeo.smith-story.v2`: conserva contadores por personaje, retos superados y pregunta pendiente; no se elimina al borrar conversaciones. La migración deja intactos los historiales y estrena contadores en cero. Contiene una versión de formato, el personaje activo y tres entradas con `messages`, `draft` e `interrupted`. No guarda credenciales, cookies, prompts ni cuotas. Los errores transitorios de la interfaz tampoco se serializan.
 
-El almacenamiento pertenece al **origen**: protocolo, dominio y puerto. Se conserva entre sesiones del mismo navegador; cambiar de dispositivo, perfil, puerto o dominio de Preview no traslada los datos. Para revisar la iteración de forma continua uso su [URL estable de rama](https://chat-morfeo-m3-git-feat-matrix-v2-miguel-miranda-v.vercel.app/home). La URL de producción tiene su propio almacenamiento. [Referencia: localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage).
+El almacenamiento pertenece al **origen**: protocolo, dominio y puerto. Se conserva entre sesiones del mismo navegador; cambiar de dispositivo, perfil, puerto o dominio de Preview no traslada los datos. Para revisar la iteración de forma continua uso su [URL estable de rama](https://chat-morfeo-m3-git-feat-matrix-v3-miguel-miranda-v.vercel.app/home). La URL de producción tiene su propio almacenamiento. [Referencia: localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage).
 
 Los datos se guardan como texto, sin cifrado propio. El código compartido 79 abre el canal de la app y no representa una cuenta personal. La vista de mensajes y el campo del borrador se mantienen vacíos hasta validar acceso. El navegador puede eliminar o bloquear datos según sus ajustes.
 
@@ -29,6 +29,8 @@ Al recargar restaura ese borrador con un aviso y **no lo reenvía**. También co
 Recuperar el borrador no recupera una respuesta del servidor que nunca llegó al navegador. Una reserva de cuota ya realizada puede seguir consumida; el usuario decide si reintenta.
 
 ## Borrado con confirmación
+
+Las dos acciones están dentro del desplegable **Historial**. El indicador de guardado permanece visible; los avisos de fallo o conflicto muestran su mensaje completo. Escape cierra el desplegable y conserva el foco en su control.
 
 - **Borrar esta conversación:** elimina mensajes y borrador del personaje activo; conserva las otras conversaciones y la selección.
 - **Borrar todos los historiales:** elimina la clave de conversaciones y vuelve a la selección inicial, salvo que Smith controle la terminal: en ese caso conserva su intervención y personaje de retorno.

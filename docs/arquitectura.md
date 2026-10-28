@@ -39,7 +39,8 @@ El desbloqueo se hace antes de este recorrido: `{action:"unlock",cohort:"79"}` o
 | `scripts/prepare-assets.js` | Copia los módulos Three.js fijados y su licencia a `src/vendor`, generado e ignorado en Git. |
 | `src/chat.js` | `createCharacterSession` coordina tres `createChatSession`, con mensajes/borrador/error separados; `postApi` gestiona fetch, JSON y errores; `mountChat`/`mountAccess` conectan estado y DOM. |
 | `src/history-storage.js` | Valida registros versionados, guarda/restaura, protege borradores, coordina conflictos y borrado de la clave propia. |
-| `src/smith-story.js` | Valida y guarda el ciclo narrativo en su propia clave, con respuestas locales de Smith y aviso de conflictos. |
+| `src/smith-story.js` | Valida y guarda el progreso y la exención de Smith por personaje, con aviso de conflictos. |
+| `src/smith-questions.js` | Diez preguntas locales, dos opciones y token de intento; sin peticiones de IA. |
 | `src/smith-scene.js` | Rostro procedural proyectado y lluvia Canvas; pausa, movimiento reducido, visibilidad y limpieza. |
 | `src/chat-controls.js` | Reconoce peticiones directas de cambio, decide Enter/Shift+Enter/composición y coordina el plazo de retorno disponible; no interpreta respuestas del modelo. |
 | `src/characters.js` | Identificadores permitidos y metadatos públicos, sin prompts. |
@@ -64,7 +65,7 @@ El desbloqueo se hace antes de este recorrido: `{action:"unlock",cohort:"79"}` o
 
 | Dato | Dónde vive | Duración / uso |
 | --- | --- | --- |
-| Ciclo y diálogo local de Smith | Memoria y clave independiente de localStorage | Conserva progreso y personaje de retorno; no se envía a Gemini. |
+| Reto local de Smith | Memoria y clave independiente de localStorage | Conserva progreso por personaje y pregunta pendiente; no se envía a Gemini. |
 | Conversación y borrador | Memoria y localStorage del navegador | Persisten al navegar y, si el guardado funciona, al recargar el mismo origen. El historial se envía a la función y a Gemini para generar la respuesta. |
 | Cookie de acceso | Navegador, HttpOnly | Token firmado con expiración de 8 horas; Secure en HTTPS, SameSite=Strict. Sin identidad individual. |
 | Cantidades y tiempos de solicitudes | Redis compartido, o archivo privado solo en desarrollo sin Redis | Ventana móvil y día del Pacífico, con expiraciones. No guarda mensajes. |
@@ -99,4 +100,4 @@ El coordinador separa un control de cambio de una pregunta antes de llamar al pr
 
 ## Narrativa independiente de las cuotas
 
-El cierre exitoso de un turno incrementa el contador antes de notificar pending=false. Al tercero se fija el personaje de retorno. Los dos pares de Smith son locales, separados de las conversaciones normales. Al completar 2/2, un botón o un temporizador de 12 segundos restituye el canal y reinicia solo la cadencia narrativa. Historial y ciclo usan claves diferentes; borrar uno no elimina el otro. [Diseño, persistencia y límites](smith.md).
+El cierre exitoso de un turno incrementa el contador de su personaje antes de notificar pending=false. Al tercero se activa su único reto local. Los errores avanzan por diez preguntas de dos opciones; un acierto recupera el canal y conserva su exención. No hay retorno por tiempo. Historial y progreso usan claves diferentes; borrar uno no elimina el otro. La migración inicia los contadores nuevos en cero sin modificar los mensajes previos. [Diseño, persistencia y límites](smith.md).

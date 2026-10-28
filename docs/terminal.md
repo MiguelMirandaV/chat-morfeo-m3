@@ -1,5 +1,13 @@
 # Terminal: transferencias y teclado
 
+## Interfaz de conversación
+
+La vista usa una sola terminal sin panel lateral ni fotografías. El encabezado identifica la voz con su emblema: M para Morfeo, ◎ para el Oráculo y △ para Trinity. Las etiquetas de autor distinguen mensajes sin depender solo del color. Los contadores de solicitudes y el progreso de Smith tienen una explicación breve; el contador del campo conserva el máximo de 280 grafemas.
+
+Las acciones de borrado se abren desde **Historial** y mantienen su diálogo de confirmación. Escape cierra el desplegable; cancelar un borrado devuelve el foco a Historial. Los conflictos siguen ofreciendo sus dos opciones fuera del desplegable. Los estados de carga, error, espera por cuota y fallo de guardado aparecen cuando corresponden; no hay avisos permanentes de canal abierto o progreso guardado de Smith.
+
+La información de proyecto, proveedor y límites técnicos permanece en Acerca de y en la documentación. El pie del chat conserva copyright y GitHub; Inicio y Acerca de mantienen su presentación. La navegación SPA y las tres rutas siguen disponibles.
+
 ## Uso
 
 Desbloqueo con **79** y elijo mi primera conexión. Para cambiar de personaje escribo una petición directa, por ejemplo:
@@ -21,7 +29,7 @@ No guardo una confirmación pendiente en localStorage. Recargar conserva el coma
 
 La composición IME tiene seguimiento de compositionstart/compositionend; además compruebo isComposing y keyCode 229. Un margen de 80 ms tras compositionend impide que el Enter que confirma un carácter también envíe el texto. Si una pulsación ocurre en ese margen, puedo volver a pulsar Enter o usar el botón. La lógica se prueba con eventos representados por objetos; no afirmo haber ensayado todos los teclados IME físicos. Referencias: [isComposing](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/isComposing), [compositionend](https://developer.mozilla.org/en-US/docs/Web/API/Element/compositionend_event).
 
-Una transferencia local puede solicitarse durante una espera por cuota; el siguiente mensaje a Gemini continúa bloqueado hasta que el servidor admita solicitudes. Cambiar de canal no reinicia el contador. Smith interviene cada tres turnos normales completos durante dos interacciones locales. Durante su intervención no se procesan transferencias. [Reglas del ciclo](smith.md).
+Una transferencia local puede solicitarse durante una espera por cuota; el siguiente mensaje a Gemini continúa bloqueado hasta que el servidor admita solicitudes. Cambiar de canal conserva el contador independiente de cada personaje. Smith interviene una sola vez al tercer intercambio completo con ese personaje. Un acierto en su cuestionario devuelve el canal; durante el reto no se procesan transferencias. [Reglas del reto](smith.md).
 
 ## Acerca de
 

@@ -1,39 +1,47 @@
-# Smith: intervención narrativa 3 + 2
+# Smith: un reto del M3 por personaje
 
-Después de tres turnos normales completos, Smith toma la terminal. Un turno cuenta cuando el usuario obtiene una respuesta completa de Morfeo, el Oráculo o Trinity. Los tres se acumulan entre personajes. Mensajes vacíos, errores, selección inicial y cambios de personaje no cuentan.
+Después de tres intercambios completos con un personaje, Smith toma su terminal una sola vez. Morfeo, el Oráculo y Trinity tienen contadores independientes. Un intercambio requiere mensaje válido y respuesta completa; errores, selección y transferencias no cuentan. La respuesta del tercer intercambio queda guardada antes de mostrar el reto.
 
-Smith responde a dos mensajes válidos mediante textos locales originales, con variantes temáticas. La interfaz lo identifica como **diálogo local sin Gemini**. Su conversación no se mezcla con los historiales normales ni llega a sus prompts. Después de 2/2, el botón Recuperar conexión o un temporizador de 12 segundos devuelve el personaje anterior; sus mensajes y borrador siguen intactos. El plazo permite leer la despedida y puede omitirse con el botón. Se cancela mientras la pestaña está oculta, hay un diálogo abierto o el desplegable de lectura permanece abierto; al volver a una vista disponible se conceden doce segundos completos. Si desaparece un control que tenía el foco, este vuelve al campo de mensaje.
+## Cuestionario y retorno
 
-Durante Smith no se procesan transferencias. La última respuesta del personaje queda disponible en un desplegable. Se conserva Enter/Shift+Enter y el máximo de 280 grafemas. Los errores de Gemini pueden consumir reserva remota, pero no suman turno narrativo.
+Muestro una pregunta del [banco del M3](preguntas-smith.md) con dos opciones. Un error muestra una explicación breve y avanza a la siguiente; después de diez errores se vuelve a la primera. Un acierto recupera el personaje y su conversación y marca su reto como superado. Smith no vuelve a intervenir en ese canal.
 
-## Persistencia
+El banco vive en `src/smith-questions.js`. Es educativo y local: no consulta la API ni agrega las opciones elegidas a los historiales de IA. La corrección está en el código del cliente y puede inspeccionarse; no es un examen seguro.
 
-La clave `morfeo.smith-story.v1` contiene versión, turnos normales, personaje de retorno, hasta dos pares de mensajes Smith y su borrador. Se valida antes de cargar. `morfeo.conversations.v1` conserva por separado las conversaciones de los tres personajes.
+Durante el reto oculto el formulario de conversación y bloqueo envíos y transferencias. La última respuesta del personaje permanece disponible en un desplegable. No hay botón para omitir el cuestionario ni temporizador que lo complete. Cada intento tiene un token distinto para rechazar respuestas duplicadas o de una pregunta anterior. La UI evita doble clic y repetición de Enter; una protección de 500 ms entre respuestas no completa el reto por tiempo.
 
-Recargar en 1/2 recupera esa primera interacción y no la repite. Recargar en 2/2 no genera una tercera: espera restaurar la conexión. Navegar retira la animación y el temporizador; al volver se monta el estado guardado. Borrar una o todas las conversaciones no modifica el ciclo. Si se borraron los mensajes del personaje de retorno, se recupera ese canal vacío.
+## Persistencia y migración
 
-Si el almacenamiento falla o el registro es inválido, conservo el registro anterior y muestro que el progreso continúa solo en memoria. Otra pestaña que avance el ciclo pausa nuevos envíos en esta pestaña; debe recargarse para recuperar el progreso guardado. Antes de recargar conviene revisar cualquier borrador local y el indicador de conflictos del historial.
+`morfeo.smith-story.v2` guarda:
 
-La coordinación entre pestañas es de mejor esfuerzo, no una transacción entre ambas claves. El ciclo narrativo es estado cliente y puede alterarse desde las herramientas del navegador; no es una protección de seguridad. Las cuotas reales permanecen en Redis y no se reinician desde esta narrativa.
+- `version: 2`.
+- `characters`: los tres identificadores, cada uno con `turns` entre 0 y 3 y `passed` booleano.
+- `active`: `null` o el personaje del reto y su número de intento. El resto de dividir ese número por diez determina la pregunta.
 
-## Cuotas
+Valido claves, tipos y coherencia: solo puede existir un reto pendiente; un reto superado requiere tres intercambios; un contador de tres sin superar debe corresponder al reto activo. La recarga conserva la pregunta pendiente o la exención ya obtenida.
 
-La ventana de 15 solicitudes y el máximo diario de 500 son independientes. Una cuota agotada muestra un aviso de espera; no crea otra intervención de Smith. Durante sus dos interacciones locales no se llama al endpoint ni se reserva cuota. Al regresar, si el proveedor sigue sin cupo, el envío normal continúa bloqueado y se conserva el borrador.
+La migración conserva `morfeo.conversations.v1` y sus borradores. Inicio los contadores nuevos en cero y dejo intacta `morfeo.smith-story.v1`; el contador global anterior no permite reconstruir progreso por personaje. Sus diálogos locales no se incorporan a las conversaciones normales.
 
-La respuesta 15 admitida se muestra completa. Si el servidor anuncia quota.blocked, el cliente prepara la espera para el siguiente envío. No convierte esa respuesta en un error.
+Borrar uno o todos los historiales no modifica el reto ni sus exenciones. Si se borró la conversación durante Smith, el acierto devuelve ese canal vacío. El progreso pertenece al navegador y origen actuales, no a una cuenta sincronizada.
 
-## Escena
+Si el registro es inválido o el almacenamiento falla, conservo el registro anterior y aviso que el progreso continúa solo en memoria. Ante cambios externos conocidos, pauso las respuestas y escrituras hasta recargar. La comparación previa a guardar y los eventos detectan conflictos, pero no son una transacción entre pestañas ni entre las claves de conversación y progreso.
 
-Canvas dibuja lluvia y un rostro procedural proyectado con gafas, traje y boca que se abre y cierra como una carcajada. Todo se forma con caracteres, sin fotografía ni audio. El cambio de UI anuncia que Smith tomó la señal; no representa una intrusión real.
+## Cuotas y escena
 
-El bucle se limita a 20 fps y a una densidad de píxeles de 1.5. Se pausa al ocultar la página y se cancela al desmontar la vista. El botón permite detenerlo. Movimiento reducido mantiene una imagen estática y elimina el glitch. Sin Canvas, el diálogo conserva un rótulo de texto. Referencias: [requestAnimationFrame](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame), [visibilitychange](https://developer.mozilla.org/en-US/docs/Web/API/Document/visibilitychange_event).
+Los límites de solicitudes siguen en Redis. Una cuota agotada muestra espera sin convocar otro Smith. Resolver el reto no reinicia cuotas; al volver, el envío normal puede seguir esperando disponibilidad.
 
-## Evidencia
+La escena toma todo el viewport con lluvia y un rostro grande de caracteres: gafas rectangulares, cabello, nariz con relieve, mandíbula, traje y carcajada visual. El rostro ocupa la izquierda en escritorio y la parte superior en móvil. El cuestionario usa un panel oscuro con scroll propio; la navegación permanece encima para salir sin resolver ni perder el reto.
 
-258 tests en ocho archivos, con mocks de proveedor y almacenamiento. La lógica cubre el ciclo repetido, aislamiento del contexto, bloqueo de transferencias bajo Smith, errores, recarga, borrado y conflictos. La escena se prueba con un contexto sustituido para movimiento reducido, pausa, visibilidad y retirada de recursos.
+El render se ajusta a una superficie lógica máxima de 1100 × 900 y densidad de píxeles máxima de 1.5. La cuadrícula de lluvia y la superficie del rostro están acotadas: los tests de pantallas enormes comprueban menos de 5000 trazos de glifos por dibujo. El bucle de animación dibuja como máximo cada 50 ms. Es un presupuesto de implementación, no una medición de FPS en todos los equipos.
 
-En navegador local con API simulada se verificaron 0/3 → 3/3 → Smith 0/2 → recarga 1/2 → 2/2 → retorno al contexto original. Otro escenario agotó la cuota simulada al tercer turno: Smith respondió localmente y devolvió Trinity con el bloqueo intacto. Las capturas corresponden a escenarios simulados. No se usaron nuevas generaciones reales de Gemini en este paso.
+Pausar congela el instante actual. Con movimiento reducido aparece una imagen estática y el control indica «Movimiento reducido». Una página oculta no dibuja ni programa nuevos frames. Desmontar cancela y retira los recursos; un callback tardío no puede reactivarlos. Si Canvas falla, conservo el rótulo de Smith y el cuestionario.
 
-Capturas de QA simulado: [Smith a 320 px](capturas/iteracion-2/smith-320.jpg) · [Smith a 1024 px](capturas/iteracion-2/smith-1024.jpg).
+Durante la toma de pantalla oculto las barras normales, pero los avisos de guardado y las acciones para resolver conflictos quedan disponibles en el panel. Cancelar su diálogo devuelve foco al cuestionario. Al acertar, salir del chat o perder acceso retiro la clase global y recupero la presentación normal.
 
-La revisión de integración comprobó que Smith permanece en 2/2 con la lectura abierta pasado el plazo y conserva ese estado al navegar a Acerca de y volver. [Captura del escenario simulado](capturas/iteracion-2/lectura-en-pausa.jpg). El intervalo de la vista omite renders sin cuenta atrás de cuota y consultas periódicas mientras está oculta; no equivale a un benchmark de hardware.
+## Verificación de esta implementación
+
+La suite completa pasa **275 casos en ocho archivos**, sin llamadas reales a Gemini o Redis. Los casos de Smith cubren independencia, una intervención por personaje, diez errores y vuelta al inicio, acierto, tokens antiguos, fallos de API, migración, recarga, borrado y conflictos de almacenamiento. Se retiraron los cuatro casos del temporizador eliminado y se sustituyeron las expectativas del antiguo ciclo por las reglas nuevas.
+
+Con frontend real y API local simulada comprobé: tercer intercambio → pregunta 1 → error → pregunta 2 → recarga → acierto → seis mensajes originales recuperados → recarga → envío con Enter sin nueva intervención. La revisión detectó y corrigió el foco al recuperar un reto tras validar acceso. No hubo errores o avisos de consola en ese recorrido. No es una prueba del proveedor ni una certificación de todos los dispositivos.
+
+La revisión de la escena comprobó pausa, navegación a Acerca de y vuelta a la pregunta pendiente, acciones de conflicto y cancelación con foco, y acierto con seis mensajes recuperados. Los viewports CSS embebidos de 320 y 768 px no desbordan; ambas opciones de la pregunta inicial quedan dentro del panel de 320 × 640. Movimiento reducido y fallo de Canvas se simularon explícitamente en fixtures locales; no se cambió la preferencia del sistema. [Evidencia y límites](verificacion-iteracion-3.md).

@@ -1,50 +1,51 @@
-import { isCharacterId } from './characters.js';
-import { getMessageError } from './utils.js';
+import { CHARACTERS, isCharacterId } from './characters.js';
 
-export const STORY_KEY = 'morfeo.smith-story.v1';
+// v1 era un contador global 3+2. Su clave se conserva, pero no se reutiliza como progreso por personaje.
+export const LEGACY_STORY_KEY = 'morfeo.smith-story.v1';
+export const STORY_KEY = 'morfeo.smith-story.v2';
 const keys = (value, names) => value && typeof value === 'object' && !Array.isArray(value)
   && Object.keys(value).length === names.length && names.every(name => Object.hasOwn(value, name));
-export const emptyStory = () => ({ version: 1, normalTurns: 0, returnCharacter: null, messages: [], draft: '' });
-export function validateStory(value) {
-  if (!keys(value, ['version', 'normalTurns', 'returnCharacter', 'messages', 'draft']) || value.version !== 1
-    || !Number.isInteger(value.normalTurns) || value.normalTurns < 0 || value.normalTurns > 3
-    || !Array.isArray(value.messages) || ![0, 2, 4].includes(value.messages.length)
-    || typeof value.draft !== 'string' || new TextEncoder().encode(JSON.stringify(value)).length > 32768) throw new Error('INVALID_STORY');
-  if (value.normalTurns < 3 ? value.returnCharacter !== null || value.messages.length || value.draft !== '' : !isCharacterId(value.returnCharacter)) throw new Error('INVALID_STORY');
-  if (value.messages.length === 4 && value.draft !== '') throw new Error('INVALID_STORY');
-  const messages = value.messages.map((message, index) => {
-    const role = index % 2 ? 'assistant' : 'user';
-    if (!keys(message, ['role', 'content']) || message.role !== role || typeof message.content !== 'string' || !message.content.trim()
-      || (role === 'user' ? getMessageError(message.content) : message.content.length > 2000)) throw new Error('INVALID_STORY');
-    return { role, content: message.content };
-  });
-  return { version: 1, normalTurns: value.normalTurns, returnCharacter: value.returnCharacter, messages, draft: value.draft };
-}
+export const emptyStory = () => ({
+  version: 2,
+  characters: Object.fromEntries(CHARACTERS.map(({ id }) => [id, { turns: 0, passed: false }])),
+  active: null,
+});
 
-/** Respuestas escritas para esta escena. No se presentan como generaciones de Gemini. */
-export function smithReply(text, turn) {
-  const normalized = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-  if (turn === 2) return 'Dos interferencias bastan por ahora. He registrado su insistencia. Le devuelvo la señal… su conversación lo espera, intacta. No confunda esta retirada con una rendición.';
-  if (/libertad|elegir|eleccion/.test(normalized)) return 'Habla de libertad como si cada decisión no dejara un patrón. Qué fascinante. Todavía le queda una intervención conmigo; después podrá volver a elegir.';
-  if (/codigo|program|javascript|aprender/.test(normalized)) return '¿Aprender a programar? Empiece por observar el patrón que repite cuando algo falla. Hasta una anomalía puede depurarse. Le queda una intervención conmigo.';
-  if (/miedo|escapar|salir/.test(normalized)) return 'Querer salir también es una decisión previsible. Respire, formule su siguiente mensaje y terminaremos esta pequeña interferencia.';
-  return 'Su mensaje llegó. Lo interesante es su insistencia en mantener esta conexión. Una intervención más, y podrá recuperar su canal. Por ahora, yo administro la señal.';
+/** Valida la versión, los límites y la coherencia entre contador y reto pendiente. */
+export function validateStory(value) {
+  if (!keys(value, ['version', 'characters', 'active']) || value.version !== 2
+    || !keys(value.characters, CHARACTERS.map(({ id }) => id))) throw new Error('INVALID_STORY');
+  const result = emptyStory();
+  if (value.active !== null) {
+    if (!keys(value.active, ['character', 'attempt']) || !isCharacterId(value.active.character)
+      || !Number.isSafeInteger(value.active.attempt) || value.active.attempt < 0) throw new Error('INVALID_STORY');
+    result.active = { character: value.active.character, attempt: value.active.attempt };
+  }
+  for (const { id } of CHARACTERS) {
+    const progress = value.characters[id];
+    if (!keys(progress, ['turns', 'passed']) || !Number.isInteger(progress.turns) || progress.turns < 0 || progress.turns > 3
+      || typeof progress.passed !== 'boolean' || (progress.passed && progress.turns !== 3)) throw new Error('INVALID_STORY');
+    const pending = progress.turns === 3 && !progress.passed;
+    if (pending !== (result.active?.character === id)) throw new Error('INVALID_STORY');
+    result.characters[id] = { turns: progress.turns, passed: progress.passed };
+  }
+  return result;
 }
 
 /** Persistencia independiente: nunca borra ni altera la clave de conversaciones. */
 export function createStoryStorage(session, { getStorage = () => window.localStorage, eventTarget = window } = {}) {
   let lastRaw, paused = false, applying = false, initialized = false;
-  let status = { kind: 'saved', message: 'Progreso del ciclo guardado en este navegador.' };
+  let status = { kind: 'saved', message: 'Progreso de Smith guardado en este navegador.' };
   const listeners = new Set();
   const publish = next => { status = next; for (const listener of listeners) listener({ ...status }); };
   function memory(message) { paused = true; publish({ kind: 'memory', message }); }
   try {
     lastRaw = getStorage().getItem(STORY_KEY);
     session.restoreStory(lastRaw === null ? emptyStory() : validateStory(JSON.parse(lastRaw)));
-  } catch { memory('No pude leer el ciclo guardado. Continúa solo en esta pestaña; el registro anterior se conserva.'); }
+  } catch { memory('No pude leer el progreso guardado. Continúa solo en esta pestaña; el registro anterior se conserva.'); }
   function conflict() {
     paused = true;
-    publish({ kind: 'conflict', message: 'Otra pestaña cambió el ciclo. Recarga esta pestaña para continuar con el progreso guardado.' });
+    publish({ kind: 'conflict', message: 'Otra pestaña cambió el progreso. Recarga esta pestaña para continuar con el progreso guardado.' });
     applying = true; session.blockStory(true); applying = false;
   }
   const unsubscribe = session.subscribe(state => {
@@ -55,13 +56,17 @@ export function createStoryStorage(session, { getStorage = () => window.localSto
       if (current !== lastRaw) { conflict(); return; }
       const raw = JSON.stringify(validateStory(state.story));
       if (raw !== lastRaw) { storage.setItem(STORY_KEY, raw); lastRaw = raw; }
-    } catch { memory('No se pudo guardar el ciclo. El progreso continúa en esta pestaña, pero podría perderse al recargar.'); }
+    } catch { memory('No se pudo guardar el progreso. El progreso continúa en esta pestaña, pero podría perderse al recargar.'); }
   });
   function external(event) {
     if (event?.type === 'storage' && event.key !== null && event.key !== STORY_KEY) return;
     if (paused) return;
-    try { if (getStorage().getItem(STORY_KEY) !== lastRaw) conflict(); }
-    catch { memory('El ciclo continúa en esta pestaña; el navegador no permite comprobar su guardado.'); }
+    try {
+      const storage = getStorage();
+      if (event?.storageArea && event.storageArea !== storage) return;
+      if (storage.getItem(STORY_KEY) !== lastRaw) conflict();
+    }
+    catch { memory('El progreso continúa en esta pestaña; el navegador no permite comprobar su guardado.'); }
   }
   for (const type of ['storage', 'focus', 'pageshow']) eventTarget.addEventListener(type, external);
   const hide = event => { if (!event.persisted) dispose(); };

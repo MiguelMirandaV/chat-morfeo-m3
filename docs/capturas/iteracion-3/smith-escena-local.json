@@ -1,0 +1,76 @@
+{
+  "scope": "Paso 5: Smith de pantalla completa, frontend real y API de QA simulada",
+  "realGemini": 0,
+  "realRedis": 0,
+  "unitTests": 275,
+  "testFiles": 8,
+  "sceneTests": 9,
+  "build": "passed",
+  "desktop": {
+    "viewportWidth": 1280,
+    "viewportHeight": 720,
+    "overlay": {
+      "x": 0,
+      "y": 0,
+      "width": 1280,
+      "height": 720
+    },
+    "canvasSurface": {
+      "width": 1650,
+      "height": 928
+    }
+  },
+  "graphicsBudget": {
+    "logicalMaxWidth": 1100,
+    "logicalMaxHeight": 900,
+    "maxPixelRatio": 1.5,
+    "minimumFrameIntervalMs": 50,
+    "testGlyphCallsPerDraw": "<5000 en 3840x2160 y pantalla 10 veces mayor"
+  },
+  "responsive": {
+    "method": "Viewports CSS embebidos del mismo origen, con movimiento reducido simulado.",
+    "viewports": [
+      {
+        "width": 320,
+        "height": 640,
+        "documentScrollWidth": 320,
+        "questionPanel": {
+          "left": 12,
+          "top": 199.203125,
+          "right": 308,
+          "bottom": 628
+        },
+        "optionABottom": 482.8515625,
+        "optionBBottom": 611.921875
+      },
+      {
+        "width": 768,
+        "height": 820,
+        "documentScrollWidth": 768
+      }
+    ]
+  },
+  "observed": [
+    "Pausa cambia el control a Reanudar lluvia y conserva la pregunta.",
+    "Una respuesta incorrecta avanza a la pregunta 2 dentro de la escena.",
+    "Navegar a Acerca de retira smith-takeover; volver a Chat recupera la pregunta 2.",
+    "Un cambio de historial desde una pestaña QA externa muestra aviso y ambas acciones de conflicto dentro de Smith.",
+    "Abrir Cargar historial guardado muestra el diálogo; cancelar devuelve foco a una opción del cuestionario.",
+    "Acertar la pregunta 2 retira la toma de pantalla y recupera los seis mensajes y el campo de entrada.",
+    "La variante de movimiento reducido muestra una imagen estática y control deshabilitado con texto Movimiento reducido.",
+    "Sin Canvas, el rótulo fallback está visible, el control de lluvia se oculta y acertar sigue recuperando el chat.",
+    "Consolas del recorrido directo y del fallback sin errores ni avisos."
+  ],
+  "sourceSha256": {
+    "src/app.js": "ea7a601b032217e1545be37ff4a0d02c3323b88bfcdd3a5cb716491e50334a8b",
+    "src/chat.js": "396bec4864203bf5de7406242faca4c629e50ea73b38d9b65acf42168811b0da",
+    "src/smith-scene.js": "6866e5c113b38b3dc8ee3dfbe96d3296ab2bc1fe401d7d0eb07c51a2de20014a",
+    "src/styles.css": "97c5ed7ccf9438f15f20ef3eb6c3ad3400c00e2dd5a98cf942b650529f24f022"
+  },
+  "limits": [
+    "No es un benchmark de rendimiento de GPU ni garantiza FPS en todos los equipos.",
+    "Movimiento reducido y fallo de Canvas se inyectaron como escenarios de QA; no se cambió una preferencia real del sistema.",
+    "Los marcos prueban CSS y teclado de escritorio, no un dispositivo ni teclado móvil físico.",
+    "No se confirmó reemplazo ni borrado de historiales en UI: se abrió y canceló la resolución de conflicto con datos ficticios."
+  ]
+}

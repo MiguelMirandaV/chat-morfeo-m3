@@ -1,0 +1,45 @@
+{
+  "scenario": "Frontend real de la rama feat/matrix-v3 con API local simulada en 127.0.0.1:4343",
+  "realGemini": 0,
+  "realRedis": 0,
+  "simulatedGenerationRequests": 2,
+  "initialFixture": {
+    "character": "oracle",
+    "completedExchanges": 2,
+    "messages": 4,
+    "draft": "Tercer intercambio de QA"
+  },
+  "observed": [
+    "El tercer intercambio muestra la pregunta 1 con dos opciones y oculta el formulario normal.",
+    "La opción B incorrecta muestra la pregunta 2 y feedback; ambas opciones se deshabilitan brevemente.",
+    "Recargar mantiene la pregunta 2 y devuelve el foco al primer botón tras validar el acceso simulado.",
+    "La opción B correcta recupera el Oráculo con sus seis mensajes.",
+    "Recargar conserva la exención del Oráculo y los seis mensajes.",
+    "Enviar con Enter agrega el siguiente par de mensajes sin reactivar Smith.",
+    "El navegador no registró errores ni avisos de consola en el recorrido."
+  ],
+  "serverEvents": [
+    {
+      "character": "oracle",
+      "messages": 5,
+      "last": "Tercer intercambio de QA"
+    },
+    {
+      "character": "oracle",
+      "messages": 7,
+      "last": "Continúo tras superar el reto"
+    }
+  ],
+  "sourceSha256": {
+    "src/chat.js": "2aaccf4fb8df4d80ecbbbabf972189256455208f27946048d5ee13dbc6a45dc6",
+    "src/app.js": "6f4843eda0e7434d806597478aacd4b1eca4bf2c34ada7eaf6ed789a49b48d53",
+    "src/smith-story.js": "28bd41a161cd29609b57fece47dd8e65ecea4be2364daab929161b4347de7da9",
+    "src/smith-questions.js": "bb1904df0a61e52a53daaa2a22a60362d4fba62123600f4c2cc3144444007e48",
+    "src/styles.css": "7c9369d302a27dd7c2aceeac0284b254d8e2ebf6b7709b999f986addbc44b114"
+  },
+  "limits": [
+    "API, acceso y cuotas simulados; no demuestra integración con los servicios remotos.",
+    "La adaptación visual móvil y la escena invasiva quedan para los pasos visuales.",
+    "El recorrido de UI no borró historiales; el borrado se comprobó con almacenamiento sustituido en Vitest."
+  ]
+}
