@@ -2,7 +2,7 @@
 
 Después de tres turnos normales completos, Smith toma la terminal. Un turno cuenta cuando el usuario obtiene una respuesta completa de Morfeo, el Oráculo o Trinity. Los tres se acumulan entre personajes. Mensajes vacíos, errores, selección inicial y cambios de personaje no cuentan.
 
-Smith responde a dos mensajes válidos mediante textos locales originales, con variantes temáticas. La interfaz lo identifica como **diálogo local sin Gemini**. Su conversación no se mezcla con los historiales normales ni llega a sus prompts. Después de 2/2, el botón Recuperar conexión o un temporizador de 12 segundos devuelve el personaje anterior; sus mensajes y borrador siguen intactos. El plazo permite leer la despedida y puede omitirse con el botón.
+Smith responde a dos mensajes válidos mediante textos locales originales, con variantes temáticas. La interfaz lo identifica como **diálogo local sin Gemini**. Su conversación no se mezcla con los historiales normales ni llega a sus prompts. Después de 2/2, el botón Recuperar conexión o un temporizador de 12 segundos devuelve el personaje anterior; sus mensajes y borrador siguen intactos. El plazo permite leer la despedida y puede omitirse con el botón. Se cancela mientras la pestaña está oculta, hay un diálogo abierto o el desplegable de lectura permanece abierto; al volver a una vista disponible se conceden doce segundos completos. Si desaparece un control que tenía el foco, este vuelve al campo de mensaje.
 
 Durante Smith no se procesan transferencias. La última respuesta del personaje queda disponible en un desplegable. Se conserva Enter/Shift+Enter y el máximo de 280 grafemas. Los errores de Gemini pueden consumir reserva remota, pero no suman turno narrativo.
 
@@ -30,8 +30,10 @@ El bucle se limita a 20 fps y a una densidad de píxeles de 1.5. Se pausa al ocu
 
 ## Evidencia
 
-254 tests en ocho archivos, con mocks de proveedor y almacenamiento. La lógica cubre el ciclo repetido, aislamiento del contexto, bloqueo de transferencias bajo Smith, errores, recarga, borrado y conflictos. La escena se prueba con un contexto sustituido para movimiento reducido, pausa, visibilidad y retirada de recursos.
+258 tests en ocho archivos, con mocks de proveedor y almacenamiento. La lógica cubre el ciclo repetido, aislamiento del contexto, bloqueo de transferencias bajo Smith, errores, recarga, borrado y conflictos. La escena se prueba con un contexto sustituido para movimiento reducido, pausa, visibilidad y retirada de recursos.
 
 En navegador local con API simulada se verificaron 0/3 → 3/3 → Smith 0/2 → recarga 1/2 → 2/2 → retorno al contexto original. Otro escenario agotó la cuota simulada al tercer turno: Smith respondió localmente y devolvió Trinity con el bloqueo intacto. Las capturas corresponden a escenarios simulados. No se usaron nuevas generaciones reales de Gemini en este paso.
 
 Capturas de QA simulado: [Smith a 320 px](capturas/iteracion-2/smith-320.jpg) · [Smith a 1024 px](capturas/iteracion-2/smith-1024.jpg).
+
+La revisión de integración comprobó que Smith permanece en 2/2 con la lectura abierta pasado el plazo y conserva ese estado al navegar a Acerca de y volver. [Captura del escenario simulado](capturas/iteracion-2/lectura-en-pausa.jpg). El intervalo de la vista omite renders sin cuenta atrás de cuota y consultas periódicas mientras está oculta; no equivale a un benchmark de hardware.

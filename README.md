@@ -41,7 +41,7 @@ Guardo historiales y borradores por personaje en localStorage; se recuperan al v
 3. Elige a **Morfeo, el Oráculo o Trinity**, escribe una pregunta y presiona **Enter** o pulsa **Enviar**. Usa **Shift+Enter** para agregar una línea.
 4. Espera la respuesta. Ante un fallo, revisa el mensaje de estado y reintenta con el borrador conservado.
 5. Puedes navegar o recargar y recuperar lo guardado en ese mismo navegador y sitio. Un envío interrumpido vuelve como borrador; no se reenvía automáticamente.
-6. Después de tres turnos completos, conversa dos veces con Smith. Su diálogo es local y no consume Gemini. La conexión vuelve automáticamente tras 12 segundos, o antes con **Recuperar conexión**.
+6. Después de tres turnos completos, conversa dos veces con Smith. Su diálogo es local y no consume Gemini. La conexión vuelve automáticamente tras 12 segundos, o antes con **Recuperar conexión**. Si estás leyendo la respuesta guardada, atendiendo un diálogo o tienes la pestaña oculta, la espera se pausa.
 7. Usa **Borrar esta conversación** o **Borrar todos los historiales** y confirma si quieres eliminarlos. El borrado no reinicia el ciclo narrativo ni las cuotas.
 
 Envío las preguntas a Gemini a través de mi función de servidor. No escribas contraseñas ni claves en la conversación.
@@ -126,7 +126,7 @@ npm test
 npm run test:watch
 ```
 
-Incluí **254 pruebas en ocho archivos** para validar caracteres, navegación, historiales separados, identidad, estados, errores, transporte, acceso, cuotas y contratos de Gemini. Uso mocks para que la suite no consuma Gemini ni Redis reales y restauro el entorno entre pruebas.
+Incluí **258 pruebas en ocho archivos** para validar caracteres, navegación, historiales separados, identidad, estados, errores, transporte, acceso, cuotas y contratos de Gemini. Uso mocks para que la suite no consuma Gemini ni Redis reales y restauro el entorno entre pruebas.
 
 [Personajes y contrato](docs/personajes.md) · [Detalle de las pruebas](docs/pruebas-unitarias.md) · [Comprobaciones y límites](docs/pruebas.md).
 

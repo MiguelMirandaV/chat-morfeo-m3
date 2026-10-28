@@ -222,3 +222,7 @@ La suite alcanza 220 casos; las pruebas de UI usaron respuestas simuladas en un 
 Usé Codex para implementar la cadencia, persistencia independiente y el rostro procedural proyectado en Canvas con lluvia de caracteres. Las respuestas locales se identifican en la UI; no se atribuyen a Gemini. El cierre del turno se cuenta antes de liberar pending para impedir carreras; transferencias y errores no cuentan. Las pruebas verifican borrado de historial sin reiniciar el ciclo y conflictos entre pestañas.
 
 La suite alcanza 254 casos. Se comprobó en UI simulada la entrada al tercer turno, recarga tras 1/2, respuesta 2/2 y retorno automático; en un escenario con cuota agotada, Smith siguió funcionando y devolvió Trinity con las tres respuestas y el bloqueo de cuota intactos. Se corrigió un temporizador que debía cancelarse al usar el botón de retorno. No hubo nuevas generaciones reales de Gemini.
+
+## Iteración 2 — Integración de lectura, foco y temporizadores
+
+Con la Preview de Smith confirmada por Miguel, revisé problemas concretos del ciclo de vida. Incorporé un controlador de retorno que pausa ante ocultamiento, diálogos o lectura desplegada, y se cancela al desmontar. El foco vuelve al campo si desaparece un control de Smith. Eliminé renders cada segundo cuando no hay cuenta atrás de cuota y consultas periódicas de la vista oculta. La suite pasa 258 casos, incluidos cuatro de este controlador con reloj sustituido. El QA visual usa una API simulada; no se generaron nuevas respuestas reales. No se presenta como un benchmark de GPU/FPS.

@@ -1,8 +1,12 @@
 # Pruebas unitarias
 
-## Iteración 2: Smith
+## Iteración 2: integración
 
-Resultado vigente: **254 casos en ocho archivos**. Agregué 30 casos en smith-story.test.js sobre cadencia, aislamiento, fallos, comandos, recarga, borrado y almacenamiento; y cuatro en smith-scene.test.js sobre movimiento reducido, pausa, visibilidad, límites de resolución, fallback y limpieza. Actualicé el contrato de cuota: la respuesta 15 admitida se conserva y quota.blocked anuncia espera para la siguiente; ya no activa Smith.
+Resultado vigente: **258 casos en ocho archivos**. Cuatro casos nuevos con reloj sustituido verifican disponibilidad para el retorno, un único temporizador pese a varios renders, pausa/reinicio del plazo y retirada al desmontar. No usan Gemini ni esperas reales.
+
+## Registro de Smith
+
+Resultado de esa etapa: **254 casos en ocho archivos**. Agregué 30 casos en smith-story.test.js sobre cadencia, aislamiento, fallos, comandos, recarga, borrado y almacenamiento; y cuatro en smith-scene.test.js sobre movimiento reducido, pausa, visibilidad, límites de resolución, fallback y limpieza. Actualicé el contrato de cuota: la respuesta 15 admitida se conserva y quota.blocked anuncia espera para la siguiente; ya no activa Smith.
 
 ## Registro de terminal
 
