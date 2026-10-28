@@ -4,7 +4,7 @@ Guardo las conversaciones y borradores separados de Morfeo, el Oráculo y Trinit
 
 ## Dónde y qué se guarda
 
-El controlador de conversaciones usa la clave **`morfeo.conversations.v1`** de localStorage. El [ciclo de Smith](smith.md) usa una clave independiente y no se elimina al borrar conversaciones. Contiene una versión de formato, el personaje activo y tres entradas con `messages`, `draft` e `interrupted`. No guarda credenciales, cookies, prompts ni cuotas. Los errores transitorios de la interfaz tampoco se serializan.
+El controlador de conversaciones usa la clave **`morfeo.conversations.v1`** de localStorage. El [progreso de Smith](smith.md) usa `morfeo.smith-story.v2`: conserva contadores por personaje, retos superados y pregunta pendiente; no se elimina al borrar conversaciones. La migración deja intactos los historiales y estrena contadores en cero. Contiene una versión de formato, el personaje activo y tres entradas con `messages`, `draft` e `interrupted`. No guarda credenciales, cookies, prompts ni cuotas. Los errores transitorios de la interfaz tampoco se serializan.
 
 El almacenamiento pertenece al **origen**: protocolo, dominio y puerto. Se conserva entre sesiones del mismo navegador; cambiar de dispositivo, perfil, puerto o dominio de Preview no traslada los datos. Para revisar la iteración de forma continua uso su [URL estable de rama](https://chat-morfeo-m3-git-feat-matrix-v2-miguel-miranda-v.vercel.app/home). La URL de producción tiene su propio almacenamiento. [Referencia: localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage).
 

@@ -2,7 +2,7 @@
 
 ## Próxima iteración
 
-[Iteración 3: alcance aprobado](iteracion-3.md) y [cuestionario de Smith](preguntas-smith.md). La preparación está en desarrollo; los documentos de entrega siguientes describen la versión publicada de la iteración 2.
+[Iteración 3: alcance aprobado](iteracion-3.md) y [cuestionario de Smith](preguntas-smith.md). La rama de desarrollo incorpora el nuevo reto; su implementación está en [Smith](smith.md) y sus comprobaciones en [verificación de la iteración 3](verificacion-iteracion-3.md). Los informes de entrega siguientes conservan la versión publicada de la iteración 2.
 
 ## Uso y entrega vigentes
 
@@ -14,7 +14,7 @@
 
 ## Diseño e implementación
 
-[Arquitectura](arquitectura.md) · [Home 3D](home-3d.md) · [Personajes y contrato](personajes.md) · [Historiales](persistencia.md) · [Terminal y teclado](terminal.md) · [Smith 3+2](smith.md) · [Redis](redis.md).
+[Arquitectura](arquitectura.md) · [Home 3D](home-3d.md) · [Personajes y contrato](personajes.md) · [Historiales](persistencia.md) · [Terminal y teclado](terminal.md) · [Reto de Smith](smith.md) · [Redis](redis.md).
 
 ## Evaluación y decisiones
 

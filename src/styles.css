@@ -361,6 +361,12 @@ body[data-page="home"] { background: #000402; --accent: #68ff99; }
 .smith-fallback { display: none; font-size: .6rem; color: #69ffae; }
 .smith-signal canvas[hidden] + .smith-fallback { display: block; }
 .smith-brief { min-width: 0; flex: 1; }
+.smith-quiz h3 { font-size: .85rem; line-height: 1.8; margin-block: .8rem; }
+.smith-options { display: grid; gap: .6rem; }
+.smith-options button { padding: .75rem; border: 1px solid #35885a; color: #d7ffe6; background: #001b0e; text-align: left; font: inherit; font-size: .7rem; line-height: 1.7; overflow-wrap: anywhere; cursor: pointer; }
+.smith-options button:hover:not(:disabled) { border-color: #91ffbd; background: #073b22; }
+.smith-options button:disabled { opacity: .55; cursor: wait; }
+.smith-options button:focus-visible, .smith-quiz h3:focus { outline: 2px solid #b6ffd0; outline-offset: 3px; }
 .smith-brief h2 { color: #d7ffe6; }
 .smith-brief details { font-size: .6rem; margin-top: .5rem; }
 .smith-brief summary { cursor: pointer; color: #b5edc7; }

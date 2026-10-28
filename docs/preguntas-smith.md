@@ -1,6 +1,6 @@
 # Cuestionario de Smith — Módulo 3
 
-Banco previsto para la iteración 3. Todavía no está conectado a la aplicación.
+Banco de la iteración 3, implementado en `src/smith-questions.js` y conectado al reto local de Smith.
 
 Preparé estas preguntas a partir de las lectures proporcionadas en `M3.md` y los objetivos del Proyecto Integrador. Son formulaciones propias sobre los conceptos del curso. La columna de corrección sirve para implementar y revisar el banco; no se muestra antes de responder en la interfaz.
 
