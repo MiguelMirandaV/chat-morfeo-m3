@@ -216,3 +216,9 @@ Se usaron escenarios locales con datos ficticios y proveedor/cuotas simulados pa
 Usé Codex para implementar peticiones directas de transferencia con confirmación, Enter/Shift+Enter y tres tarjetas con SVG originales. Revisé el cambio como un control local, separado del contexto del modelo: cancelar conserva el comando, confirmar recupera solo el historial del destino y las intenciones no se guardan. Se corrigió el selector del texto descriptivo del diálogo y se usó Object.hasOwn para rechazar nombres heredados como constructor.
 
 La suite alcanza 220 casos; las pruebas de UI usaron respuestas simuladas en un puerto propio, sin nuevas generaciones Gemini ni operaciones Redis. Se comprobaron Enter, Shift+Enter, Escape/foco, bloqueo de 281 caracteres, transferencias, restauración y tarjetas a 320/768/1024 px. La composición IME se verificó como lógica de eventos, no con teclado físico. Smith 3+2 sigue pendiente de su etapa.
+
+## Iteración 2 — Smith 3+2
+
+Usé Codex para implementar la cadencia, persistencia independiente y el rostro procedural proyectado en Canvas con lluvia de caracteres. Las respuestas locales se identifican en la UI; no se atribuyen a Gemini. El cierre del turno se cuenta antes de liberar pending para impedir carreras; transferencias y errores no cuentan. Las pruebas verifican borrado de historial sin reiniciar el ciclo y conflictos entre pestañas.
+
+La suite alcanza 254 casos. Se comprobó en UI simulada la entrada al tercer turno, recarga tras 1/2, respuesta 2/2 y retorno automático; en un escenario con cuota agotada, Smith siguió funcionando y devolvió Trinity con las tres respuestas y el bloqueo de cuota intactos. Se corrigió un temporizador que debía cancelarse al usar el botón de retorno. No hubo nuevas generaciones reales de Gemini.

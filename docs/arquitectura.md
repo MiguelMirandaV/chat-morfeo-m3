@@ -24,7 +24,7 @@ sequenceDiagram
         Sesion-->>Vista: Añade respuesta y libera el campo
     else Se alcanzó el límite
         API-->>Sesion: 429 + quota + Retry-After
-        Sesion-->>Vista: Recupera borrador y muestra Smith
+        Sesion-->>Vista: Recupera borrador y muestra espera de cuota
     end
 ```
 
@@ -39,6 +39,8 @@ El desbloqueo se hace antes de este recorrido: `{action:"unlock",cohort:"79"}` o
 | `scripts/prepare-assets.js` | Copia los módulos Three.js fijados y su licencia a `src/vendor`, generado e ignorado en Git. |
 | `src/chat.js` | `createCharacterSession` coordina tres `createChatSession`, con mensajes/borrador/error separados; `postApi` gestiona fetch, JSON y errores; `mountChat`/`mountAccess` conectan estado y DOM. |
 | `src/history-storage.js` | Valida registros versionados, guarda/restaura, protege borradores, coordina conflictos y borrado de la clave propia. |
+| `src/smith-story.js` | Valida y guarda el ciclo narrativo en su propia clave, con respuestas locales de Smith y aviso de conflictos. |
+| `src/smith-scene.js` | Rostro procedural proyectado y lluvia Canvas; pausa, movimiento reducido, visibilidad y limpieza. |
 | `src/chat-controls.js` | Reconoce peticiones directas de cambio y decide Enter/Shift+Enter/composición; no interpreta respuestas del modelo. |
 | `src/characters.js` | Identificadores permitidos y metadatos públicos, sin prompts. |
 | `src/utils.js` | `countCharacters` con Intl.Segmenter y `getMessageError`; la función backend reutiliza la validación. |
@@ -93,3 +95,7 @@ Los prompts tienen una base compartida de conversación, brevedad y límites de 
 ## Transferencia de canal
 
 El coordinador separa un control de cambio de una pregunta antes de llamar al proveedor. Conserva una intención privada con origen, destino, borrador y revisión. Confirmar limpia únicamente el comando del origen y selecciona el destino en una sola notificación; cancelar conserva el texto. No hay mensajes de control en el contexto Gemini. Las intenciones no se serializan: recargar exige volver a solicitar y confirmar. Una restauración invalida cualquier intención anterior. [Detalle](terminal.md).
+
+## Narrativa independiente de las cuotas
+
+El cierre exitoso de un turno incrementa el contador antes de notificar pending=false. Al tercero se fija el personaje de retorno. Los dos pares de Smith son locales, separados de las conversaciones normales. Al completar 2/2, un botón o un temporizador de 12 segundos restituye el canal y reinicia solo la cadencia narrativa. Historial y ciclo usan claves diferentes; borrar uno no elimina el otro. [Diseño, persistencia y límites](smith.md).

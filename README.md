@@ -29,7 +29,8 @@ Diseñé la interfaz como una terminal de Zion. En esta rama construí una entra
 - Recuperar conversaciones y borradores al recargar; borrar una conversación o todas, con confirmación.
 - Resolver cambios detectados desde otra pestaña antes de sobrescribir un historial.
 - Consultar las solicitudes compartidas de la app: **15 en una ventana móvil de 60 segundos y 500 al día**.
-- Ver la intervención visual de Smith cuando el servidor rechaza una solicitud por cuota.
+- Vivir la intervención de **Smith cada tres turnos completos**: dos interacciones locales y regreso al personaje anterior, conservando su contexto.
+- Recuperar el progreso del ciclo al recargar; pausar la lluvia de Smith.
 
 Guardo historiales y borradores por personaje en localStorage; se recuperan al volver al mismo sitio. El indicador muestra si el navegador pudo guardarlos. Para cambiar, escribe **«Quiero hablar con Trinity»** o **`/hablar trinity`** y confirma. Acerca de presenta las tres voces con retratos vectoriales originales. [Explico las reglas de esta iteración](docs/iteracion-2.md).
 
@@ -40,7 +41,8 @@ Guardo historiales y borradores por personaje en localStorage; se recuperan al v
 3. Elige a **Morfeo, el Oráculo o Trinity**, escribe una pregunta y presiona **Enter** o pulsa **Enviar**. Usa **Shift+Enter** para agregar una línea.
 4. Espera la respuesta. Ante un fallo, revisa el mensaje de estado y reintenta con el borrador conservado.
 5. Puedes navegar o recargar y recuperar lo guardado en ese mismo navegador y sitio. Un envío interrumpido vuelve como borrador; no se reenvía automáticamente.
-6. Usa **Borrar esta conversación** o **Borrar todos los historiales** y confirma si quieres eliminarlos.
+6. Después de tres turnos completos, conversa dos veces con Smith. Su diálogo es local y no consume Gemini. La conexión vuelve automáticamente tras 12 segundos, o antes con **Recuperar conexión**.
+7. Usa **Borrar esta conversación** o **Borrar todos los historiales** y confirma si quieres eliminarlos. El borrado no reinicia el ciclo narrativo ni las cuotas.
 
 Envío las preguntas a Gemini a través de mi función de servidor. No escribas contraseñas ni claves en la conversación.
 
@@ -55,6 +57,8 @@ src/app.js             Vistas, routing, foco y transición
 src/matrix-scene.js    Rostro procedural, lluvia 3D, fallback y limpieza
 scripts/prepare-assets.js Copia local de módulos Three.js y licencia
 src/chat.js            Conversaciones separadas, peticiones HTTP y render del chat
+src/smith-story.js     Ciclo 3+2, respuestas locales y persistencia independiente
+src/smith-scene.js     Rostro de caracteres, lluvia y pausa de Smith
 src/chat-controls.js   Peticiones de cambio y reglas del teclado
 src/characters.js      Identificadores y metadatos públicos de personajes
 src/history-storage.js Validación, guardado, restauración y conflictos de localStorage
@@ -122,7 +126,7 @@ npm test
 npm run test:watch
 ```
 
-Incluí **220 pruebas en seis archivos** para validar caracteres, navegación, historiales separados, identidad, estados, errores, transporte, acceso, cuotas y contratos de Gemini. Uso mocks para que la suite no consuma Gemini ni Redis reales y restauro el entorno entre pruebas.
+Incluí **254 pruebas en ocho archivos** para validar caracteres, navegación, historiales separados, identidad, estados, errores, transporte, acceso, cuotas y contratos de Gemini. Uso mocks para que la suite no consuma Gemini ni Redis reales y restauro el entorno entre pruebas.
 
 [Personajes y contrato](docs/personajes.md) · [Detalle de las pruebas](docs/pruebas-unitarias.md) · [Comprobaciones y límites](docs/pruebas.md).
 

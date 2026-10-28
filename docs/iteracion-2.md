@@ -4,7 +4,7 @@
 
 La versión entregada queda identificada por el tag `m3-v1-entregado`, sobre el commit `7af140e6c5d204968a085140da6ca6e043d1f3ea`. La iteración se desarrolla en `feat/matrix-v2`. `main` continúa representando la versión publicada; la integración se realizará al completar la revisión de Preview.
 
-Este documento describe funcionalidades aprobadas. Su presencia aquí no significa que estén implementadas. Las etapas 1–5 están implementadas en la rama: preparación, Home, personajes, persistencia, cambio solicitado con confirmación, teclado y tarjetas de Acerca de. Smith 3+2 corresponde a la etapa 6.
+Este documento describe funcionalidades aprobadas. Su presencia aquí no significa que estén implementadas. Las etapas 1–6 están implementadas en la rama: preparación, Home, personajes, persistencia, cambio solicitado con confirmación, teclado, tarjetas de Acerca de y Smith 3+2 con progreso independiente. La siguiente etapa es la integración visual y de rendimiento.
 
 ## Decisiones aprobadas
 

@@ -1,8 +1,12 @@
 # Pruebas unitarias
 
-## Iteración 2: terminal
+## Iteración 2: Smith
 
-Resultado vigente: **220 casos en seis archivos**. `tests/chat-controls.test.js` añade 32 casos sobre solicitudes directas, falsas menciones, comandos inválidos, confirmación/cancelación, restauración, aislamiento del proveedor, concurrencia y reglas de teclado/composición. La prueba de IME usa eventos representados por objetos; no equivale a una sesión física con todos los teclados.
+Resultado vigente: **254 casos en ocho archivos**. Agregué 30 casos en smith-story.test.js sobre cadencia, aislamiento, fallos, comandos, recarga, borrado y almacenamiento; y cuatro en smith-scene.test.js sobre movimiento reducido, pausa, visibilidad, límites de resolución, fallback y limpieza. Actualicé el contrato de cuota: la respuesta 15 admitida se conserva y quota.blocked anuncia espera para la siguiente; ya no activa Smith.
+
+## Registro de terminal
+
+Resultado de esa etapa: **220 casos en seis archivos**. `tests/chat-controls.test.js` añade 32 casos sobre solicitudes directas, falsas menciones, comandos inválidos, confirmación/cancelación, restauración, aislamiento del proveedor, concurrencia y reglas de teclado/composición. La prueba de IME usa eventos representados por objetos; no equivale a una sesión física con todos los teclados.
 
 ## Registro de persistencia
 

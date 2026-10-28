@@ -21,7 +21,7 @@ No guardo una confirmación pendiente en localStorage. Recargar conserva el coma
 
 La composición IME tiene seguimiento de compositionstart/compositionend; además compruebo isComposing y keyCode 229. Un margen de 80 ms tras compositionend impide que el Enter que confirma un carácter también envíe el texto. Si una pulsación ocurre en ese margen, puedo volver a pulsar Enter o usar el botón. La lógica se prueba con eventos representados por objetos; no afirmo haber ensayado todos los teclados IME físicos. Referencias: [isComposing](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/isComposing), [compositionend](https://developer.mozilla.org/en-US/docs/Web/API/Element/compositionend_event).
 
-Una transferencia local puede solicitarse durante una espera por cuota; el siguiente mensaje a Gemini continúa bloqueado hasta que el servidor admita solicitudes. Cambiar de canal no reinicia el contador. La intervención narrativa de Smith se implementará en la siguiente etapa.
+Una transferencia local puede solicitarse durante una espera por cuota; el siguiente mensaje a Gemini continúa bloqueado hasta que el servidor admita solicitudes. Cambiar de canal no reinicia el contador. Smith interviene cada tres turnos normales completos durante dos interacciones locales. Durante su intervención no se procesan transferencias. [Reglas del ciclo](smith.md).
 
 ## Acerca de
 
